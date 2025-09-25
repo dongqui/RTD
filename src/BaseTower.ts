@@ -12,16 +12,13 @@ export abstract class BaseTower {
   protected cost: number;
   protected scene: Phaser.Scene;
   public sprite: Phaser.GameObjects.Sprite;
-  protected idleTexture: string;
-  protected shootTexture: string;
-  private isAttacking: boolean = false;
+  protected isAttacking: boolean = false;
 
   constructor(
     scene: Phaser.Scene,
     gridX: number,
     gridY: number,
-    idleTexture: string,
-    shootTexture: string,
+    texture: string,
     damage: number,
     range: number,
     attackSpeed: number,
@@ -45,14 +42,16 @@ export abstract class BaseTower {
     this.range = range;
     this.attackSpeed = attackSpeed;
     this.cost = cost;
-    this.idleTexture = idleTexture;
-    this.shootTexture = shootTexture;
 
     this.sprite = this.scene.add
-      .sprite(centerX, centerY, idleTexture)
-      .setDisplaySize(32 * width, 32 * height)
+      .sprite(centerX, centerY, texture)
+      .setDisplaySize(256 * width, 256 * height)
       .setInteractive({ draggable: true });
+
+    this.setupAnimations();
   }
+
+  protected abstract setupAnimations(): void;
   onDrag(
     callback: (
       pointer: Phaser.Input.Pointer | null,
@@ -87,19 +86,8 @@ export abstract class BaseTower {
     this.performAttack(target);
   }
 
-  private playAttackAnimation(): void {
-    if (this.isAttacking) return;
-
-    this.isAttacking = true;
-    this.sprite.setTexture(this.shootTexture);
-
-    this.scene.time.delayedCall(200, () => {
-      this.sprite.setTexture(this.idleTexture);
-      this.isAttacking = false;
-    });
-  }
-
-  abstract performAttack(target: Phaser.GameObjects.GameObject): void;
+  protected abstract playAttackAnimation(): void;
+  protected abstract performAttack(target: Phaser.GameObjects.GameObject): void;
 
   isInRange(targetX: number, targetY: number): boolean {
     const distance = Phaser.Math.Distance.Between(
