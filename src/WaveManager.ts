@@ -85,10 +85,14 @@ export class WaveManager {
 
   private setupSpawnPoints(): void {
     this.spawnPoints = [
-      { x: 5, y: 15 },
-      { x: 25, y: 15 },
-      { x: 15, y: 5 },
-      { x: 15, y: 25 },
+      { x: 2, y: 15 },   // 왼쪽
+      { x: 28, y: 15 },  // 오른쪽
+      { x: 15, y: 2 },   // 위쪽
+      { x: 15, y: 28 },  // 아래쪽
+      { x: 5, y: 5 },    // 왼쪽 위
+      { x: 25, y: 5 },   // 오른쪽 위
+      { x: 5, y: 25 },   // 왼쪽 아래
+      { x: 25, y: 25 },  // 오른쪽 아래
     ];
   }
 
@@ -133,8 +137,43 @@ export class WaveManager {
     this.currentWave = waveNumber;
     this.isWaveActive = true;
 
-    const waveConfig = this.waveConfigs[waveNumber - 1];
-    this.spawnWave(waveConfig);
+    this.spawnMonstersNearCore();
+  }
+
+  private spawnMonstersNearCore(): void {
+    const coreNearPositions = [
+      { x: 10, y: 15 }, // 코어 왼쪽 더 멀리
+      { x: 19, y: 15 }, // 코어 오른쪽 더 멀리
+      { x: 15, y: 10 }, // 코어 위쪽 더 멀리
+    ];
+
+    for (let i = 0; i < 3; i++) {
+      const spawnPos = coreNearPositions[i];
+      const spawnWorldPos = this.gridSystem.gridToWorld(spawnPos.x, spawnPos.y);
+
+      const monster = new BasicMonster(
+        this.scene,
+        spawnWorldPos.x,
+        spawnWorldPos.y
+      );
+
+      // 킹(코어)으로 가는 경로 설정
+      const path = this.pathfindingSystem.findPath(
+        spawnPos.x,
+        spawnPos.y,
+        this.corePosition.x + 1,
+        this.corePosition.y + 1
+      );
+
+      if (path) {
+        monster.setPath(path);
+        this.monsterManager.addMonster(monster);
+        this.scene.events.emit("monster-spawned", monster);
+      } else {
+        console.warn("No path found for monster near core, destroying");
+        monster.sprite.destroy();
+      }
+    }
   }
 
   private spawnWave(waveConfig: WaveConfig): void {
