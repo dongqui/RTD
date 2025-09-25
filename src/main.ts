@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
+import GameScene from "./scenes/GameScene";
 
 class Boot extends Phaser.Scene {
   constructor() {
@@ -18,18 +19,24 @@ class Boot extends Phaser.Scene {
 
 window.addEventListener("load", function () {
   const game = new Phaser.Game({
-    width: 1280,
-    height: 720,
+    type: Phaser.AUTO,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: "#0099db",
     parent: "game-container",
     scale: {
-      mode: Phaser.Scale.ScaleModes.FIT,
-      autoCenter: Phaser.Scale.Center.CENTER_BOTH,
+      mode: Phaser.Scale.ENVELOP,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: window.innerWidth,
+      height: window.innerHeight,
     },
-    physics: {
-      default: "arcade",
-    },
-    scene: [Boot, Preload, Level],
+
+    scene: [Boot, Preload, Level, GameScene],
+  });
+
+  // 화면 크기 변경 시 게임 크기 조정
+  window.addEventListener("resize", () => {
+    game.scale.resize(window.innerWidth, window.innerHeight);
   });
 
   game.scene.start("Boot");
