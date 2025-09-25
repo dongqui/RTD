@@ -98,8 +98,17 @@ export class TowerManager {
         tower.sprite.y,
         tower.range
       );
-      if (target && tower.isInRange(target.x, target.y)) {
-        tower.attack(target);
+      if (target) {
+        const distance = Phaser.Math.Distance.Between(
+          tower.sprite.x, tower.sprite.y,
+          target.sprite.x, target.sprite.y
+        );
+        console.log(`Tower at (${tower.sprite.x}, ${tower.sprite.y}), Target at (${target.sprite.x}, ${target.sprite.y}), Distance: ${distance}, Range: ${tower.range}`);
+
+        if (tower.isInRange(target.sprite.x, target.sprite.y)) {
+          console.log(`Attacking!`);
+          tower.attack(target);
+        }
       }
     });
   }

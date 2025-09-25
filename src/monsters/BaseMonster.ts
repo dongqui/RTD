@@ -46,18 +46,9 @@ export abstract class BaseMonster {
     this.isMoving = false;
 
     // Sprite 생성 및 설정
-    this.sprite = this.scene.add.sprite(x, y, config.textureKey);
-
-    if (config.scale) {
-      this.sprite.setScale(config.scale);
-    }
-
-    this.sprite.setDepth(5);
-
-    // Physics 활성화 확인 후 적용
-    if (scene.physics && scene.physics.world) {
-      scene.physics.add.existing(this.sprite);
-    }
+    this.sprite = this.scene.add
+      .sprite(x, y, config.textureKey)
+      .setDisplaySize(256, 256);
   }
 
   setPath(path: Array<{ x: number; y: number }>): void {
@@ -75,7 +66,11 @@ export abstract class BaseMonster {
     }
 
     const nextGridPos = this.currentPath[this.currentPathIndex];
-    const worldPos = GridSystem.gridToWorldStatic(nextGridPos.x, nextGridPos.y, 80);
+    const worldPos = GridSystem.gridToWorldStatic(
+      nextGridPos.x,
+      nextGridPos.y,
+      80
+    );
 
     this.targetPosition = worldPos;
     this.isMoving = true;

@@ -14,14 +14,13 @@ export class Arrow extends Phaser.GameObjects.Sprite {
     this.damage = damage;
     this.speed = 300;
 
-    this.targetX = target.x;
-    this.targetY = target.y;
+    this.targetX = target.sprite.x;
+    this.targetY = target.sprite.y;
 
     const angle = Phaser.Math.Angle.Between(x, y, this.targetX, this.targetY);
     this.setRotation(angle);
 
     scene.add.existing(this);
-    scene.physics.add.existing(this);
 
     this.setDepth(10);
 
@@ -45,19 +44,19 @@ export class Arrow extends Phaser.GameObjects.Sprite {
   }
 
   private hitTarget(): void {
-    if (this.target && !this.target.destroyed) {
+    if (this.target && !this.target.sprite.destroyed) {
       this.target.takeDamage(this.damage);
     }
     this.destroy();
   }
 
   update(): void {
-    if (!this.target || this.target.destroyed) {
+    if (!this.target || this.target.sprite.destroyed) {
       this.destroy();
       return;
     }
 
-    const currentDistance = Phaser.Math.Distance.Between(this.x, this.y, this.target.x, this.target.y);
+    const currentDistance = Phaser.Math.Distance.Between(this.x, this.y, this.target.sprite.x, this.target.sprite.y);
     if (currentDistance < 8) {
       this.hitTarget();
     }

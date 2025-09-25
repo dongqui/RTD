@@ -13,8 +13,8 @@ export class ArrowTower extends BaseTower {
       gridY,
       "archer_idle", // 초기 텍스처
       25, // damage
-      150, // range
-      1000, // attackSpeed (ms)
+      300, // range - 사거리 늘림
+      500, // attackSpeed (ms) - 더 빠르게
       50, // cost
       1, // width
       1 // height

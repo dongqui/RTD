@@ -84,7 +84,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.cameraManager.centerOn(castleWorldPos.x, castleWorldPos.y);
 
-    this.gridSystem.setAreaOccupied(castleGridX, castleGridY, 1, 1, true);
+    // King 위치는 몬스터가 도달할 수 있도록 occupied로 설정하지 않음
   }
 
   private setupGrid() {
