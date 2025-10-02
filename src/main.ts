@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
+import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 
 class Boot extends Phaser.Scene {
   constructor() {
@@ -24,6 +25,15 @@ window.addEventListener("load", function () {
     height: window.innerHeight,
     backgroundColor: "#0099db",
     parent: "game-container",
+    plugins: {
+      scene: [
+        {
+          key: "spine.SpinePlugin",
+          plugin: SpinePlugin,
+          mapping: "spine",
+        },
+      ],
+    },
     scale: {
       mode: Phaser.Scale.ENVELOP,
       autoCenter: Phaser.Scale.CENTER_BOTH,

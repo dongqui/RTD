@@ -7,11 +7,6 @@
         "url": "assets/Castle.png"
       },
       {
-        "type": "image",
-        "key": "tower",
-        "url": "assets/tower.png"
-      },
-      {
         "type": "spritesheet",
         "key": "archer_idle",
         "url": "assets/Archer_Idle.png",
@@ -39,6 +34,13 @@
         "key": "warrior_run",
         "url": "assets/Warrior_Run.png",
         "frameConfig": { "frameWidth": 192, "frameHeight": 192, "endFrame": 5 }
+      },
+      {
+        "type": "spine",
+        "key": "fantasy_character",
+        "textureURL": "assets/spine/Fantasy Character.png",
+        "atlasURL": "assets/spine/Fantasy Character.atlas.txt",
+        "jsonURL": "assets/spine/Fantasy Character.json"
       }
     ]
   },

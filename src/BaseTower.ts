@@ -45,7 +45,7 @@ export abstract class BaseTower {
 
     this.sprite = this.scene.add
       .sprite(centerX, centerY, texture)
-      .setDisplaySize(256 * width, 256 * height)
+      // .setDisplaySize(256 * width, 256 * height)
       .setInteractive({ draggable: true });
 
     this.setupAnimations();
