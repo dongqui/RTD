@@ -24,6 +24,7 @@
         "vite": "^5.1.4"
     },
     "dependencies": {
+        "@esotericsoftware/spine-core": "^4.2.93",
         "@esotericsoftware/spine-phaser-v3": "^4.2.93",
         "phaser": "3.80.1"
     }

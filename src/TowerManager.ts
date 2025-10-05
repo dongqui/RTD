@@ -5,6 +5,7 @@ import { CannonTower } from "./towers/CannonTower";
 import { FrostTower } from "./towers/FrostTower";
 import GameManager from "./GameManager";
 import { MonsterManager } from "./MonsterManager";
+import { TowerMergeUI } from "./TowerMergeUI";
 
 export type TowerType = "arrow" | "cannon" | "frost";
 
@@ -16,6 +17,9 @@ export class TowerManager {
   private monsterManager: MonsterManager;
   private placementMode: boolean = false;
   private placementTowerType: TowerType | null = null;
+  private mergeUI: TowerMergeUI;
+  private draggedTower: BaseTower | null = null;
+  private targetTower: BaseTower | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -27,6 +31,7 @@ export class TowerManager {
     this.gridSystem = gridSystem;
     this.gameManager = gameManager;
     this.monsterManager = monsterManager;
+    this.mergeUI = new TowerMergeUI(scene);
 
     this.setupPlacementModeEvents();
   }
@@ -155,6 +160,7 @@ export class TowerManager {
       }
 
       isDragging = true;
+      this.draggedTower = tower;
 
       // 카메라 드래그 차단
       const cameraManager = this.gameManager.getCameraManager();
@@ -233,6 +239,13 @@ export class TowerManager {
         // 포인터 위치가 유효한지 확인
         const targetTower = this.getTowerAt(pointerGridPos.x, pointerGridPos.y);
 
+        // 타워 합치기 체크
+        if (targetTower && targetTower !== tower && tower.canMergeWith(targetTower)) {
+          this.targetTower = targetTower;
+          this.showMergeConfirmation(tower, targetTower);
+          return;
+        }
+
         if (
           this.gridSystem.isValidArea(
             pointerGridPos.x,
@@ -284,6 +297,8 @@ export class TowerManager {
           );
         }
       }
+
+      this.draggedTower = null;
     });
   }
 
@@ -447,5 +462,105 @@ export class TowerManager {
 
     return (gridX >= kingGridX && gridX < kingGridX + kingWidth &&
             gridY >= kingGridY && gridY < kingGridY + kingHeight);
+  }
+
+  private showMergeConfirmation(tower1: BaseTower, tower2: BaseTower): void {
+    this.mergeUI.show(
+      tower1.towerType,
+      tower1.level,
+      tower1.level + 1,
+      () => this.mergeTowers(tower1, tower2),
+      () => this.cancelMerge(tower1)
+    );
+  }
+
+  private mergeTowers(tower1: BaseTower, tower2: BaseTower): void {
+    const mergeGridX = tower2.gridX;
+    const mergeGridY = tower2.gridY;
+    const towerType = tower2.towerType;
+    const newLevel = tower2.level + 1;
+
+    this.removeTower(tower1.gridX, tower1.gridY);
+    tower1.sprite.destroy();
+
+    this.removeTower(tower2.gridX, tower2.gridY);
+    tower2.sprite.destroy();
+
+    const newTower = this.createTowerWithLevel(
+      mergeGridX,
+      mergeGridY,
+      towerType,
+      newLevel
+    );
+
+    if (newTower) {
+      this.setupTowerDragHandlers(newTower);
+      this.towers.push(newTower);
+      this.gridSystem.setAreaOccupied(
+        newTower.gridX,
+        newTower.gridY,
+        newTower.width,
+        newTower.height,
+        true
+      );
+
+      this.playMergeEffect(mergeGridX, mergeGridY);
+    }
+
+    this.draggedTower = null;
+    this.targetTower = null;
+  }
+
+  private cancelMerge(tower: BaseTower): void {
+    const originalWorldPos = this.gridSystem.gridToWorld(tower.gridX, tower.gridY);
+    tower.sprite.setPosition(originalWorldPos.x, originalWorldPos.y);
+    this.gridSystem.setAreaOccupied(
+      tower.gridX,
+      tower.gridY,
+      tower.width,
+      tower.height,
+      true
+    );
+
+    this.draggedTower = null;
+    this.targetTower = null;
+  }
+
+  private createTowerWithLevel(
+    gridX: number,
+    gridY: number,
+    towerType: TowerType,
+    level: number
+  ): BaseTower | null {
+    switch (towerType) {
+      case "arrow":
+        return new ArrowTower(this.scene, gridX, gridY, level);
+      case "cannon":
+        return new CannonTower(this.scene, gridX, gridY, level);
+      case "frost":
+        return new FrostTower(this.scene, gridX, gridY, level);
+      default:
+        return null;
+    }
+  }
+
+  private playMergeEffect(gridX: number, gridY: number): void {
+    const worldPos = this.gridSystem.gridToWorld(gridX, gridY);
+
+    const mergeEffect = this.scene.add.image(worldPos.x, worldPos.y, 'fire');
+    mergeEffect.setScale(3);
+    mergeEffect.setDepth(1000);
+    mergeEffect.setTint(0xffd700);
+
+    this.scene.tweens.add({
+      targets: mergeEffect,
+      scale: { from: 1, to: 4 },
+      alpha: { from: 1, to: 0 },
+      duration: 1000,
+      ease: 'Power2.easeOut',
+      onComplete: () => {
+        mergeEffect.destroy();
+      }
+    });
   }
 }

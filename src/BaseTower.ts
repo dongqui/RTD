@@ -1,4 +1,6 @@
 import { GridSystem } from "./GridSystem";
+import { TowerType } from "./TowerManager";
+import { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 
 export abstract class BaseTower {
   public gridX: number;
@@ -8,21 +10,27 @@ export abstract class BaseTower {
   public damage: number;
   public range: number;
   public attackSpeed: number;
+  public level: number;
+  public towerType: TowerType;
   private lastAttackTime: number = 0;
   protected cost: number;
   protected scene: Phaser.Scene;
-  public sprite: Phaser.GameObjects.Sprite;
+  public spineObject: SpineGameObject;
   protected isAttacking: boolean = false;
+  protected baseDamage: number;
+  protected baseRange: number;
+  protected baseAttackSpeed: number;
 
   constructor(
     scene: Phaser.Scene,
     gridX: number,
     gridY: number,
-    texture: string,
+    towerType: TowerType,
     damage: number,
     range: number,
     attackSpeed: number,
     cost: number,
+    level: number = 1,
     width: number = 1,
     height: number = 1
   ) {
@@ -38,15 +46,25 @@ export abstract class BaseTower {
     this.gridY = gridY;
     this.width = width;
     this.height = height;
+    this.towerType = towerType;
+    this.level = level;
+    this.baseDamage = damage;
+    this.baseRange = range;
+    this.baseAttackSpeed = attackSpeed;
     this.damage = damage;
     this.range = range;
     this.attackSpeed = attackSpeed;
     this.cost = cost;
 
-    this.sprite = this.scene.add
-      .sprite(centerX, centerY, texture)
-      // .setDisplaySize(256 * width, 256 * height)
-      .setInteractive({ draggable: true });
+    this.applyLevelStats();
+
+    this.spineObject = this.scene.add.spine(
+      centerX,
+      centerY,
+      "fantasy_character",
+      "fantasy_character-atlas"
+    );
+    this.spineObject.setInteractive({ draggable: true });
 
     this.setupAnimations();
   }
@@ -59,7 +77,7 @@ export abstract class BaseTower {
       dragY: number
     ) => void
   ) {
-    this.sprite.on(
+    this.spineObject.on(
       "drag",
       (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         callback(pointer, dragX, dragY);
@@ -68,7 +86,7 @@ export abstract class BaseTower {
   }
 
   onDragEnd(callback: (pointer: Phaser.Input.Pointer | null) => void) {
-    this.sprite.on("dragend", (pointer: Phaser.Input.Pointer) => {
+    this.spineObject.on("dragend", (pointer: Phaser.Input.Pointer) => {
       callback(pointer);
     });
   }
@@ -91,8 +109,8 @@ export abstract class BaseTower {
 
   isInRange(targetX: number, targetY: number): boolean {
     const distance = Phaser.Math.Distance.Between(
-      this.sprite.x,
-      this.sprite.y,
+      this.spineObject.x,
+      this.spineObject.y,
       targetX,
       targetY
     );
@@ -102,4 +120,33 @@ export abstract class BaseTower {
   getCost(): number {
     return this.cost;
   }
+
+  canMergeWith(other: BaseTower): boolean {
+    return (
+      this.towerType === other.towerType &&
+      this.level === other.level &&
+      this.level < 4
+    );
+  }
+
+  levelUp(): void {
+    if (this.level >= 4) {
+      return;
+    }
+    this.level++;
+    this.applyLevelStats();
+    this.updateVisualForLevel();
+  }
+
+  private applyLevelStats(): void {
+    const levelMultiplier = 1 + (this.level - 1) * 0.5;
+    this.damage = Math.floor(this.baseDamage * levelMultiplier);
+    this.range = Math.floor(this.baseRange * (1 + (this.level - 1) * 0.2));
+    this.attackSpeed = Math.max(
+      100,
+      Math.floor(this.baseAttackSpeed * (1 - (this.level - 1) * 0.1))
+    );
+  }
+
+  protected abstract updateVisualForLevel(): void;
 }

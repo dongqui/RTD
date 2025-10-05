@@ -1,87 +1,91 @@
 import { BaseTower } from "../BaseTower";
 import { Arrow } from "../Arrow";
 import { BaseMonster } from "../monsters/BaseMonster";
+import { Skin } from "@esotericsoftware/spine-core";
 
 export class ArrowTower extends BaseTower {
   private static readonly IDLE_ANIM_KEY = "archer_idle";
   private static readonly ATTACK_ANIM_KEY = "archer_attack";
 
-  constructor(scene: Phaser.Scene, gridX: number, gridY: number) {
+  constructor(scene: Phaser.Scene, gridX: number, gridY: number, level: number = 1) {
     super(
       scene,
       gridX,
       gridY,
-      "archer_idle", // 초기 텍스처
+      "arrow", // towerType
       25, // damage
       300, // range - 사거리 늘림
       500, // attackSpeed (ms) - 더 빠르게
       50, // cost
+      level, // level
       1, // width
       1 // height
     );
 
     this.setupAnimations();
+    this.updateVisualForLevel();
   }
 
   protected setupAnimations(): void {
-    // Idle 애니메이션 (한 번만 생성)
-    if (!this.scene.anims.exists(ArrowTower.IDLE_ANIM_KEY)) {
-      this.scene.anims.create({
-        key: ArrowTower.IDLE_ANIM_KEY,
-        frames: this.scene.anims.generateFrameNumbers("archer_idle", {
-          start: 0,
-          end: 5,
-        }),
-        frameRate: 1,
-        repeat: -1,
-      });
-    }
+    console.log(this.spineObject.skeleton.data.animations.map((anim: any) => anim.name));
 
-    // Attack 애니메이션 (한 번만 생성)
-    if (!this.scene.anims.exists(ArrowTower.ATTACK_ANIM_KEY)) {
-      this.scene.anims.create({
-        key: ArrowTower.ATTACK_ANIM_KEY,
-        frames: [{ key: "archer_attack", frame: 8 }],
-        frameRate: 5,
-        repeat: 0,
-      });
+    const skin = new Skin("arrow_tower");
+    const fullskin = this.spineObject.skeleton.data.findSkin("full_skins_f");
+    if (fullskin) {
+      skin.addSkin(fullskin);
     }
+    const boots = this.spineObject.skeleton.data.findSkin("boots/boots_f_19");
+    if (boots) {
+      skin.addSkin(boots);
+    }
+    const left = this.spineObject.skeleton.data.findSkin("gear_left/gear_left_f_2");
+    if (left) {
+      skin.addSkin(left);
+    }
+    const right = this.spineObject.skeleton.data.findSkin("gear_right/gear_right_f_2");
+    if (right) {
+      skin.addSkin(right);
+    }
+    this.spineObject.skeleton.setSkin(skin);
 
-    // 초기 idle 애니메이션 재생
-    console.log(this.scene.anims.exists(ArrowTower.IDLE_ANIM_KEY), this.sprite);
-    if (this.scene.anims.exists(ArrowTower.IDLE_ANIM_KEY)) {
-      this.sprite.play(ArrowTower.IDLE_ANIM_KEY);
+    const animations = this.spineObject.skeleton.data.animations;
+    if (animations.length > 0) {
+      const randomIndex = Phaser.Math.Between(0, animations.length - 1);
+      const animationToPlay = animations[randomIndex].name;
+      this.spineObject.animationState.setAnimation(0, animationToPlay, true);
     }
   }
 
   protected playAttackAnimation(): void {
     if (this.isAttacking) return;
-
     this.isAttacking = true;
 
-    // Attack 애니메이션 재생
-    if (this.scene.anims.exists(ArrowTower.ATTACK_ANIM_KEY)) {
-      this.sprite.play(ArrowTower.ATTACK_ANIM_KEY);
-
-      // 애니메이션 완료 후 idle로 복귀
-      this.sprite.once("animationcomplete", () => {
-        if (this.scene.anims.exists(ArrowTower.IDLE_ANIM_KEY)) {
-          this.sprite.play(ArrowTower.IDLE_ANIM_KEY);
-        }
+    const listener = {
+      complete: () => {
         this.isAttacking = false;
-      });
-    } else {
-      // 애니메이션이 없으면 바로 공격 완료 처리
-      this.isAttacking = false;
-    }
+      }
+    };
+
+    this.spineObject.animationState.addListener(listener);
+    this.scene.time.delayedCall(500, () => {
+      this.spineObject.animationState.removeListener(listener);
+    });
   }
 
   protected performAttack(target: Phaser.GameObjects.GameObject): void {
     if (target instanceof BaseMonster) {
-      new Arrow(this.scene, this.sprite.x, this.sprite.y, target, this.damage);
+      new Arrow(this.scene, this.spineObject.x, this.spineObject.y, target, this.damage);
       console.log(
-        `Arrow Tower at (${this.gridX}, ${this.gridY}) fires arrow at target`
+        `Arrow Tower Lv.${this.level} at (${this.gridX}, ${this.gridY}) fires arrow at target`
       );
     }
+  }
+
+  protected updateVisualForLevel(): void {
+    const scaleMultiplier = 1 + (this.level - 1) * 0.15;
+    this.spineObject.setScale(scaleMultiplier);
+
+    const alphaValues = [1.0, 0.9, 0.8, 0.7];
+    this.spineObject.setAlpha(alphaValues[this.level - 1] || 1.0);
   }
 }

@@ -1,73 +1,73 @@
 import { BaseTower } from "../BaseTower";
 import { BaseMonster } from "../monsters/BaseMonster";
+import { Skin } from "@esotericsoftware/spine-core";
 
 export class CannonTower extends BaseTower {
   private static readonly IDLE_ANIM_KEY = "cannon_idle";
   private static readonly ATTACK_ANIM_KEY = "cannon_attack";
 
-  constructor(scene: Phaser.Scene, gridX: number, gridY: number) {
+  constructor(scene: Phaser.Scene, gridX: number, gridY: number, level: number = 1) {
     super(
       scene,
       gridX,
       gridY,
-      "archer_idle", // 임시로 archer 사용
+      "cannon", // towerType
       80, // damage
       120, // range
       2000, // attackSpeed (ms)
       150, // cost
+      level, // level
       1, // width
       1 // height
     );
 
-    this.sprite.setTint(0x8b4513); // 갈색 틴트로 구분
+    this.updateVisualForLevel();
   }
 
   protected setupAnimations(): void {
-    // Idle 애니메이션
-    if (!this.scene.anims.exists(CannonTower.IDLE_ANIM_KEY)) {
-      this.scene.anims.create({
-        key: CannonTower.IDLE_ANIM_KEY,
-        frames: [{ key: "archer_idle" }],
-        frameRate: 1,
-        repeat: -1,
-      });
+    const skin = new Skin("cannon_tower");
+    const fullskin = this.spineObject.skeleton.data.findSkin("full_skins_f");
+    if (fullskin) {
+      skin.addSkin(fullskin);
     }
-
-    // Attack 애니메이션 (더 느린 공격 속도)
-    if (!this.scene.anims.exists(CannonTower.ATTACK_ANIM_KEY)) {
-      this.scene.anims.create({
-        key: CannonTower.ATTACK_ANIM_KEY,
-        frames: [{ key: "archer_attack" }],
-        frameRate: 3, // 더 느린 애니메이션
-        repeat: 0,
-      });
+    const boots = this.spineObject.skeleton.data.findSkin("boots/boots_f_1");
+    if (boots) {
+      skin.addSkin(boots);
     }
+    const left = this.spineObject.skeleton.data.findSkin("gear_left/gear_left_f_1");
+    if (left) {
+      skin.addSkin(left);
+    }
+    const right = this.spineObject.skeleton.data.findSkin("gear_right/gear_right_f_1");
+    if (right) {
+      skin.addSkin(right);
+    }
+    this.spineObject.skeleton.setSkin(skin);
 
-    if (this.scene.anims.exists(CannonTower.IDLE_ANIM_KEY)) {
-      this.sprite.play(CannonTower.IDLE_ANIM_KEY);
+    const animations = this.spineObject.skeleton.data.animations;
+    if (animations.length > 0) {
+      const randomIndex = Phaser.Math.Between(0, animations.length - 1);
+      const animationToPlay = animations[randomIndex].name;
+      this.spineObject.animationState.setAnimation(0, animationToPlay, true);
     }
   }
 
   protected playAttackAnimation(): void {
     if (this.isAttacking) return;
-
     this.isAttacking = true;
 
-    // 캐논 발사 효과 (화면 흔들림)
     this.scene.cameras.main.shake(100, 0.01);
 
-    if (this.scene.anims.exists(CannonTower.ATTACK_ANIM_KEY)) {
-      this.sprite.play(CannonTower.ATTACK_ANIM_KEY);
-
-      this.sprite.once("animationcomplete", () => {
-        if (this.scene.anims.exists(CannonTower.IDLE_ANIM_KEY)) {
-          this.sprite.play(CannonTower.IDLE_ANIM_KEY);
-        }
+    const listener = {
+      complete: () => {
         this.isAttacking = false;
-      });
-    } else {
-      this.isAttacking = false;
-    }
+      }
+    };
+
+    this.spineObject.animationState.addListener(listener);
+    this.scene.time.delayedCall(500, () => {
+      this.spineObject.animationState.removeListener(listener);
+    });
   }
 
   protected performAttack(target: Phaser.GameObjects.GameObject): void {
@@ -75,26 +75,18 @@ export class CannonTower extends BaseTower {
       // 즉시 데미지 (포탄 발사체 없음)
       target.takeDamage(this.damage);
 
-      // 폭발 효과 (간단한 시각적 피드백)
-      const explosion = this.scene.add.circle(
-        target.x,
-        target.y,
-        20,
-        0xff6600,
-        0.7
-      );
-      this.scene.tweens.add({
-        targets: explosion,
-        scaleX: 2,
-        scaleY: 2,
-        alpha: 0,
-        duration: 300,
-        onComplete: () => explosion.destroy(),
-      });
-
+   
       console.log(
-        `Cannon Tower at (${this.gridX}, ${this.gridY}) attacks target for ${this.damage} damage`
+        `Cannon Tower Lv.${this.level} at (${this.gridX}, ${this.gridY}) attacks target for ${this.damage} damage`
       );
     }
+  }
+
+  protected updateVisualForLevel(): void {
+    const scaleMultiplier = 1 + (this.level - 1) * 0.15;
+    this.spineObject.setScale(scaleMultiplier);
+
+    const alphaValues = [1.0, 0.9, 0.8, 0.7];
+    this.spineObject.setAlpha(alphaValues[this.level - 1] || 1.0);
   }
 }
