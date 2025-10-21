@@ -96,7 +96,7 @@ export abstract class BaseTower {
     return currentTime - this.lastAttackTime >= this.attackSpeed;
   }
 
-  attack(target: Phaser.GameObjects.GameObject): void {
+  attack(target: any): void {
     if (!this.canAttack() || this.isAttacking) return;
 
     this.lastAttackTime = this.scene.time.now;
@@ -105,7 +105,7 @@ export abstract class BaseTower {
   }
 
   protected abstract playAttackAnimation(): void;
-  protected abstract performAttack(target: Phaser.GameObjects.GameObject): void;
+  protected abstract performAttack(target: any): void;
 
   isInRange(targetX: number, targetY: number): boolean {
     const distance = Phaser.Math.Distance.Between(

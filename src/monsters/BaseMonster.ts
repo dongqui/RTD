@@ -1,4 +1,5 @@
 import { GridSystem } from "../GridSystem";
+import { BaseTower } from "../BaseTower";
 
 export interface MonsterConfig {
   health: number;
@@ -6,6 +7,9 @@ export interface MonsterConfig {
   reward: number;
   textureKey: string;
   scale?: number;
+  attackRange?: number;
+  attackDamage?: number;
+  attackSpeed?: number;
 }
 
 export enum MonsterState {
@@ -28,6 +32,12 @@ export abstract class BaseMonster {
   protected targetPosition: { x: number; y: number };
   protected isMoving: boolean;
 
+  protected attackRange: number;
+  protected attackDamage: number;
+  protected attackSpeed: number;
+  private lastAttackTime: number = 0;
+  private attackTarget: BaseTower | null = null;
+
   constructor(
     scene: Phaser.Scene,
     x: number,
@@ -44,6 +54,10 @@ export abstract class BaseMonster {
     this.currentPath = [];
     this.currentPathIndex = 0;
     this.isMoving = false;
+
+    this.attackRange = config.attackRange || 100;
+    this.attackDamage = config.attackDamage || 10;
+    this.attackSpeed = config.attackSpeed || 1000;
 
     // Sprite 생성 및 설정
     this.sprite = this.scene.add
@@ -80,8 +94,56 @@ export abstract class BaseMonster {
   update(_time: number, delta: number): void {
     if (this.state === MonsterState.DEAD) return;
 
-    if (this.isMoving && this.targetPosition) {
-      this.moveTowardsTarget(delta);
+    const nearbyTower = this.findNearbyTower();
+
+    if (nearbyTower) {
+      this.state = MonsterState.ATTACKING;
+      this.attackTarget = nearbyTower;
+      this.attackTower(nearbyTower);
+    } else {
+      if (this.state === MonsterState.ATTACKING) {
+        this.state = MonsterState.MOVING;
+        this.attackTarget = null;
+      }
+
+      if (this.isMoving && this.targetPosition) {
+        this.moveTowardsTarget(delta);
+      }
+    }
+  }
+
+  private findNearbyTower(): BaseTower | null {
+    const towers = this.scene.data.get('towers') as BaseTower[] || [];
+
+    for (const tower of towers) {
+      const distance = Phaser.Math.Distance.Between(
+        this.sprite.x,
+        this.sprite.y,
+        tower.spineObject.x,
+        tower.spineObject.y
+      );
+
+      if (distance <= this.attackRange) {
+        return tower;
+      }
+    }
+
+    return null;
+  }
+
+  private attackTower(tower: BaseTower): void {
+    const currentTime = this.scene.time.now;
+
+    if (currentTime - this.lastAttackTime >= this.attackSpeed) {
+      this.lastAttackTime = currentTime;
+      this.scene.events.emit('monster-attack-tower', tower, this.attackDamage);
+
+      this.sprite.setTint(0xff8800);
+      this.scene.time.delayedCall(100, () => {
+        if (this.state !== MonsterState.DEAD) {
+          this.sprite.clearTint();
+        }
+      });
     }
   }
 
@@ -103,18 +165,23 @@ export abstract class BaseMonster {
   }
 
   takeDamage(damage: number): void {
-    if (this.state === MonsterState.DEAD) return;
+    if (this.state === MonsterState.DEAD) {
+      console.log("Monster is already dead, ignoring damage");
+      return;
+    }
 
     this.currentHealth -= damage;
+    console.log(`Monster took ${damage} damage. HP: ${this.currentHealth}/${this.maxHealth}`);
 
     this.sprite.setTint(0xff0000);
     this.scene.time.delayedCall(100, () => {
-      if (this.state !== MonsterState.DEAD) {
+      if (this.state !== MonsterState.DEAD && this.sprite && !this.sprite.destroyed) {
         this.sprite.clearTint();
       }
     });
 
     if (this.currentHealth <= 0) {
+      console.log("Monster died!");
       this.die();
     }
   }

@@ -33,7 +33,29 @@ export class TowerManager {
     this.monsterManager = monsterManager;
     this.mergeUI = new TowerMergeUI(scene);
 
+    this.scene.data.set('towers', this.towers);
+
     this.setupPlacementModeEvents();
+    this.setupTowerAttackEvents();
+  }
+
+  private setupTowerAttackEvents(): void {
+    this.scene.events.on('monster-attack-tower', (tower: BaseTower, damage: number) => {
+      this.handleTowerDamage(tower, damage);
+    });
+  }
+
+  private handleTowerDamage(tower: BaseTower, damage: number): void {
+    const towerIndex = this.towers.indexOf(tower);
+    if (towerIndex === -1) return;
+
+    console.log(`Tower at (${tower.gridX}, ${tower.gridY}) takes ${damage} damage`);
+
+    const originalAlpha = tower.spineObject.alpha;
+    tower.spineObject.setAlpha(0.5);
+    this.scene.time.delayedCall(100, () => {
+      tower.spineObject.setAlpha(originalAlpha);
+    });
   }
 
   placeTower(gridX: number, gridY: number, towerType: TowerType): boolean {
@@ -73,6 +95,7 @@ export class TowerManager {
 
     this.setupTowerDragHandlers(tower);
     this.towers.push(tower);
+    this.scene.data.set('towers', this.towers);
 
     // 타워가 점유하는 영역을 그리드에 설정
     this.gridSystem.setAreaOccupied(
@@ -95,6 +118,7 @@ export class TowerManager {
     const towerIndex = this.towers.indexOf(tower);
 
     this.towers.splice(towerIndex, 1);
+    this.scene.data.set('towers', this.towers);
     this.gridSystem.setAreaOccupied(
       tower.gridX,
       tower.gridY,
@@ -125,16 +149,16 @@ export class TowerManager {
   update(): void {
     this.towers.forEach((tower) => {
       const target = this.monsterManager.findNearestMonster(
-        tower.sprite.x,
-        tower.sprite.y,
+        tower.spineObject.x,
+        tower.spineObject.y,
         tower.range
       );
       if (target) {
         const distance = Phaser.Math.Distance.Between(
-          tower.sprite.x, tower.sprite.y,
+          tower.spineObject.x, tower.spineObject.y,
           target.sprite.x, target.sprite.y
         );
-        console.log(`Tower at (${tower.sprite.x}, ${tower.sprite.y}), Target at (${target.sprite.x}, ${target.sprite.y}), Distance: ${distance}, Range: ${tower.range}`);
+        console.log(`Tower at (${tower.spineObject.x}, ${tower.spineObject.y}), Target at (${target.sprite.x}, ${target.sprite.y}), Distance: ${distance}, Range: ${tower.range}`);
 
         if (tower.isInRange(target.sprite.x, target.sprite.y)) {
           console.log(`Attacking!`);
@@ -149,13 +173,13 @@ export class TowerManager {
 
     // 타워는 항상 드래그 가능 상태로 생성됨 (dragstart에서 상태 체크)
 
-    tower.sprite.on("dragstart", (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
+    tower.spineObject.on("dragstart", (pointer: Phaser.Input.Pointer, gameObject: Phaser.GameObjects.GameObject) => {
       // 타워 배치 가능한 상태인지 확인
       if (!this.gameManager.canPlaceTower()) {
         console.log("Tower dragging not allowed in current game state");
         // 드래그를 즉시 중단
-        tower.sprite.input!.enabled = false;
-        tower.sprite.input!.enabled = true;
+        tower.spineObject.input!.enabled = false;
+        tower.spineObject.input!.enabled = true;
         return;
       }
 
@@ -216,7 +240,7 @@ export class TowerManager {
         );
       }
 
-      tower.sprite.setPosition(dragX, dragY);
+      tower.spineObject.setPosition(dragX, dragY);
     });
 
     tower.onDragEnd((pointer) => {
@@ -267,7 +291,7 @@ export class TowerManager {
             pointerGridPos.x,
             pointerGridPos.y
           );
-          tower.sprite.setPosition(worldPos.x, worldPos.y);
+          tower.spineObject.setPosition(worldPos.x, worldPos.y);
           tower.gridX = pointerGridPos.x;
           tower.gridY = pointerGridPos.y;
 
@@ -285,7 +309,7 @@ export class TowerManager {
             tower.gridX,
             tower.gridY
           );
-          tower.sprite.setPosition(originalWorldPos.x, originalWorldPos.y);
+          tower.spineObject.setPosition(originalWorldPos.x, originalWorldPos.y);
 
           // 원래 위치를 다시 점유 상태로 설정
           this.gridSystem.setAreaOccupied(
@@ -481,10 +505,10 @@ export class TowerManager {
     const newLevel = tower2.level + 1;
 
     this.removeTower(tower1.gridX, tower1.gridY);
-    tower1.sprite.destroy();
+    tower1.spineObject.destroy();
 
     this.removeTower(tower2.gridX, tower2.gridY);
-    tower2.sprite.destroy();
+    tower2.spineObject.destroy();
 
     const newTower = this.createTowerWithLevel(
       mergeGridX,
@@ -496,6 +520,7 @@ export class TowerManager {
     if (newTower) {
       this.setupTowerDragHandlers(newTower);
       this.towers.push(newTower);
+      this.scene.data.set('towers', this.towers);
       this.gridSystem.setAreaOccupied(
         newTower.gridX,
         newTower.gridY,
@@ -513,7 +538,7 @@ export class TowerManager {
 
   private cancelMerge(tower: BaseTower): void {
     const originalWorldPos = this.gridSystem.gridToWorld(tower.gridX, tower.gridY);
-    tower.sprite.setPosition(originalWorldPos.x, originalWorldPos.y);
+    tower.spineObject.setPosition(originalWorldPos.x, originalWorldPos.y);
     this.gridSystem.setAreaOccupied(
       tower.gridX,
       tower.gridY,

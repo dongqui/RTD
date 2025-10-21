@@ -44,14 +44,17 @@ export class Arrow extends Phaser.GameObjects.Sprite {
   }
 
   private hitTarget(): void {
-    if (this.target && !this.target.sprite.destroyed) {
+    if (this.target && this.target.sprite && !this.target.sprite.destroyed) {
+      console.log(`Arrow hitting target, dealing ${this.damage} damage`);
       this.target.takeDamage(this.damage);
     }
     this.destroy();
   }
 
-  update(): void {
-    if (!this.target || this.target.sprite.destroyed) {
+  preUpdate(time: number, delta: number): void {
+    super.preUpdate(time, delta);
+
+    if (!this.target || !this.target.sprite || this.target.sprite.destroyed) {
       this.destroy();
       return;
     }

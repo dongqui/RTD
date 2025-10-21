@@ -4,8 +4,9 @@ import { BaseMonster } from "../monsters/BaseMonster";
 import { Skin } from "@esotericsoftware/spine-core";
 
 export class ArrowTower extends BaseTower {
-  private static readonly IDLE_ANIM_KEY = "archer_idle";
-  private static readonly ATTACK_ANIM_KEY = "archer_attack";
+  private static readonly IDLE_ANIM_KEY = "Idle_Bow";
+  private static readonly ATTACK_ANIM_KEY = "Attack_Bow";
+  private static readonly LEVEL_1_SKIN_KEYS = ["back/back_f_21", "boots/boots_f_2", "bottom/bottom_f_1", "eyes/eyes_f_9", "gear_right/gear_right_f_25", 'hair_short/hair_short_f_1', 'mouth/mouth_f_2', 'skin/skin_1', 'top/top_f_56'];
 
   constructor(scene: Phaser.Scene, gridX: number, gridY: number, level: number = 1) {
     super(
@@ -29,51 +30,48 @@ export class ArrowTower extends BaseTower {
   protected setupAnimations(): void {
     console.log(this.spineObject.skeleton.data.animations.map((anim: any) => anim.name));
 
-    const skin = new Skin("arrow_tower");
-    const fullskin = this.spineObject.skeleton.data.findSkin("full_skins_f");
-    if (fullskin) {
-      skin.addSkin(fullskin);
-    }
-    const boots = this.spineObject.skeleton.data.findSkin("boots/boots_f_19");
-    if (boots) {
-      skin.addSkin(boots);
-    }
-    const left = this.spineObject.skeleton.data.findSkin("gear_left/gear_left_f_2");
-    if (left) {
-      skin.addSkin(left);
-    }
-    const right = this.spineObject.skeleton.data.findSkin("gear_right/gear_right_f_2");
-    if (right) {
-      skin.addSkin(right);
-    }
-    this.spineObject.skeleton.setSkin(skin);
+    const initSkin = new Skin("arrow_tower");
 
-    const animations = this.spineObject.skeleton.data.animations;
-    if (animations.length > 0) {
-      const randomIndex = Phaser.Math.Between(0, animations.length - 1);
-      const animationToPlay = animations[randomIndex].name;
-      this.spineObject.animationState.setAnimation(0, animationToPlay, true);
-    }
+    ArrowTower.LEVEL_1_SKIN_KEYS.forEach((key) => {
+      const skin = this.spineObject.skeleton.data.findSkin(key);
+      if (skin) {
+          console.log(key)
+          initSkin.addSkin(skin);
+      }
+    });
+    this.spineObject.skeleton.setSkin(initSkin);
+    this.spineObject.animationState.setAnimation(0, ArrowTower.IDLE_ANIM_KEY, true);    
   }
 
   protected playAttackAnimation(): void {
     if (this.isAttacking) return;
     this.isAttacking = true;
 
+    this.spineObject.animationState.setAnimation(0, ArrowTower.ATTACK_ANIM_KEY, false);
+
     const listener = {
       complete: () => {
         this.isAttacking = false;
+        this.spineObject.animationState.setAnimation(0, ArrowTower.IDLE_ANIM_KEY, true);
+        this.spineObject.animationState.removeListener(listener);
       }
     };
 
     this.spineObject.animationState.addListener(listener);
-    this.scene.time.delayedCall(500, () => {
-      this.spineObject.animationState.removeListener(listener);
-    });
   }
 
-  protected performAttack(target: Phaser.GameObjects.GameObject): void {
-    if (target instanceof BaseMonster) {
+  protected performAttack(target: any): void {
+    if (target && target.sprite) {
+      const dx = target.sprite.x - this.spineObject.x;
+      const dy = target.sprite.y - this.spineObject.y;
+      const angle = Math.atan2(dy, dx);
+
+      const currentScale = Math.abs(this.spineObject.scaleX);
+      this.spineObject.scaleX = dx < 0 ? currentScale : -currentScale;
+
+      const rotationOffset = dx < 0 ? Math.PI : 0;
+      this.spineObject.rotation = angle - rotationOffset;
+
       new Arrow(this.scene, this.spineObject.x, this.spineObject.y, target, this.damage);
       console.log(
         `Arrow Tower Lv.${this.level} at (${this.gridX}, ${this.gridY}) fires arrow at target`
