@@ -1,8 +1,5 @@
 export enum GameState {
-  PREPARATION = "preparation",
-  WAVE_ACTIVE = "wave_active",
-  WAVE_COMPLETE = "wave_complete",
-  REWARD_SELECTION = "reward_selection",
+  BATTLE = "battle",
   GAME_OVER = "game_over",
   GAME_CLEAR = "game_clear"
 }
@@ -10,20 +7,16 @@ export enum GameState {
 export default class GameManager {
   private scene: Phaser.Scene;
   private currentState: GameState;
-  private currentWave: number;
-  private coreHealth: number;
+  private playerBaseHealth: number;
+  private enemyBaseHealth: number;
   private gold: number;
   private cameraManager: any;
-  private gridSystem: any;
-  private towerManager: any;
-  private selectedReward: any = null;
-  private pendingTowerPlacement: boolean = false;
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.currentState = GameState.PREPARATION;
-    this.currentWave = 1;
-    this.coreHealth = 20;
+    this.currentState = GameState.BATTLE;
+    this.playerBaseHealth = 100;
+    this.enemyBaseHealth = 100;
     this.gold = 100;
   }
 
@@ -31,56 +24,28 @@ export default class GameManager {
     return this.currentState;
   }
 
-  canPlaceTower(): boolean {
-    return this.currentState === GameState.PREPARATION ||
-           this.currentState === GameState.WAVE_COMPLETE;
+  startBattle(): void {
+    this.currentState = GameState.BATTLE;
+    this.scene.events.emit('battle-started');
   }
 
-  canStartWave(): boolean {
-    return this.currentState === GameState.PREPARATION && !this.pendingTowerPlacement;
-  }
+  damagePlayerBase(damage: number = 1): void {
+    this.playerBaseHealth -= damage;
+    this.scene.events.emit('player-base-damaged', this.playerBaseHealth);
 
-  startWave(): void {
-    if (!this.canStartWave()) return;
-
-    this.currentState = GameState.WAVE_ACTIVE;
-    this.updateGridVisibility();
-    this.scene.events.emit('wave-started', this.currentWave);
-  }
-
-  completeWave(): void {
-    if (this.currentState !== GameState.WAVE_ACTIVE) return;
-
-    this.currentState = GameState.WAVE_COMPLETE;
-    this.updateGridVisibility();
-    this.scene.events.emit('wave-completed', this.currentWave);
-
-    if (this.currentWave >= 15) {
-      this.currentState = GameState.GAME_CLEAR;
-      this.updateGridVisibility();
-      this.scene.events.emit('game-clear');
-    } else {
-      // 보상 선택 상태로 전환
-      this.currentState = GameState.REWARD_SELECTION;
-      this.updateGridVisibility();
-      this.scene.events.emit('show-rewards', this.currentWave);
+    if (this.playerBaseHealth <= 0) {
+      this.currentState = GameState.GAME_OVER;
+      this.scene.events.emit('game-over');
     }
   }
 
-  private prepareNextWave(): void {
-    this.currentWave++;
-    this.currentState = GameState.PREPARATION;
-    this.updateGridVisibility();
-    this.scene.events.emit('wave-prepared', this.currentWave);
-  }
+  damageEnemyBase(damage: number = 1): void {
+    this.enemyBaseHealth -= damage;
+    this.scene.events.emit('enemy-base-damaged', this.enemyBaseHealth);
 
-  takeDamage(damage: number = 1): void {
-    this.coreHealth -= damage;
-    this.scene.events.emit('core-damage', this.coreHealth);
-
-    if (this.coreHealth <= 0) {
-      this.currentState = GameState.GAME_OVER;
-      this.scene.events.emit('game-over');
+    if (this.enemyBaseHealth <= 0) {
+      this.currentState = GameState.GAME_CLEAR;
+      this.scene.events.emit('game-clear');
     }
   }
 
@@ -98,12 +63,12 @@ export default class GameManager {
     return false;
   }
 
-  getCurrentWave(): number {
-    return this.currentWave;
+  getPlayerBaseHealth(): number {
+    return this.playerBaseHealth;
   }
 
-  getCoreHealth(): number {
-    return this.coreHealth;
+  getEnemyBaseHealth(): number {
+    return this.enemyBaseHealth;
   }
 
   getGold(): number {
@@ -116,75 +81,5 @@ export default class GameManager {
 
   getCameraManager(): any {
     return this.cameraManager;
-  }
-
-  setGridSystem(gridSystem: any): void {
-    this.gridSystem = gridSystem;
-  }
-
-  setTowerManager(towerManager: any): void {
-    this.towerManager = towerManager;
-  }
-
-  selectReward(reward: any): void {
-    if (this.currentState !== GameState.REWARD_SELECTION) return;
-
-    this.selectedReward = reward;
-
-    console.log('Reward selected:', reward);
-    console.log('Reward type:', reward.type);
-
-    // 타워 보상인 경우 설치 모드로 전환
-    if (reward.type === 'tower') {
-      this.pendingTowerPlacement = true;
-      this.currentState = GameState.PREPARATION;
-      this.updateGridVisibility();
-      this.scene.events.emit('reward-selected', reward);
-      this.scene.events.emit('enter-placement-mode', reward);
-      console.log('Entering tower placement mode for:', reward.name);
-    }
-  }
-
-  completeTowerPlacement(): void {
-    console.log('=== completeTowerPlacement called ===');
-    console.log('Before: pendingTowerPlacement =', this.pendingTowerPlacement);
-    this.pendingTowerPlacement = false;
-    this.selectedReward = null;
-    console.log('After: pendingTowerPlacement =', this.pendingTowerPlacement);
-    console.log('Calling prepareNextWave...');
-    this.prepareNextWave();
-
-    // 타워 설치 완료 이벤트 추가
-    this.scene.events.emit('tower-placement-completed');
-  }
-
-  getSelectedReward(): any {
-    return this.selectedReward;
-  }
-
-  isPendingTowerPlacement(): boolean {
-    return this.pendingTowerPlacement;
-  }
-
-  private updateGridVisibility(): void {
-    if (!this.gridSystem) return;
-
-    switch (this.currentState) {
-      case GameState.PREPARATION:
-      case GameState.WAVE_COMPLETE:
-        this.gridSystem.showGrid();
-        break;
-      case GameState.WAVE_ACTIVE:
-      case GameState.REWARD_SELECTION:
-      case GameState.GAME_OVER:
-      case GameState.GAME_CLEAR:
-        this.gridSystem.hideGrid();
-        break;
-    }
-
-    // 타워 드래그 상태도 업데이트
-    if (this.towerManager) {
-      this.towerManager.updateAllTowersDragState();
-    }
   }
 }

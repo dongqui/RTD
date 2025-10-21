@@ -1,14 +1,28 @@
 import { BaseTower } from "../BaseTower";
-import { Arrow } from "../Arrow";
-import { BaseMonster } from "../monsters/BaseMonster";
+
 import { Skin } from "@esotericsoftware/spine-core";
 
 export class ArrowTower extends BaseTower {
   private static readonly IDLE_ANIM_KEY = "Idle_Bow";
   private static readonly ATTACK_ANIM_KEY = "Attack_Bow";
-  private static readonly LEVEL_1_SKIN_KEYS = ["back/back_f_21", "boots/boots_f_2", "bottom/bottom_f_1", "eyes/eyes_f_9", "gear_right/gear_right_f_25", 'hair_short/hair_short_f_1', 'mouth/mouth_f_2', 'skin/skin_1', 'top/top_f_56'];
+  private static readonly LEVEL_1_SKIN_KEYS = [
+    "back/back_f_21",
+    "boots/boots_f_2",
+    "bottom/bottom_f_1",
+    "eyes/eyes_f_9",
+    "gear_right/gear_right_f_25",
+    "hair_short/hair_short_f_1",
+    "mouth/mouth_f_2",
+    "skin/skin_1",
+    "top/top_f_56",
+  ];
 
-  constructor(scene: Phaser.Scene, gridX: number, gridY: number, level: number = 1) {
+  constructor(
+    scene: Phaser.Scene,
+    gridX: number,
+    gridY: number,
+    level: number = 1
+  ) {
     super(
       scene,
       gridX,
@@ -28,33 +42,47 @@ export class ArrowTower extends BaseTower {
   }
 
   protected setupAnimations(): void {
-    console.log(this.spineObject.skeleton.data.animations.map((anim: any) => anim.name));
+    console.log(
+      this.spineObject.skeleton.data.animations.map((anim: any) => anim.name)
+    );
 
     const initSkin = new Skin("arrow_tower");
 
     ArrowTower.LEVEL_1_SKIN_KEYS.forEach((key) => {
       const skin = this.spineObject.skeleton.data.findSkin(key);
       if (skin) {
-          console.log(key)
-          initSkin.addSkin(skin);
+        console.log(key);
+        initSkin.addSkin(skin);
       }
     });
     this.spineObject.skeleton.setSkin(initSkin);
-    this.spineObject.animationState.setAnimation(0, ArrowTower.IDLE_ANIM_KEY, true);    
+    this.spineObject.animationState.setAnimation(
+      0,
+      ArrowTower.IDLE_ANIM_KEY,
+      true
+    );
   }
 
   protected playAttackAnimation(): void {
     if (this.isAttacking) return;
     this.isAttacking = true;
 
-    this.spineObject.animationState.setAnimation(0, ArrowTower.ATTACK_ANIM_KEY, false);
+    this.spineObject.animationState.setAnimation(
+      0,
+      ArrowTower.ATTACK_ANIM_KEY,
+      false
+    );
 
     const listener = {
       complete: () => {
         this.isAttacking = false;
-        this.spineObject.animationState.setAnimation(0, ArrowTower.IDLE_ANIM_KEY, true);
+        this.spineObject.animationState.setAnimation(
+          0,
+          ArrowTower.IDLE_ANIM_KEY,
+          true
+        );
         this.spineObject.animationState.removeListener(listener);
-      }
+      },
     };
 
     this.spineObject.animationState.addListener(listener);
@@ -72,7 +100,13 @@ export class ArrowTower extends BaseTower {
       const rotationOffset = dx < 0 ? Math.PI : 0;
       this.spineObject.rotation = angle - rotationOffset;
 
-      new Arrow(this.scene, this.spineObject.x, this.spineObject.y, target, this.damage);
+      // new Arrow(
+      //   this.scene,
+      //   this.spineObject.x,
+      //   this.spineObject.y,
+      //   target,
+      //   this.damage
+      // );
       console.log(
         `Arrow Tower Lv.${this.level} at (${this.gridX}, ${this.gridY}) fires arrow at target`
       );

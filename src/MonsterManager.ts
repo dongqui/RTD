@@ -1,4 +1,7 @@
 import { BaseMonster, MonsterState } from "./monsters/BaseMonster";
+import { BasicMonster } from "./monsters/BasicMonster";
+import { FastMonster } from "./monsters/FastMonster";
+import { TankMonster } from "./monsters/TankMonster";
 
 export class MonsterManager {
   private scene: Phaser.Scene;
@@ -6,6 +9,7 @@ export class MonsterManager {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
+    this.scene.data.set('monsters', this.activeMonsters);
     this.setupEventHandlers();
   }
 
@@ -18,14 +22,36 @@ export class MonsterManager {
       }
     );
 
-    this.scene.events.on("monster-reached-core", (monster: BaseMonster) => {
+    this.scene.events.on("monster-reached-player-base", (monster: BaseMonster) => {
       this.removeMonster(monster);
-      this.scene.events.emit("monster-manager-reached-core", monster);
+      this.scene.events.emit("monster-manager-reached-player-base", monster);
     });
+  }
+
+  spawnMonster(type: "basic" | "fast" | "tank", x: number, y: number): BaseMonster | null {
+    let monster: BaseMonster;
+
+    switch (type) {
+      case "basic":
+        monster = new BasicMonster(this.scene, x, y);
+        break;
+      case "fast":
+        monster = new FastMonster(this.scene, x, y);
+        break;
+      case "tank":
+        monster = new TankMonster(this.scene, x, y);
+        break;
+      default:
+        return null;
+    }
+
+    this.addMonster(monster);
+    return monster;
   }
 
   addMonster(monster: BaseMonster): void {
     this.activeMonsters.push(monster);
+    this.scene.data.set('monsters', this.activeMonsters);
     this.scene.events.emit("monster-added", monster);
   }
 
@@ -33,6 +59,7 @@ export class MonsterManager {
     const index = this.activeMonsters.indexOf(monster);
     if (index > -1) {
       this.activeMonsters.splice(index, 1);
+      this.scene.data.set('monsters', this.activeMonsters);
       this.scene.events.emit("monster-removed", monster);
     }
   }

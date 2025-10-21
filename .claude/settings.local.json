@@ -1,5 +1,4 @@
 {
-  "outputStyle": "default",
   "hooks": {
     "Notification": [
       {
@@ -10,6 +9,12 @@
           }
         ]
       }
+    ]
+  },
+  "outputStyle": "default",
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)"
     ]
   }
 }
