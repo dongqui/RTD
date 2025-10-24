@@ -7,6 +7,7 @@ import { MovingState } from "../fsm/states/MovingState";
 import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
+import { HealthBar } from "../ui/HealthBar";
 
 export interface UnitConfig {
   health: number;
@@ -30,6 +31,7 @@ export abstract class BaseUnit implements CombatEntity {
   protected cost: number;
   protected scene: Phaser.Scene;
   public spineObject: SpineGameObject;
+  protected healthBar: HealthBar;
 
   protected attackRange: number;
   protected attackDamage: number;
@@ -60,6 +62,9 @@ export abstract class BaseUnit implements CombatEntity {
       "fantasy_character-atlas"
     );
 
+    this.healthBar = new HealthBar(this.scene, x, y - 100);
+    this.healthBar.setVisible(false);
+
     this.setupAnimations();
 
     this.stateMachine = new StateMachine<CombatEntity>(this);
@@ -88,30 +93,30 @@ export abstract class BaseUnit implements CombatEntity {
   }
 
   protected playHitAnimation(): void {
-    if (this.stateMachine.isInState(BehaviorState.ATTACKING)) {
-      return;
+    const skeleton = this.spineObject.skeleton;
+    if (skeleton) {
+      skeleton.color.r = 1;
+      skeleton.color.g = 0.67;
+      skeleton.color.b = 0.67;
     }
+    this.healthBar.setVisible(true);
 
-    this.spineObject.animationState.setAnimation(
-      0,
-      BaseUnit.HIT_ANIM_KEY,
-      false
-    );
-
-    const listener = {
-      complete: () => {
-        if (!this.isDead()) {
-          this.spineObject.animationState.setAnimation(
-            0,
-            BaseUnit.RUN_ANIM_KEY,
-            true
-          );
+    this.scene.time.delayedCall(150, () => {
+      if (!this.isDead() && this.spineObject) {
+        const skeleton = this.spineObject.skeleton;
+        if (skeleton) {
+          skeleton.color.r = 1;
+          skeleton.color.g = 1;
+          skeleton.color.b = 1;
         }
-        this.spineObject.animationState.removeListener(listener);
-      },
-    };
+      }
+    });
 
-    this.spineObject.animationState.addListener(listener);
+    this.scene.time.delayedCall(2000, () => {
+      if (!this.isDead() && this.healthBar) {
+        this.healthBar.setVisible(false);
+      }
+    });
   }
 
   playDeadAnimation(): void {
@@ -121,6 +126,7 @@ export abstract class BaseUnit implements CombatEntity {
       false
     );
 
+    this.healthBar.destroy();
     this.scene.events.emit("unit-killed", this);
 
     this.scene.time.delayedCall(1000, () => {
@@ -133,6 +139,12 @@ export abstract class BaseUnit implements CombatEntity {
   update(_time: number, delta: number): void {
     this.statusEffects.update(delta);
     this.stateMachine.update(delta);
+    this.healthBar.update(
+      this.currentHealth,
+      this.maxHealth,
+      this.spineObject.x,
+      this.spineObject.y - 100
+    );
   }
 
   move(delta: number): void {

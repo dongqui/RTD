@@ -6,6 +6,7 @@ import { MovingState } from "../fsm/states/MovingState";
 import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
+import { HealthBar } from "../ui/HealthBar";
 
 export interface MonsterConfig {
   health: number;
@@ -25,6 +26,7 @@ export abstract class BaseMonster implements CombatEntity {
   protected reward: number;
   protected scene: Phaser.Scene;
   public sprite: Phaser.GameObjects.Sprite;
+  protected healthBar: HealthBar;
 
   protected attackRange: number;
   protected attackDamage: number;
@@ -58,6 +60,9 @@ export abstract class BaseMonster implements CombatEntity {
       .setDisplaySize(128, 128)
       .setFlipX(true);
 
+    this.healthBar = new HealthBar(this.scene, x, y - 80);
+    this.healthBar.setVisible(false);
+
     this.stateMachine = new StateMachine<CombatEntity>(this);
     this.statusEffects = new StatusEffectManager(this);
 
@@ -71,6 +76,12 @@ export abstract class BaseMonster implements CombatEntity {
   update(_time: number, delta: number): void {
     this.statusEffects.update(delta);
     this.stateMachine.update(delta);
+    this.healthBar.update(
+      this.currentHealth,
+      this.maxHealth,
+      this.sprite.x,
+      this.sprite.y - 80
+    );
   }
 
   move(delta: number): void {
@@ -162,14 +173,18 @@ export abstract class BaseMonster implements CombatEntity {
   }
 
   playHitAnimation(): void {
-    if (this.stateMachine.isInState(BehaviorState.ATTACKING)) {
-      return;
-    }
+    this.sprite.setTint(0xffaaaa);
+    this.healthBar.setVisible(true);
 
-    this.sprite.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => {
+    this.scene.time.delayedCall(150, () => {
       if (!this.isDead() && this.sprite) {
         this.sprite.clearTint();
+      }
+    });
+
+    this.scene.time.delayedCall(2000, () => {
+      if (!this.isDead() && this.healthBar) {
+        this.healthBar.setVisible(false);
       }
     });
   }
@@ -179,6 +194,7 @@ export abstract class BaseMonster implements CombatEntity {
 
     this.sprite.setTint(0x666666);
     this.sprite.setAlpha(0.7);
+    this.healthBar.destroy();
 
     this.scene.time.delayedCall(500, () => {
       if (this.sprite) {
