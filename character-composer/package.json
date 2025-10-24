@@ -1,0 +1,19 @@
+{
+  "name": "character-composer",
+  "version": "1.0.0",
+  "description": "Fantasy Character Parts Composer Tool",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@esotericsoftware/spine-core": "^4.2.93",
+    "@esotericsoftware/spine-phaser-v3": "^4.2.93",
+    "phaser": "3.80.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "vite": "^5.1.4"
+  }
+}
