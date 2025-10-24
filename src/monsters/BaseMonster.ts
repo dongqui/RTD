@@ -55,11 +55,11 @@ export abstract class BaseMonster {
   update(_time: number, delta: number): void {
     if (this.state === MonsterState.DEAD) return;
 
-    const nearbyUnit = this.findNearbyUnit();
+    const target = this.findNearbyTarget();
 
-    if (nearbyUnit) {
+    if (target) {
       this.state = MonsterState.ATTACKING;
-      this.attackUnit(nearbyUnit);
+      this.attackTarget(target);
     } else {
       if (this.state === MonsterState.ATTACKING) {
         this.state = MonsterState.MOVING;
@@ -68,11 +68,15 @@ export abstract class BaseMonster {
     }
   }
 
-  private findNearbyUnit(): any | null {
-    const units = this.scene.data.get('units') || [];
+  private findNearbyTarget(): any | null {
+    const units = this.scene.data.get("units") || [];
+    const playerBase = this.scene.data.get("playerBase");
+
+    let nearestTarget: any = null;
+    let nearestDistance = Infinity;
 
     for (const unit of units) {
-      if (unit.getState() === 'dead') continue;
+      if (unit.getState() === "dead") continue;
 
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x,
@@ -81,20 +85,38 @@ export abstract class BaseMonster {
         unit.spineObject.y
       );
 
-      if (distance <= this.attackRange) {
-        return unit;
+      if (distance <= this.attackRange && distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestTarget = unit;
+      }
+    }
+
+    if (nearestTarget) {
+      return nearestTarget;
+    }
+
+    if (playerBase && playerBase.isActive()) {
+      const baseDistance = Phaser.Math.Distance.Between(
+        this.sprite.x,
+        this.sprite.y,
+        playerBase.getX(),
+        playerBase.getY()
+      );
+
+      if (baseDistance <= this.attackRange) {
+        return playerBase;
       }
     }
 
     return null;
   }
 
-  private attackUnit(unit: any): void {
+  private attackTarget(target: any): void {
     const currentTime = this.scene.time.now;
 
     if (currentTime - this.lastAttackTime >= this.attackSpeed) {
       this.lastAttackTime = currentTime;
-      unit.takeDamage(this.attackDamage);
+      target.takeDamage(this.attackDamage);
 
       this.sprite.setTint(0xff8800);
       this.scene.time.delayedCall(100, () => {
@@ -121,11 +143,13 @@ export abstract class BaseMonster {
     }
 
     this.currentHealth -= damage;
-    console.log(`Monster took ${damage} damage. HP: ${this.currentHealth}/${this.maxHealth}`);
+    console.log(
+      `Monster took ${damage} damage. HP: ${this.currentHealth}/${this.maxHealth}`
+    );
 
     this.sprite.setTint(0xff0000);
     this.scene.time.delayedCall(100, () => {
-      if (this.state !== MonsterState.DEAD && this.sprite && !this.sprite.destroyed) {
+      if (this.state !== MonsterState.DEAD && this.sprite) {
         this.sprite.clearTint();
       }
     });

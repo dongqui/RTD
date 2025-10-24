@@ -1,7 +1,5 @@
 import { BaseMonster, MonsterState } from "./monsters/BaseMonster";
 import { BasicMonster } from "./monsters/BasicMonster";
-import { FastMonster } from "./monsters/FastMonster";
-import { TankMonster } from "./monsters/TankMonster";
 
 export class MonsterManager {
   private scene: Phaser.Scene;
@@ -9,7 +7,7 @@ export class MonsterManager {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.scene.data.set('monsters', this.activeMonsters);
+    this.scene.data.set("monsters", this.activeMonsters);
     this.setupEventHandlers();
   }
 
@@ -22,25 +20,23 @@ export class MonsterManager {
       }
     );
 
-    this.scene.events.on("monster-reached-player-base", (monster: BaseMonster) => {
-      this.removeMonster(monster);
-      this.scene.events.emit("monster-manager-reached-player-base", monster);
-    });
+    this.scene.events.on(
+      "monster-reached-player-base",
+      (monster: BaseMonster) => {
+        this.removeMonster(monster);
+        this.scene.events.emit("monster-manager-reached-player-base", monster);
+      }
+    );
   }
 
-  spawnMonster(type: "basic" | "fast" | "tank", x: number, y: number): BaseMonster | null {
+  spawnMonster(type: "basic", x: number, y: number): BaseMonster | null {
     let monster: BaseMonster;
 
     switch (type) {
       case "basic":
         monster = new BasicMonster(this.scene, x, y);
         break;
-      case "fast":
-        monster = new FastMonster(this.scene, x, y);
-        break;
-      case "tank":
-        monster = new TankMonster(this.scene, x, y);
-        break;
+
       default:
         return null;
     }
@@ -51,7 +47,7 @@ export class MonsterManager {
 
   addMonster(monster: BaseMonster): void {
     this.activeMonsters.push(monster);
-    this.scene.data.set('monsters', this.activeMonsters);
+    this.scene.data.set("monsters", this.activeMonsters);
     this.scene.events.emit("monster-added", monster);
   }
 
@@ -59,7 +55,7 @@ export class MonsterManager {
     const index = this.activeMonsters.indexOf(monster);
     if (index > -1) {
       this.activeMonsters.splice(index, 1);
-      this.scene.data.set('monsters', this.activeMonsters);
+      this.scene.data.set("monsters", this.activeMonsters);
       this.scene.events.emit("monster-removed", monster);
     }
   }
@@ -77,7 +73,7 @@ export class MonsterManager {
     let nearestDistance = Infinity;
 
     for (const monster of this.activeMonsters) {
-      if (monster.sprite.destroyed || monster.getState() === MonsterState.DEAD) continue;
+      if (monster.getState() === MonsterState.DEAD) continue;
 
       const distance = Phaser.Math.Distance.Between(
         x,
@@ -105,9 +101,7 @@ export class MonsterManager {
 
   clear(): void {
     for (const monster of this.activeMonsters) {
-      if (!monster.sprite.destroyed) {
-        monster.sprite.destroy();
-      }
+      monster.sprite.destroy();
     }
     this.activeMonsters = [];
   }

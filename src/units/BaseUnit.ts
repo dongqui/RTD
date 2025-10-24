@@ -17,6 +17,10 @@ export enum UnitState {
 }
 
 export abstract class BaseUnit {
+  protected static readonly HIT_ANIM_KEY = "Hit";
+  protected static readonly DIE_ANIM_KEY = "Die";
+  protected static readonly RUN_ANIM_KEY = "Run";
+
   protected maxHealth: number;
   protected currentHealth: number;
   protected speed: number;
@@ -56,32 +60,80 @@ export abstract class BaseUnit {
   }
 
   protected abstract setupAnimations(): void;
-  protected playAttackAnimation?(): void;
-  protected playRunAnimation?(): void;
+  protected abstract playAttackAnimation(): void;
+
+  protected playRunAnimation(): void {
+    const currentAnim = this.spineObject.animationState.getCurrent(0);
+    if (currentAnim && currentAnim.animation?.name === BaseUnit.RUN_ANIM_KEY) {
+      return;
+    }
+    this.spineObject.animationState.setAnimation(
+      0,
+      BaseUnit.RUN_ANIM_KEY,
+      true
+    );
+  }
+
+  protected playHitAnimation(): void {
+    if (this.state === UnitState.ATTACKING) {
+      return;
+    }
+
+    this.spineObject.animationState.setAnimation(
+      0,
+      BaseUnit.HIT_ANIM_KEY,
+      false
+    );
+
+    const listener = {
+      complete: () => {
+        if (this.state !== UnitState.DEAD) {
+          this.spineObject.animationState.setAnimation(
+            0,
+            BaseUnit.RUN_ANIM_KEY,
+            true
+          );
+        }
+        this.spineObject.animationState.removeListener(listener);
+      },
+    };
+
+    this.spineObject.animationState.addListener(listener);
+  }
+
+  protected playDieAnimation(): void {
+    this.spineObject.animationState.setAnimation(
+      0,
+      BaseUnit.DIE_ANIM_KEY,
+      false
+    );
+  }
 
   update(_time: number, delta: number): void {
     if (this.state === UnitState.DEAD) return;
 
-    const nearbyMonster = this.findNearbyMonster();
+    const target = this.findNearbyTarget();
 
-    if (nearbyMonster) {
+    if (target) {
       if (this.state !== UnitState.ATTACKING) {
         this.state = UnitState.ATTACKING;
       }
-      this.attackMonster(nearbyMonster);
+      this.attackTarget(target);
     } else {
       if (this.state === UnitState.ATTACKING) {
         this.state = UnitState.MOVING;
-        if (this.playRunAnimation) {
-          this.playRunAnimation();
-        }
+        this.playRunAnimation();
       }
       this.moveRight(delta);
     }
   }
 
-  private findNearbyMonster(): any | null {
+  private findNearbyTarget(): any | null {
     const monsters = this.scene.data.get("monsters") || [];
+    const enemyBase = this.scene.data.get("enemyBase");
+
+    let nearestTarget: any = null;
+    let nearestDistance = Infinity;
 
     for (const monster of monsters) {
       if (monster.getState() === "dead") continue;
@@ -93,31 +145,40 @@ export abstract class BaseUnit {
         monster.sprite.y
       );
 
-      if (distance <= this.attackRange) {
-        return monster;
+      if (distance <= this.attackRange && distance < nearestDistance) {
+        nearestDistance = distance;
+        nearestTarget = monster;
+      }
+    }
+
+    if (nearestTarget) {
+      return nearestTarget;
+    }
+
+    if (enemyBase && enemyBase.isActive()) {
+      const baseDistance = Phaser.Math.Distance.Between(
+        this.spineObject.x,
+        this.spineObject.y,
+        enemyBase.getX(),
+        enemyBase.getY()
+      );
+
+      if (baseDistance <= this.attackRange) {
+        return enemyBase;
       }
     }
 
     return null;
   }
 
-  private attackMonster(monster: any): void {
+  private attackTarget(target: any): void {
     const currentTime = this.scene.time.now;
 
     if (currentTime - this.lastAttackTime >= this.attackSpeed) {
       this.lastAttackTime = currentTime;
-      monster.takeDamage(this.attackDamage);
+      target.takeDamage(this.attackDamage);
 
-      if (this.playAttackAnimation) {
-        this.playAttackAnimation();
-      }
-
-      this.spineObject.alpha = 0.5;
-      this.scene.time.delayedCall(100, () => {
-        if (this.state !== UnitState.DEAD) {
-          this.spineObject.alpha = 1;
-        }
-      });
+      this.playAttackAnimation();
     }
   }
 
@@ -137,13 +198,7 @@ export abstract class BaseUnit {
     }
 
     this.currentHealth -= damage;
-
-    this.spineObject.alpha = 0.5;
-    this.scene.time.delayedCall(100, () => {
-      if (this.state !== UnitState.DEAD) {
-        this.spineObject.alpha = 1;
-      }
-    });
+    this.playHitAnimation();
 
     if (this.currentHealth <= 0) {
       this.die();
@@ -154,10 +209,12 @@ export abstract class BaseUnit {
     this.state = UnitState.DEAD;
     this.scene.events.emit("unit-killed", this);
 
-    this.spineObject.setAlpha(0.5);
+    this.playDieAnimation();
 
-    this.scene.time.delayedCall(500, () => {
-      this.spineObject.destroy();
+    this.scene.time.delayedCall(1000, () => {
+      if (this.spineObject) {
+        this.spineObject.destroy();
+      }
     });
   }
 
