@@ -31,18 +31,30 @@ export default class ComposerScene extends Phaser.Scene {
     console.log("Spine object created:", this.spineObject);
     console.log("Available skins:", this.spineObject.skeleton.data.skins);
 
-    // this.spineObject.skeleton.setSkinByName("skin_1");
-    // this.spineObject.skeleton.setToSetupPose();
-
-    const skin = this.spineObject.skeleton.skin;
-    console.log("Current skin:", skin);
     console.log(
       "Available slots:",
       this.spineObject.skeleton.slots.map((s: any) => s.data.name)
     );
-    console.log("Skin attachments:", skin?.attachments);
 
     (window as any).spineObject = this.spineObject;
+    (window as any).changeSlotColor = (
+      slotName: string,
+      r: number,
+      g: number,
+      b: number,
+      a: number = 1
+    ) => {
+      const slot = this.spineObject.skeleton.findSlot(slotName);
+      if (slot) {
+        slot.color.r = r / 255;
+        slot.color.g = g / 255;
+        slot.color.b = b / 255;
+        slot.color.a = a;
+        console.log(`Color changed for slot "${slotName}":`, { r, g, b, a });
+      } else {
+        console.error(`Slot "${slotName}" not found`);
+      }
+    };
 
     this.game.events.emit("spine-ready", this.spineObject);
   }
