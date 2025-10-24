@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
+import HomeScene from "./scenes/HomeScene";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 
 class Boot extends Phaser.Scene {
@@ -48,7 +49,7 @@ window.addEventListener("load", function () {
       },
     },
 
-    scene: [Boot, Preload, Level, GameScene],
+    scene: [Boot, Preload, HomeScene, Level, GameScene],
   });
 
   // 화면 크기 변경 시 게임 크기 조정
