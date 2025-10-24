@@ -10,7 +10,7 @@ export class UnitManager {
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
-    this.scene.data.set('units', this.units);
+    this.scene.data.set("units", this.units);
   }
 
   spawnUnit(type: UnitType, x: number, y: number): BaseUnit | null {
@@ -27,26 +27,30 @@ export class UnitManager {
         return null;
     }
 
-    this.units.push(unit);
-    this.scene.data.set('units', this.units);
-    this.scene.events.emit("unit-spawned", unit);
+    this.addUnit(unit);
 
     return unit;
   }
 
+  addUnit(unit: BaseUnit): void {
+    this.units.push(unit);
+    this.scene.data.set("units", this.units);
+    this.scene.events.emit("unit-spawned", unit);
+  }
+
   update(time: number, delta: number): void {
-    this.units = this.units.filter(unit => {
-      if (unit.getState() === "dead" || !unit.spineObject || unit.spineObject.destroyed) {
+    this.units = this.units.filter((unit) => {
+      if (unit.getState() === "dead" || !unit.spineObject) {
         return false;
       }
       unit.update(time, delta);
       return true;
     });
-    this.scene.data.set('units', this.units);
+    this.scene.data.set("units", this.units);
   }
 
   getActiveUnits(): BaseUnit[] {
-    return this.units.filter(unit => unit.getState() !== "dead");
+    return this.units.filter((unit) => unit.getState() !== "dead");
   }
 
   getActiveUnitCount(): number {
@@ -57,17 +61,17 @@ export class UnitManager {
     const index = this.units.indexOf(unit);
     if (index > -1) {
       this.units.splice(index, 1);
-      this.scene.data.set('units', this.units);
+      this.scene.data.set("units", this.units);
     }
   }
 
   clear(): void {
-    this.units.forEach(unit => {
-      if (unit.spineObject && !unit.spineObject.destroyed) {
+    this.units.forEach((unit) => {
+      if (unit.spineObject) {
         unit.spineObject.destroy();
       }
     });
     this.units = [];
-    this.scene.data.set('units', this.units);
+    this.scene.data.set("units", this.units);
   }
 }

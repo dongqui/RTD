@@ -3,6 +3,12 @@ import GameManager from "../GameManager";
 import { MonsterManager } from "../MonsterManager";
 import { UnitManager } from "../UnitManager";
 import { SpawnManager } from "../SpawnManager";
+import ResourceManager from "../ResourceManager";
+import ResourceUI from "../ui/ResourceUI";
+import UnitCard from "../ui/UnitCard";
+import CardManager from "../CardManager";
+import Base, { BaseTeam } from "../Base";
+import PlayerDeck from "../PlayerDeck";
 
 export default class GameScene extends Phaser.Scene {
   private cameraManager: CameraManager;
@@ -10,6 +16,11 @@ export default class GameScene extends Phaser.Scene {
   private monsterManager: MonsterManager;
   private unitManager: UnitManager;
   private spawnManager: SpawnManager;
+  private resourceManager: ResourceManager;
+  private resourceUI: ResourceUI;
+  private cardManager: CardManager;
+  private playerBase: Base;
+  private enemyBase: Base;
 
   constructor() {
     super("GameScene");
@@ -34,10 +45,14 @@ export default class GameScene extends Phaser.Scene {
     this.monsterManager = new MonsterManager(this);
     this.unitManager = new UnitManager(this);
 
+    this.resourceManager = new ResourceManager(this, 10, 2000);
+
     this.setupBases();
     this.setupSpawnManager();
     this.setupGameEventHandlers();
     this.setupMobileOptimization();
+    this.setupResourceUI();
+    this.setupUnitCards();
 
     this.cameraManager.setupCameraDrag();
 
@@ -47,20 +62,15 @@ export default class GameScene extends Phaser.Scene {
   private setupBases(): void {
     const { width, height } = this.scale.gameSize;
 
-    const playerBaseX = 50;
-    const enemyBaseX = width - 50;
+    const playerBaseX = 150;
+    const enemyBaseX = width - 150;
     const baseY = height / 2;
 
-    const playerBase = this.add
-      .rectangle(playerBaseX, baseY, 100, 100, 0x0000ff)
-      .setDepth(0);
+    this.playerBase = new Base(this, playerBaseX, baseY, BaseTeam.PLAYER, 100);
+    this.enemyBase = new Base(this, enemyBaseX, baseY, BaseTeam.ENEMY, 100);
 
-    const enemyBase = this.add
-      .rectangle(enemyBaseX, baseY, 100, 100, 0xff0000)
-      .setDepth(0);
-
-    this.data.set("playerBase", playerBase);
-    this.data.set("enemyBase", enemyBase);
+    this.data.set("playerBase", this.playerBase);
+    this.data.set("enemyBase", this.enemyBase);
   }
 
   private setupSpawnManager(): void {
@@ -99,11 +109,15 @@ export default class GameScene extends Phaser.Scene {
     );
 
     this.events.on("monster-manager-reached-player-base", (_monster: any) => {
-      this.gameManager.damagePlayerBase(1);
+      if (this.playerBase && this.playerBase.isActive()) {
+        this.playerBase.takeDamage(1);
+      }
     });
 
     this.events.on("unit-reached-enemy-base", (_unit: any) => {
-      this.gameManager.damageEnemyBase(1);
+      if (this.enemyBase && this.enemyBase.isActive()) {
+        this.enemyBase.takeDamage(1);
+      }
     });
 
     this.events.on("battle-started", () => {
@@ -185,12 +199,88 @@ export default class GameScene extends Phaser.Scene {
     this.spawnManager.stop();
   }
 
+  private setupResourceUI(): void {
+    const { height } = this.scale.gameSize;
+
+    this.resourceUI = new ResourceUI(this, 20, height - 80, 10);
+    this.resourceUI.updateResource(this.resourceManager.getCurrentResource());
+
+    this.events.on("resource-changed", (currentResource: number) => {
+      this.resourceUI.updateResource(currentResource);
+      this.updateCardStates();
+    });
+  }
+
+  private setupUnitCards(): void {
+    const deck = PlayerDeck.getInstance();
+    const deckCards = deck.getCards();
+
+    const cardPool = deckCards.map(card => ({
+      type: card.type,
+      cost: card.cost,
+      name: card.name,
+      weight: 1,
+    }));
+
+    if (cardPool.length === 0) {
+      console.warn("No cards in deck! Using default cards.");
+      cardPool.push(
+        { type: "warrior" as const, cost: 5, name: "Warrior", weight: 1 },
+        { type: "archer" as const, cost: 4, name: "Archer", weight: 1 }
+      );
+    }
+
+    this.cardManager = new CardManager(this, cardPool);
+    this.cardManager.initializeCards();
+
+    this.cardManager.setOnCardUsed((card) => {
+      this.spawnUnitFromCard(card);
+    });
+
+    this.updateCardStates();
+  }
+
+  private spawnUnitFromCard(card: UnitCard): void {
+    const cost = card.getCost();
+
+    if (!this.resourceManager.spendResource(cost)) {
+      console.log("Not enough resources!");
+      return;
+    }
+
+    const { height } = this.scale.gameSize;
+    const playerBaseX = 50;
+    const spawnX = playerBaseX + 120;
+    const spawnY = height / 2;
+
+    const unitType = card.getType();
+
+    this.unitManager.spawnUnit(unitType, spawnX, spawnY);
+
+    console.log(`Spawned ${unitType} unit for ${cost} resources`);
+
+    const cardIndex = this.cardManager.getCards().indexOf(card);
+    if (cardIndex !== -1) {
+      this.cardManager.replaceCard(cardIndex);
+    }
+  }
+
+  private updateCardStates(): void {
+    if (!this.cardManager) return;
+
+    const currentResource = this.resourceManager.getCurrentResource();
+    this.cardManager.updateCardStates(currentResource);
+  }
+
   update(): void {
     if (this.monsterManager) {
       this.monsterManager.update();
     }
     if (this.unitManager) {
       this.unitManager.update(this.time.now, this.game.loop.delta);
+    }
+    if (this.resourceManager) {
+      this.resourceManager.update(this.time.now);
     }
   }
 }
