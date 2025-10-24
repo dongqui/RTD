@@ -48,7 +48,7 @@ export class WarriorUnit extends BaseUnit {
     this.playRunAnimation();
   }
 
-  protected playAttackAnimation(): void {
+  playAttackAnimation(): void {
     this.spineObject.animationState.setAnimation(
       0,
       WarriorUnit.ATTACK_ANIM_KEY,

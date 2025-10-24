@@ -27,20 +27,16 @@ export class UnitManager {
         return null;
     }
 
-    this.addUnit(unit);
+    this.units.push(unit);
+    this.scene.data.set("units", this.units);
+    this.scene.events.emit("unit-spawned", unit);
 
     return unit;
   }
 
-  addUnit(unit: BaseUnit): void {
-    this.units.push(unit);
-    this.scene.data.set("units", this.units);
-    this.scene.events.emit("unit-spawned", unit);
-  }
-
   update(time: number, delta: number): void {
     this.units = this.units.filter((unit) => {
-      if (unit.getState() === "dead" || !unit.spineObject) {
+      if (unit.isDead() || !unit.spineObject) {
         return false;
       }
       unit.update(time, delta);
@@ -50,7 +46,7 @@ export class UnitManager {
   }
 
   getActiveUnits(): BaseUnit[] {
-    return this.units.filter((unit) => unit.getState() !== "dead");
+    return this.units.filter((unit) => !unit.isDead());
   }
 
   getActiveUnitCount(): number {

@@ -1,3 +1,12 @@
+import { CombatEntity } from "../fsm/CombatEntity";
+import { StateMachine } from "../fsm/StateMachine";
+import { StatusEffectManager } from "../fsm/effects/StatusEffectManager";
+import { BehaviorState } from "../fsm/StateTypes";
+import { MovingState } from "../fsm/states/MovingState";
+import { AttackingState } from "../fsm/states/AttackingState";
+import { DeadState } from "../fsm/states/DeadState";
+import Base from "../Base";
+
 export interface MonsterConfig {
   health: number;
   speed: number;
@@ -9,18 +18,11 @@ export interface MonsterConfig {
   attackSpeed?: number;
 }
 
-export enum MonsterState {
-  MOVING = "moving",
-  ATTACKING = "attacking",
-  DEAD = "dead",
-}
-
-export abstract class BaseMonster {
+export abstract class BaseMonster implements CombatEntity {
   protected maxHealth: number;
   protected currentHealth: number;
   protected speed: number;
   protected reward: number;
-  protected state: MonsterState;
   protected scene: Phaser.Scene;
   public sprite: Phaser.GameObjects.Sprite;
 
@@ -28,6 +30,12 @@ export abstract class BaseMonster {
   protected attackDamage: number;
   protected attackSpeed: number;
   private lastAttackTime: number = 0;
+
+  public stateMachine: StateMachine<CombatEntity>;
+  public statusEffects: StatusEffectManager;
+  public speedMultiplier: number = 1;
+  public attackDamageMultiplier: number = 1;
+  public attackSpeedMultiplier: number = 1;
 
   constructor(
     scene: Phaser.Scene,
@@ -40,7 +48,6 @@ export abstract class BaseMonster {
     this.currentHealth = config.health;
     this.speed = config.speed;
     this.reward = config.reward;
-    this.state = MonsterState.MOVING;
 
     this.attackRange = config.attackRange || 100;
     this.attackDamage = config.attackDamage || 10;
@@ -50,25 +57,29 @@ export abstract class BaseMonster {
       .sprite(x, y, config.textureKey)
       .setDisplaySize(128, 128)
       .setFlipX(true);
+
+    this.stateMachine = new StateMachine<CombatEntity>(this);
+    this.statusEffects = new StatusEffectManager(this);
+
+    this.stateMachine.registerState(BehaviorState.MOVING, new MovingState());
+    this.stateMachine.registerState(BehaviorState.ATTACKING, new AttackingState());
+    this.stateMachine.registerState(BehaviorState.DEAD, new DeadState());
+
+    this.stateMachine.changeState(BehaviorState.MOVING);
   }
 
   update(_time: number, delta: number): void {
-    if (this.state === MonsterState.DEAD) return;
-
-    const target = this.findNearbyTarget();
-
-    if (target) {
-      this.state = MonsterState.ATTACKING;
-      this.attackTarget(target);
-    } else {
-      if (this.state === MonsterState.ATTACKING) {
-        this.state = MonsterState.MOVING;
-      }
-      this.moveLeft(delta);
-    }
+    this.statusEffects.update(delta);
+    this.stateMachine.update(delta);
   }
 
-  private findNearbyTarget(): any | null {
+  move(delta: number): void {
+    const speed = this.getSpeed();
+    const moveDistance = (speed * delta) / 1000;
+    this.sprite.x -= moveDistance;
+  }
+
+  findTarget(): CombatEntity | Base | null {
     const units = this.scene.data.get("units") || [];
     const playerBase = this.scene.data.get("playerBase");
 
@@ -76,7 +87,7 @@ export abstract class BaseMonster {
     let nearestDistance = Infinity;
 
     for (const unit of units) {
-      if (unit.getState() === "dead") continue;
+      if (unit.isDead && unit.isDead()) continue;
 
       const distance = Phaser.Math.Distance.Between(
         this.sprite.x,
@@ -85,7 +96,7 @@ export abstract class BaseMonster {
         unit.spineObject.y
       );
 
-      if (distance <= this.attackRange && distance < nearestDistance) {
+      if (distance < nearestDistance) {
         nearestDistance = distance;
         nearestTarget = unit;
       }
@@ -96,86 +107,116 @@ export abstract class BaseMonster {
     }
 
     if (playerBase && playerBase.isActive()) {
-      const baseDistance = Phaser.Math.Distance.Between(
-        this.sprite.x,
-        this.sprite.y,
-        playerBase.getX(),
-        playerBase.getY()
-      );
-
-      if (baseDistance <= this.attackRange) {
-        return playerBase;
-      }
+      return playerBase;
     }
 
     return null;
   }
 
-  private attackTarget(target: any): void {
+  attack(target: CombatEntity | Base): void {
     const currentTime = this.scene.time.now;
 
-    if (currentTime - this.lastAttackTime >= this.attackSpeed) {
+    if (currentTime - this.lastAttackTime >= this.getAttackSpeed()) {
       this.lastAttackTime = currentTime;
-      target.takeDamage(this.attackDamage);
-
-      this.sprite.setTint(0xff8800);
-      this.scene.time.delayedCall(100, () => {
-        if (this.state !== MonsterState.DEAD) {
-          this.sprite.clearTint();
-        }
-      });
-    }
-  }
-
-  private moveLeft(delta: number): void {
-    const moveDistance = (this.speed * delta) / 1000;
-    this.sprite.x -= moveDistance;
-
-    if (this.sprite.x < -100) {
-      this.reachPlayerBase();
+      target.takeDamage(this.getAttackDamage());
+      this.playAttackAnimation();
     }
   }
 
   takeDamage(damage: number): void {
-    if (this.state === MonsterState.DEAD) {
-      console.log("Monster is already dead, ignoring damage");
+    if (this.isDead()) {
       return;
     }
 
     this.currentHealth -= damage;
-    console.log(
-      `Monster took ${damage} damage. HP: ${this.currentHealth}/${this.maxHealth}`
-    );
-
-    this.sprite.setTint(0xff0000);
-    this.scene.time.delayedCall(100, () => {
-      if (this.state !== MonsterState.DEAD && this.sprite) {
-        this.sprite.clearTint();
-      }
-    });
+    this.playHitAnimation();
 
     if (this.currentHealth <= 0) {
-      console.log("Monster died!");
-      this.die();
+      this.stateMachine.changeState(BehaviorState.DEAD);
     }
   }
 
-  private die(): void {
-    this.state = MonsterState.DEAD;
+  heal(amount: number): void {
+    this.currentHealth = Math.min(this.currentHealth + amount, this.maxHealth);
+  }
+
+  playIdleAnimation(): void {
+    this.sprite.clearTint();
+  }
+
+  playMoveAnimation(): void {
+    this.sprite.clearTint();
+  }
+
+  playAttackAnimation(): void {
+    this.sprite.setTint(0xff8800);
+    this.scene.time.delayedCall(100, () => {
+      if (!this.isDead()) {
+        this.sprite.clearTint();
+      }
+    });
+  }
+
+  playStunAnimation(): void {
+    this.playHitAnimation();
+  }
+
+  playHitAnimation(): void {
+    if (this.stateMachine.isInState(BehaviorState.ATTACKING)) {
+      return;
+    }
+
+    this.sprite.setTint(0xff0000);
+    this.scene.time.delayedCall(100, () => {
+      if (!this.isDead() && this.sprite) {
+        this.sprite.clearTint();
+      }
+    });
+  }
+
+  playDeadAnimation(): void {
     this.scene.events.emit("monster-killed", this, this.reward);
 
     this.sprite.setTint(0x666666);
     this.sprite.setAlpha(0.7);
 
     this.scene.time.delayedCall(500, () => {
-      this.sprite.destroy();
+      if (this.sprite) {
+        this.sprite.destroy();
+      }
     });
   }
 
-  private reachPlayerBase(): void {
-    this.scene.events.emit("monster-reached-player-base", this);
-    this.sprite.destroy();
-    this.state = MonsterState.DEAD;
+  getSpeed(): number {
+    return this.speed * this.speedMultiplier;
+  }
+
+  getAttackDamage(): number {
+    return this.attackDamage * this.attackDamageMultiplier;
+  }
+
+  getAttackSpeed(): number {
+    return this.attackSpeed / this.attackSpeedMultiplier;
+  }
+
+  getAttackRange(): number {
+    return this.attackRange;
+  }
+
+  isDead(): boolean {
+    return this.currentHealth <= 0;
+  }
+
+  getScene(): Phaser.Scene {
+    return this.scene;
+  }
+
+  getX(): number {
+    return this.sprite.x;
+  }
+
+  getY(): number {
+    return this.sprite.y;
   }
 
   getCurrentHealth(): number {
@@ -188,9 +229,5 @@ export abstract class BaseMonster {
 
   getReward(): number {
     return this.reward;
-  }
-
-  getState(): MonsterState {
-    return this.state;
   }
 }

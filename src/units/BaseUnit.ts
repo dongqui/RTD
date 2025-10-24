@@ -1,4 +1,12 @@
 import { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
+import { CombatEntity } from "../fsm/CombatEntity";
+import { StateMachine } from "../fsm/StateMachine";
+import { StatusEffectManager } from "../fsm/effects/StatusEffectManager";
+import { BehaviorState } from "../fsm/StateTypes";
+import { MovingState } from "../fsm/states/MovingState";
+import { AttackingState } from "../fsm/states/AttackingState";
+import { DeadState } from "../fsm/states/DeadState";
+import Base from "../Base";
 
 export interface UnitConfig {
   health: number;
@@ -10,13 +18,8 @@ export interface UnitConfig {
   attackSpeed?: number;
 }
 
-export enum UnitState {
-  MOVING = "moving",
-  ATTACKING = "attacking",
-  DEAD = "dead",
-}
 
-export abstract class BaseUnit {
+export abstract class BaseUnit implements CombatEntity {
   protected static readonly HIT_ANIM_KEY = "Hit";
   protected static readonly DIE_ANIM_KEY = "Die";
   protected static readonly RUN_ANIM_KEY = "Run";
@@ -25,7 +28,6 @@ export abstract class BaseUnit {
   protected currentHealth: number;
   protected speed: number;
   protected cost: number;
-  protected state: UnitState;
   protected scene: Phaser.Scene;
   public spineObject: SpineGameObject;
 
@@ -34,13 +36,18 @@ export abstract class BaseUnit {
   protected attackSpeed: number;
   private lastAttackTime: number = 0;
 
+  public stateMachine: StateMachine<CombatEntity>;
+  public statusEffects: StatusEffectManager;
+  public speedMultiplier: number = 1;
+  public attackDamageMultiplier: number = 1;
+  public attackSpeedMultiplier: number = 1;
+
   constructor(scene: Phaser.Scene, x: number, y: number, config: UnitConfig) {
     this.scene = scene;
     this.maxHealth = config.health;
     this.currentHealth = config.health;
     this.speed = config.speed;
     this.cost = config.cost;
-    this.state = UnitState.MOVING;
 
     this.attackRange = config.attackRange || 100;
     this.attackDamage = config.attackDamage || 10;
@@ -53,14 +60,20 @@ export abstract class BaseUnit {
       "fantasy_character-atlas"
     );
 
-    // const scale = config.scale || 0.3;
-    // this.spineObject.setScale(scale);
-
     this.setupAnimations();
+
+    this.stateMachine = new StateMachine<CombatEntity>(this);
+    this.statusEffects = new StatusEffectManager(this);
+
+    this.stateMachine.registerState(BehaviorState.MOVING, new MovingState());
+    this.stateMachine.registerState(BehaviorState.ATTACKING, new AttackingState());
+    this.stateMachine.registerState(BehaviorState.DEAD, new DeadState());
+
+    this.stateMachine.changeState(BehaviorState.MOVING);
   }
 
   protected abstract setupAnimations(): void;
-  protected abstract playAttackAnimation(): void;
+  abstract playAttackAnimation(): void;
 
   protected playRunAnimation(): void {
     const currentAnim = this.spineObject.animationState.getCurrent(0);
@@ -75,7 +88,7 @@ export abstract class BaseUnit {
   }
 
   protected playHitAnimation(): void {
-    if (this.state === UnitState.ATTACKING) {
+    if (this.stateMachine.isInState(BehaviorState.ATTACKING)) {
       return;
     }
 
@@ -87,7 +100,7 @@ export abstract class BaseUnit {
 
     const listener = {
       complete: () => {
-        if (this.state !== UnitState.DEAD) {
+        if (!this.isDead()) {
           this.spineObject.animationState.setAnimation(
             0,
             BaseUnit.RUN_ANIM_KEY,
@@ -101,34 +114,34 @@ export abstract class BaseUnit {
     this.spineObject.animationState.addListener(listener);
   }
 
-  protected playDieAnimation(): void {
+  playDeadAnimation(): void {
     this.spineObject.animationState.setAnimation(
       0,
       BaseUnit.DIE_ANIM_KEY,
       false
     );
+
+    this.scene.events.emit("unit-killed", this);
+
+    this.scene.time.delayedCall(1000, () => {
+      if (this.spineObject) {
+        this.spineObject.destroy();
+      }
+    });
   }
 
   update(_time: number, delta: number): void {
-    if (this.state === UnitState.DEAD) return;
-
-    const target = this.findNearbyTarget();
-
-    if (target) {
-      if (this.state !== UnitState.ATTACKING) {
-        this.state = UnitState.ATTACKING;
-      }
-      this.attackTarget(target);
-    } else {
-      if (this.state === UnitState.ATTACKING) {
-        this.state = UnitState.MOVING;
-        this.playRunAnimation();
-      }
-      this.moveRight(delta);
-    }
+    this.statusEffects.update(delta);
+    this.stateMachine.update(delta);
   }
 
-  private findNearbyTarget(): any | null {
+  move(delta: number): void {
+    const speed = this.getSpeed();
+    const moveDistance = (speed * delta) / 1000;
+    this.spineObject.x += moveDistance;
+  }
+
+  findTarget(): CombatEntity | Base | null {
     const monsters = this.scene.data.get("monsters") || [];
     const enemyBase = this.scene.data.get("enemyBase");
 
@@ -136,7 +149,7 @@ export abstract class BaseUnit {
     let nearestDistance = Infinity;
 
     for (const monster of monsters) {
-      if (monster.getState() === "dead") continue;
+      if (monster.getState && monster.getState() === "dead") continue;
 
       const distance = Phaser.Math.Distance.Between(
         this.spineObject.x,
@@ -145,7 +158,7 @@ export abstract class BaseUnit {
         monster.sprite.y
       );
 
-      if (distance <= this.attackRange && distance < nearestDistance) {
+      if (distance < nearestDistance) {
         nearestDistance = distance;
         nearestTarget = monster;
       }
@@ -156,44 +169,72 @@ export abstract class BaseUnit {
     }
 
     if (enemyBase && enemyBase.isActive()) {
-      const baseDistance = Phaser.Math.Distance.Between(
-        this.spineObject.x,
-        this.spineObject.y,
-        enemyBase.getX(),
-        enemyBase.getY()
-      );
-
-      if (baseDistance <= this.attackRange) {
-        return enemyBase;
-      }
+      return enemyBase;
     }
 
     return null;
   }
 
-  private attackTarget(target: any): void {
+  attack(target: CombatEntity | Base): void {
     const currentTime = this.scene.time.now;
 
-    if (currentTime - this.lastAttackTime >= this.attackSpeed) {
+    if (currentTime - this.lastAttackTime >= this.getAttackSpeed()) {
       this.lastAttackTime = currentTime;
-      target.takeDamage(this.attackDamage);
-
+      target.takeDamage(this.getAttackDamage());
       this.playAttackAnimation();
     }
   }
 
-  private moveRight(delta: number): void {
-    const moveDistance = (this.speed * delta) / 1000;
-    this.spineObject.x += moveDistance;
+  heal(amount: number): void {
+    this.currentHealth = Math.min(this.currentHealth + amount, this.maxHealth);
+  }
 
-    const gameWidth = this.scene.cameras.main.width;
-    if (this.spineObject.x > gameWidth + 100) {
-      this.reachEnemyBase();
-    }
+  playIdleAnimation(): void {
+    this.playRunAnimation();
+  }
+
+  playMoveAnimation(): void {
+    this.playRunAnimation();
+  }
+
+  playStunAnimation(): void {
+    this.playHitAnimation();
+  }
+
+  getSpeed(): number {
+    return this.speed * this.speedMultiplier;
+  }
+
+  getAttackDamage(): number {
+    return this.attackDamage * this.attackDamageMultiplier;
+  }
+
+  getAttackSpeed(): number {
+    return this.attackSpeed / this.attackSpeedMultiplier;
+  }
+
+  getAttackRange(): number {
+    return this.attackRange;
+  }
+
+  isDead(): boolean {
+    return this.currentHealth <= 0;
+  }
+
+  getScene(): Phaser.Scene {
+    return this.scene;
+  }
+
+  getX(): number {
+    return this.spineObject.x;
+  }
+
+  getY(): number {
+    return this.spineObject.y;
   }
 
   takeDamage(damage: number): void {
-    if (this.state === UnitState.DEAD) {
+    if (this.isDead()) {
       return;
     }
 
@@ -201,27 +242,8 @@ export abstract class BaseUnit {
     this.playHitAnimation();
 
     if (this.currentHealth <= 0) {
-      this.die();
+      this.stateMachine.changeState(BehaviorState.DEAD);
     }
-  }
-
-  private die(): void {
-    this.state = UnitState.DEAD;
-    this.scene.events.emit("unit-killed", this);
-
-    this.playDieAnimation();
-
-    this.scene.time.delayedCall(1000, () => {
-      if (this.spineObject) {
-        this.spineObject.destroy();
-      }
-    });
-  }
-
-  private reachEnemyBase(): void {
-    this.scene.events.emit("unit-reached-enemy-base", this);
-    this.spineObject.destroy();
-    this.state = UnitState.DEAD;
   }
 
   getCurrentHealth(): number {
@@ -234,9 +256,5 @@ export abstract class BaseUnit {
 
   getCost(): number {
     return this.cost;
-  }
-
-  getState(): UnitState {
-    return this.state;
   }
 }

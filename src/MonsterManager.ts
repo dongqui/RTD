@@ -1,4 +1,4 @@
-import { BaseMonster, MonsterState } from "./monsters/BaseMonster";
+import { BaseMonster } from "./monsters/BaseMonster";
 import { BasicMonster } from "./monsters/BasicMonster";
 
 export class MonsterManager {
@@ -17,14 +17,6 @@ export class MonsterManager {
       (monster: BaseMonster, reward: number) => {
         this.removeMonster(monster);
         this.scene.events.emit("monster-manager-killed", monster, reward);
-      }
-    );
-
-    this.scene.events.on(
-      "monster-reached-player-base",
-      (monster: BaseMonster) => {
-        this.removeMonster(monster);
-        this.scene.events.emit("monster-manager-reached-player-base", monster);
       }
     );
   }
@@ -73,7 +65,7 @@ export class MonsterManager {
     let nearestDistance = Infinity;
 
     for (const monster of this.activeMonsters) {
-      if (monster.getState() === MonsterState.DEAD) continue;
+      if (monster.isDead()) continue;
 
       const distance = Phaser.Math.Distance.Between(
         x,
@@ -93,7 +85,7 @@ export class MonsterManager {
 
   update(): void {
     for (const monster of this.activeMonsters) {
-      if (monster.getState() !== MonsterState.DEAD) {
+      if (!monster.isDead()) {
         monster.update(this.scene.time.now, this.scene.game.loop.delta);
       }
     }

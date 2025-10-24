@@ -50,7 +50,7 @@ export class ArcherUnit extends BaseUnit {
     this.playRunAnimation();
   }
 
-  protected playAttackAnimation(): void {
+   playAttackAnimation(): void {
     this.spineObject.animationState.setAnimation(
       0,
       ArcherUnit.ATTACK_ANIM_KEY,
