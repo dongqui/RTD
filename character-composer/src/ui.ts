@@ -245,9 +245,23 @@ export class ComposerUI {
       .map((p) => `    "${p}"`)
       .join(",\n");
 
-    tsOutput.innerHTML = `<code>private static readonly SKIN_KEYS = [\n${formattedParts}\n];</code>`;
+    const colorConfig = `
+skinColor = "${this.skinColor}";
+hairColor = "${this.hairColor}";
+skinKeys = [
+${formattedParts}
+];`;
+
+    tsOutput.innerHTML = `<code>${colorConfig}</code>`;
+
+    const outputData = {
+      skinColor: this.skinColor,
+      hairColor: this.hairColor,
+      skinKeys: this.selectedParts
+    };
+
     jsonOutput.innerHTML = `<code>${JSON.stringify(
-      this.selectedParts,
+      outputData,
       null,
       2
     )}</code>`;
@@ -301,11 +315,17 @@ export class ComposerUI {
     });
 
     document.getElementById("copy-btn")!.addEventListener("click", () => {
-      const text = JSON.stringify(this.selectedParts, null, 2);
+      const outputData = {
+        skinColor: this.skinColor,
+        hairColor: this.hairColor,
+        skinKeys: this.selectedParts
+      };
+
+      const text = JSON.stringify(outputData, null, 2);
       navigator.clipboard
         .writeText(text)
         .then(() => {
-          alert("배열이 클립보드에 복사되었습니다!");
+          alert("설정이 클립보드에 복사되었습니다!");
         })
         .catch((err) => {
           console.error("Failed to copy:", err);
@@ -334,6 +354,7 @@ export class ComposerUI {
       const target = e.target as HTMLInputElement;
       this.skinColor = target.value;
       this.applyColors();
+      this.updateOutput();
     });
 
     const hairColorInput = document.getElementById(
@@ -343,6 +364,7 @@ export class ComposerUI {
       const target = e.target as HTMLInputElement;
       this.hairColor = target.value;
       this.applyColors();
+      this.updateOutput();
     });
   }
 
@@ -361,13 +383,17 @@ export class ComposerUI {
 
   savePreset(name: string) {
     const presets = this.loadPresetsData();
-    presets[name] = [...this.selectedParts];
+    presets[name] = {
+      skinKeys: [...this.selectedParts],
+      skinColor: this.skinColor,
+      hairColor: this.hairColor
+    };
     localStorage.setItem("character-presets", JSON.stringify(presets));
     this.loadPresets();
     alert(`프리셋 "${name}"이(가) 저장되었습니다!`);
   }
 
-  loadPresetsData(): { [key: string]: string[] } {
+  loadPresetsData(): { [key: string]: any } {
     const data = localStorage.getItem("character-presets");
     return data ? JSON.parse(data) : {};
   }
@@ -406,9 +432,9 @@ export class ComposerUI {
 
   applyPreset(name: string) {
     const presets = this.loadPresetsData();
-    const parts = presets[name];
+    const preset = presets[name];
 
-    if (!parts) return;
+    if (!preset) return;
 
     document
       .querySelectorAll('.part-item input[type="checkbox"]')
@@ -416,7 +442,18 @@ export class ComposerUI {
         (cb as HTMLInputElement).checked = false;
       });
 
-    this.selectedParts = [...parts];
+    if (Array.isArray(preset)) {
+      this.selectedParts = [...preset];
+    } else {
+      this.selectedParts = [...(preset.skinKeys || [])];
+      this.skinColor = preset.skinColor || "#32323c";
+      this.hairColor = preset.hairColor || "#8b4513";
+
+      const skinColorInput = document.getElementById("skin-color") as HTMLInputElement;
+      const hairColorInput = document.getElementById("hair-color") as HTMLInputElement;
+      if (skinColorInput) skinColorInput.value = this.skinColor;
+      if (hairColorInput) hairColorInput.value = this.hairColor;
+    }
 
     this.selectedParts.forEach((skinName) => {
       const checkbox = document.getElementById(
