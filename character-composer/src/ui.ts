@@ -7,6 +7,8 @@ export class ComposerUI {
   private spineObject: any = null;
   private currentAnimation: string = "Idle";
   private isFlipped: boolean = false;
+  private skinColor: string = "#ffc294";
+  private hairColor: string = "#212121";
 
   async init() {
     await this.loadSpineData();
@@ -183,7 +185,14 @@ export class ComposerUI {
     this.spineObject.skeleton.setSkin(customSkin);
     this.spineObject.skeleton.setSlotsToSetupPose();
 
-    const skin_1_slots: string[] = [
+    this.applyColors();
+    console.log("Skin updated successfully");
+  }
+
+  private applyColors() {
+    if (!this.spineObject) return;
+
+    const skinSlots: string[] = [
       "arm_r",
       "leg_l",
       "leg_r",
@@ -191,16 +200,41 @@ export class ComposerUI {
       "head",
       "arm_l",
     ];
-    skin_1_slots.forEach((slotName) => {
+
+    const hairSlots: string[] = ["hair_long", "beard", "brow", "hair", "helmet_hair"];
+
+    const skinRgb = this.hexToRgb(this.skinColor);
+    skinSlots.forEach((slotName) => {
       const slot = this.spineObject.skeleton.findSlot(slotName);
       if (slot) {
-        slot.color.r = 50 / 255;
-        slot.color.g = 60 / 255;
-        slot.color.b = 70 / 255;
+        slot.color.r = skinRgb.r / 255;
+        slot.color.g = skinRgb.g / 255;
+        slot.color.b = skinRgb.b / 255;
         slot.color.a = 1;
       }
     });
-    console.log("Skin updated successfully");
+
+    const hairRgb = this.hexToRgb(this.hairColor);
+    hairSlots.forEach((slotName) => {
+      const slot = this.spineObject.skeleton.findSlot(slotName);
+      if (slot) {
+        slot.color.r = hairRgb.r / 255;
+        slot.color.g = hairRgb.g / 255;
+        slot.color.b = hairRgb.b / 255;
+        slot.color.a = 1;
+      }
+    });
+  }
+
+  private hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 50, g: 60, b: 70 };
   }
 
   updateOutput() {
@@ -291,6 +325,24 @@ export class ComposerUI {
     searchInput.addEventListener("input", (e) => {
       const target = e.target as HTMLInputElement;
       this.filterParts(target.value.toLowerCase());
+    });
+
+    const skinColorInput = document.getElementById(
+      "skin-color"
+    ) as HTMLInputElement;
+    skinColorInput.addEventListener("input", (e) => {
+      const target = e.target as HTMLInputElement;
+      this.skinColor = target.value;
+      this.applyColors();
+    });
+
+    const hairColorInput = document.getElementById(
+      "hair-color"
+    ) as HTMLInputElement;
+    hairColorInput.addEventListener("input", (e) => {
+      const target = e.target as HTMLInputElement;
+      this.hairColor = target.value;
+      this.applyColors();
     });
   }
 
