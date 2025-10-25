@@ -1,4 +1,5 @@
 import { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
+import { Skin } from "@esotericsoftware/spine-core";
 import { CombatEntity } from "../fsm/CombatEntity";
 import { StateMachine } from "../fsm/StateMachine";
 import { StatusEffectManager } from "../fsm/effects/StatusEffectManager";
@@ -8,6 +9,7 @@ import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
+import { UnitRegistry, UnitType, UnitSpec } from "./UnitRegistry";
 
 export interface UnitConfig {
   health: number;
@@ -24,6 +26,8 @@ export abstract class BaseUnit implements CombatEntity {
   protected static readonly HIT_ANIM_KEY = "Hit";
   protected static readonly DIE_ANIM_KEY = "Die";
   protected static readonly RUN_ANIM_KEY = "Run";
+
+  protected spec: UnitSpec;
 
   protected maxHealth: number;
   protected currentHealth: number;
@@ -44,16 +48,18 @@ export abstract class BaseUnit implements CombatEntity {
   public attackDamageMultiplier: number = 1;
   public attackSpeedMultiplier: number = 1;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, config: UnitConfig) {
+  constructor(scene: Phaser.Scene, x: number, y: number, unitType: UnitType) {
     this.scene = scene;
-    this.maxHealth = config.health;
-    this.currentHealth = config.health;
-    this.speed = config.speed;
-    this.cost = config.cost;
+    this.spec = UnitRegistry.getSpec(unitType);
 
-    this.attackRange = config.attackRange || 100;
-    this.attackDamage = config.attackDamage || 10;
-    this.attackSpeed = config.attackSpeed || 1000;
+    this.maxHealth = this.spec.stats.health;
+    this.currentHealth = this.spec.stats.health;
+    this.speed = this.spec.stats.speed;
+    this.cost = this.spec.cost;
+
+    this.attackRange = this.spec.stats.attackRange;
+    this.attackDamage = this.spec.stats.attackDamage;
+    this.attackSpeed = this.spec.stats.attackSpeed;
 
     this.spineObject = this.scene.add.spine(
       x,
@@ -77,8 +83,73 @@ export abstract class BaseUnit implements CombatEntity {
     this.stateMachine.changeState(BehaviorState.MOVING);
   }
 
-  protected abstract setupAnimations(): void;
-  abstract playAttackAnimation(): void;
+  protected setupAnimations(): void {
+    const initSkin = new Skin("custom");
+
+    this.spec.visual.skinKeys.forEach((key) => {
+      const skin = this.spineObject.skeleton.data.findSkin(key);
+      if (skin) {
+        initSkin.addSkin(skin);
+      }
+    });
+    this.spineObject.skeleton.setSkin(initSkin);
+
+    const skinSlots = ["arm_r", "leg_l", "leg_r", "body", "head", "arm_l"];
+    const hairSlots = ["hair", "hair_back", "hair_front"];
+
+    const skinRgb = this.hexToRgb(this.spec.visual.skinColor);
+    skinSlots.forEach((slotName) => {
+      const slot = this.spineObject.skeleton.findSlot(slotName);
+      if (slot) {
+        slot.color.r = skinRgb.r / 255;
+        slot.color.g = skinRgb.g / 255;
+        slot.color.b = skinRgb.b / 255;
+        slot.color.a = 1;
+      }
+    });
+
+    const hairRgb = this.hexToRgb(this.spec.visual.hairColor);
+    hairSlots.forEach((slotName) => {
+      const slot = this.spineObject.skeleton.findSlot(slotName);
+      if (slot) {
+        slot.color.r = hairRgb.r / 255;
+        slot.color.g = hairRgb.g / 255;
+        slot.color.b = hairRgb.b / 255;
+        slot.color.a = 1;
+      }
+    });
+
+    this.spineObject.setScale(-0.25, 0.25);
+    this.playRunAnimation();
+  }
+
+  private hexToRgb(hex: string): { r: number; g: number; b: number } {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16),
+        }
+      : { r: 50, g: 60, b: 70 };
+  }
+
+  playAttackAnimation(): void {
+    this.spineObject.animationState.setAnimation(
+      0,
+      this.spec.visual.attackAnimKey,
+      false
+    );
+
+    const listener = {
+      complete: () => {
+        this.playRunAnimation();
+        this.spineObject.animationState.removeListener(listener);
+      },
+    };
+
+    this.spineObject.animationState.addListener(listener);
+  }
 
   protected playRunAnimation(): void {
     const currentAnim = this.spineObject.animationState.getCurrent(0);
@@ -227,6 +298,14 @@ export abstract class BaseUnit implements CombatEntity {
 
   getAttackRange(): number {
     return this.attackRange;
+  }
+
+  getLastAttackTime(): number {
+    return this.lastAttackTime;
+  }
+
+  setLastAttackTime(time: number): void {
+    this.lastAttackTime = time;
   }
 
   isDead(): boolean {

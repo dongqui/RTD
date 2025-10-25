@@ -1,5 +1,6 @@
 import PlayerDeck, { CardData } from "../PlayerDeck";
 import { UnitType } from "../UnitManager";
+import { UnitRegistry } from "../units/UnitRegistry";
 
 interface CardOption {
   type: UnitType;
@@ -25,10 +26,13 @@ export default class CardDrawUI {
   }
 
   private generateCardOptions(): void {
-    const cardPool = [
-      { type: "warrior" as UnitType, cost: 5, name: "Warrior", weight: 50 },
-      { type: "archer" as UnitType, cost: 4, name: "Archer", weight: 50 },
-    ];
+    const allSpecs = UnitRegistry.getAllSpecs();
+    const cardPool = allSpecs.map(spec => ({
+      type: spec.id,
+      cost: spec.cost,
+      name: spec.name,
+      weight: 50
+    }));
 
     const totalWeight = cardPool.reduce((sum, card) => sum + card.weight, 0);
 

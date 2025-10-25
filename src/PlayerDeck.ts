@@ -1,4 +1,5 @@
 import { UnitType } from "./UnitManager";
+import { UnitRegistry } from "./units/UnitRegistry";
 
 export interface CardData {
   type: UnitType;
@@ -29,11 +30,17 @@ export default class PlayerDeck {
   }
 
   private initializeDefaultDeck(): void {
-    const defaultCards: CardData[] = [
-      { type: "warrior", cost: 5, name: "Warrior", id: this.generateId() },
-      { type: "archer", cost: 4, name: "Archer", id: this.generateId() },
-      { type: "warrior", cost: 5, name: "Knight", id: this.generateId() },
-    ];
+    const defaultUnitTypes: UnitType[] = ["warrior", "archer", "lightning_wizard"];
+
+    const defaultCards: CardData[] = defaultUnitTypes.map(type => {
+      const spec = UnitRegistry.getSpec(type);
+      return {
+        type: spec.id,
+        cost: spec.cost,
+        name: spec.name,
+        id: this.generateId()
+      };
+    });
 
     defaultCards.forEach(card => this.addCard(card));
   }

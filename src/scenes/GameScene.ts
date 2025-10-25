@@ -224,9 +224,12 @@ export default class GameScene extends Phaser.Scene {
 
     if (cardPool.length === 0) {
       console.warn("No cards in deck! Using default cards.");
+      const { UnitRegistry } = require("../units/UnitRegistry");
+      const warriorSpec = UnitRegistry.getSpec("warrior");
+      const archerSpec = UnitRegistry.getSpec("archer");
       cardPool.push(
-        { type: "warrior" as const, cost: 5, name: "Warrior", weight: 1 },
-        { type: "archer" as const, cost: 4, name: "Archer", weight: 1 }
+        { type: warriorSpec.id, cost: warriorSpec.cost, name: warriorSpec.name, weight: 1 },
+        { type: archerSpec.id, cost: archerSpec.cost, name: archerSpec.name, weight: 1 }
       );
     }
 

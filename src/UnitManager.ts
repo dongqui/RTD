@@ -1,8 +1,7 @@
 import { BaseUnit } from "./units/BaseUnit";
-import { WarriorUnit } from "./units/WarriorUnit";
-import { ArcherUnit } from "./units/ArcherUnit";
+import { UnitRegistry } from "./units/UnitRegistry";
 
-export type UnitType = "warrior" | "archer";
+export type { UnitType } from "./units/UnitRegistry";
 
 export class UnitManager {
   private units: BaseUnit[] = [];
@@ -13,19 +12,15 @@ export class UnitManager {
     this.scene.data.set("units", this.units);
   }
 
-  spawnUnit(type: UnitType, x: number, y: number): BaseUnit | null {
-    let unit: BaseUnit;
-
-    switch (type) {
-      case "warrior":
-        unit = new WarriorUnit(this.scene, x, y);
-        break;
-      case "archer":
-        unit = new ArcherUnit(this.scene, x, y);
-        break;
-      default:
-        return null;
+  spawnUnit(type: string, x: number, y: number): BaseUnit | null {
+    if (!UnitRegistry.hasSpec(type)) {
+      console.error(`Unknown unit type: ${type}`);
+      return null;
     }
+
+    const spec = UnitRegistry.getSpec(type);
+    const UnitClass = spec.unitClass as any;
+    const unit = new UnitClass(this.scene, x, y) as BaseUnit;
 
     this.units.push(unit);
     this.scene.data.set("units", this.units);

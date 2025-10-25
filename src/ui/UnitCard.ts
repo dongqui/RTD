@@ -1,4 +1,5 @@
 import type { UnitType } from "../UnitManager";
+import { UnitRegistry } from "../units/UnitRegistry";
 
 export interface UnitCardConfig {
   type: UnitType;
@@ -105,12 +106,13 @@ export default class UnitCard {
     const iconX = 60 - iconSize / 2;
     const iconY = 20;
 
-    const unitColors: Record<UnitType, number> = {
-      warrior: 0xff4444,
-      archer: 0x44ff44,
-    };
+    let cardColor = 0xffffff;
+    if (UnitRegistry.hasSpec(this.config.type)) {
+      const spec = UnitRegistry.getSpec(this.config.type);
+      cardColor = spec.cardColor || 0xffffff;
+    }
 
-    this.background.fillStyle(unitColors[this.config.type] || 0xffffff, alpha);
+    this.background.fillStyle(cardColor, alpha);
     this.background.fillCircle(60, iconY + iconSize / 2, iconSize / 2);
   }
 
