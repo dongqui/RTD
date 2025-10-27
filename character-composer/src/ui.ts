@@ -366,6 +366,26 @@ ${formattedParts}
       this.applyColors();
       this.updateOutput();
     });
+
+    document.getElementById("export-image-btn")!.addEventListener("click", () => {
+      const unitTypeInput = document.getElementById("unit-type-input") as HTMLInputElement;
+      const unitType = unitTypeInput.value.trim();
+
+      if (!unitType) {
+        alert("유닛 타입을 입력해주세요! (예: warrior, archer, lightning_wizard, frozen_wizard)");
+        return;
+      }
+
+      const game = (window as any).game as Phaser.Game;
+      const scene = game.scene.getScene("ComposerScene") as any;
+
+      if (scene && scene.captureCharacter) {
+        scene.captureCharacter(unitType);
+        alert(`이미지가 unit_portrait_${unitType}.png 로 저장됩니다!`);
+      } else {
+        console.error("Scene not found or captureCharacter method missing");
+      }
+    });
   }
 
   filterParts(searchTerm: string) {
