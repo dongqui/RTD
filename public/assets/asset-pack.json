@@ -40,6 +40,11 @@
         "key": "lightning",
         "url": "assets/skills/lightning.png",
         "frameConfig": { "frameWidth": 128, "frameHeight": 256, "endFrame": 4 }
+      },
+      {
+        "type": "image",
+        "key": "background_game",
+        "url": "assets/background_game.png"
       }
     ]
   },
