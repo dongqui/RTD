@@ -1,7 +1,7 @@
 import { BaseUnit } from "./BaseUnit";
 import { CombatEntity } from "../fsm/CombatEntity";
 import Base from "../Base";
-
+import { UnitSpec } from "./UnitRegistry";
 export class LightningWizard extends BaseUnit {
   private attackStack: number = 0;
   private maxAttackStack: number = 10;
@@ -14,7 +14,10 @@ export class LightningWizard extends BaseUnit {
     if (!LightningWizard.lightningAnimCreated && this.scene.anims) {
       this.scene.anims.create({
         key: "lightning_strike",
-        frames: this.scene.anims.generateFrameNumbers("lightning", { start: 0, end: 4 }),
+        frames: this.scene.anims.generateFrameNumbers("lightning", {
+          start: 0,
+          end: 4,
+        }),
         frameRate: 15,
         repeat: 0,
       });
@@ -44,18 +47,8 @@ export class LightningWizard extends BaseUnit {
     const targetX = target.getX();
     let targetY = target.getY();
 
-    let targetHeight = 50;
-    if ('spineObject' in target && target.spineObject) {
-      targetHeight = 100;
-    } else if ('sprite' in target && (target as any).sprite) {
-      const sprite = (target as any).sprite;
-      targetHeight = sprite.displayHeight || 50;
-    }
-
-    targetY -= targetHeight * 0.5;
-
     const lightning = this.scene.add.sprite(targetX, targetY, "lightning");
-    lightning.setScale(0.5);
+    // lightning.setScale(0.5);
     lightning.setAlpha(0.9);
     lightning.setBlendMode(Phaser.BlendModes.ADD);
 
@@ -77,10 +70,43 @@ export class LightningWizard extends BaseUnit {
   }
 
   private updateAttackSpeed(): void {
-    this.attackSpeedMultiplier = 1 + (this.attackStack * this.attackSpeedPerStack);
+    this.attackSpeedMultiplier =
+      1 + this.attackStack * this.attackSpeedPerStack;
   }
 
   getAttackStack(): number {
     return this.attackStack;
   }
 }
+
+export const lightningWizardSpec: UnitSpec = {
+  id: "lightning_wizard",
+  name: "전격 마도사",
+  cost: 6,
+  description: "공격할수록 공속 증가, 이동 시 초기화",
+  cardColor: 0xffff44,
+  stats: {
+    health: 30,
+    speed: 50,
+    attackRange: 150,
+    attackDamage: 10,
+    attackSpeed: 800,
+  },
+  visual: {
+    skinColor: "#f5cfb3",
+    hairColor: "#f9fd17",
+    skinKeys: [
+      "boots/boots_f_12",
+      "bottom/bottom_f_29",
+      "eyewear/eyewear_f_26",
+      "gear_left/gear_left_f_24",
+      "gloves/gloves_f_14",
+      "hair_short/hair_short_f_15",
+      "mouth/mouth_f_9",
+      "skin/skin_1",
+      "top/top_f_41",
+    ],
+    attackAnimKey: "Attack3",
+  },
+  unitClass: LightningWizard,
+};
