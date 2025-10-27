@@ -62,4 +62,22 @@ export default class GameManager {
   getCameraManager(): any {
     return this.cameraManager;
   }
+
+  reset(): void {
+    this.gold = 100;
+    this.currentState = GameState.BATTLE;
+
+    const playerBase = this.scene.data.get("playerBase") as Base;
+    const enemyBase = this.scene.data.get("enemyBase") as Base;
+
+    if (playerBase) {
+      playerBase.reset();
+    }
+
+    if (enemyBase) {
+      enemyBase.reset();
+    }
+
+    this.scene.events.emit('gold-changed', this.gold);
+  }
 }

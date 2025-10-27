@@ -13,7 +13,10 @@ export default class UnitCard {
   private container: Phaser.GameObjects.Container;
   private background: Phaser.GameObjects.Graphics;
   private nameText: Phaser.GameObjects.Text;
+  private descText: Phaser.GameObjects.Text;
   private costText: Phaser.GameObjects.Text;
+  private statsText: Phaser.GameObjects.Text;
+  private characterImage: Phaser.GameObjects.Image | null = null;
   private config: UnitCardConfig;
   private isEnabled: boolean = true;
   private onClick: (() => void) | null = null;
@@ -30,96 +33,167 @@ export default class UnitCard {
     this.container = this.scene.add.container(x, y);
     this.container.setScrollFactor(0);
     this.container.setDepth(9999);
-    this.container.setSize(120, 160);
+    this.container.setSize(280, 400);
 
     this.background = this.scene.add.graphics();
     this.drawCard(true);
 
-    this.nameText = this.scene.add.text(60, 60, config.name, {
-      fontSize: "18px",
-      color: "#ffffff",
+    const spec = UnitRegistry.hasSpec(config.type)
+      ? UnitRegistry.getSpec(config.type)
+      : null;
+
+    this.nameText = this.scene.add.text(140, 250, config.name, {
+      fontSize: "32px",
+      color: "#2a2a3a",
       fontStyle: "bold",
+      fontFamily: "Arial",
     });
     this.nameText.setOrigin(0.5);
 
-    this.costText = this.scene.add.text(60, 140, `${config.cost}`, {
-      fontSize: "28px",
-      color: "#ffd700",
+    this.descText = this.scene.add.text(140, 315, spec?.description || "", {
+      fontSize: "20px",
+      color: "#ffffff",
+      fontFamily: "Arial",
+      align: "center",
+      wordWrap: { width: 230 },
+    });
+    this.descText.setOrigin(0.5);
+
+    this.statsText = this.scene.add.text(
+      140,
+      372,
+      spec ? `⚔️${spec.stats.attackDamage} ❤️${spec.stats.health}` : "",
+      {
+        fontSize: "24px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      }
+    );
+    this.statsText.setOrigin(0.5);
+
+    this.costText = this.scene.add.text(45, 45, `${config.cost}`, {
+      fontSize: "48px",
+      color: "#ffffff",
       fontStyle: "bold",
+      stroke: "#000000",
+      strokeThickness: 5,
     });
     this.costText.setOrigin(0.5);
-
-    const costLabel = this.scene.add.text(60, 115, "COST", {
-      fontSize: "12px",
-      color: "#aaaaaa",
-    });
-    costLabel.setOrigin(0.5);
 
     this.container.add([
       this.background,
       this.nameText,
-      costLabel,
+      this.descText,
+      this.statsText,
       this.costText,
     ]);
 
-    const hitArea = new Phaser.Geom.Rectangle(0, 0, 120, 160);
+    this.loadCharacterImage();
+
+    const hitArea = new Phaser.Geom.Rectangle(0, 0, 280, 400);
     this.container.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
 
-    this.container.on("pointerdown", (_pointer: any, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-      event.stopPropagation();
-      if (this.isEnabled && this.onClick) {
-        this.onClick();
+    this.container.on(
+      "pointerdown",
+      (
+        _pointer: any,
+        _localX: number,
+        _localY: number,
+        event: Phaser.Types.Input.EventData
+      ) => {
+        event.stopPropagation();
+        if (this.isEnabled && this.onClick) {
+          this.onClick();
+        }
       }
-    });
+    );
 
-    this.container.on("pointerup", (_pointer: any, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
-      event.stopPropagation();
-    });
+    this.container.on(
+      "pointerup",
+      (
+        _pointer: any,
+        _localX: number,
+        _localY: number,
+        event: Phaser.Types.Input.EventData
+      ) => {
+        event.stopPropagation();
+      }
+    );
 
     this.container.on("pointerover", () => {
       if (this.isEnabled) {
-        this.scene.input.setDefaultCursor('pointer');
+        this.scene.input.setDefaultCursor("pointer");
         this.drawCard(true, true);
       }
     });
 
     this.container.on("pointerout", () => {
-      this.scene.input.setDefaultCursor('default');
+      this.scene.input.setDefaultCursor("default");
       this.drawCard(this.isEnabled);
     });
+  }
+
+  private loadCharacterImage(): void {
+    if (!UnitRegistry.hasSpec(this.config.type)) {
+      return;
+    }
+
+    const imageKey = `unit_portrait_${this.config.type}`;
+
+    if (this.scene.textures.exists(imageKey)) {
+      this.characterImage = this.scene.add.image(140, 120, imageKey);
+      this.characterImage.setDisplaySize(250, 200);
+      this.container.add(this.characterImage);
+    } else {
+      const placeholderText = this.scene.add.text(140, 120, "📷", {
+        fontSize: "80px",
+      });
+      placeholderText.setOrigin(0.5);
+      this.container.add(placeholderText);
+    }
   }
 
   private drawCard(enabled: boolean, hover: boolean = false): void {
     this.background.clear();
 
     const alpha = enabled ? 1 : 0.5;
-    const bgColor = enabled ? 0x2a2a3a : 0x1a1a1a;
-    const borderColor = hover ? 0xffff00 : enabled ? 0x5555ff : 0x333333;
+    const borderColor = hover ? 0xffff44 : 0xffffff;
+    const scale = hover ? 1.05 : 1;
 
-    this.background.fillStyle(bgColor, alpha);
-    this.background.fillRoundedRect(0, 0, 120, 160, 12);
+    this.container.setScale(scale);
 
-    this.background.lineStyle(hover ? 3 : 2, borderColor, alpha);
-    this.background.strokeRoundedRect(0, 0, 120, 160, 12);
+    this.background.lineStyle(6, 0x8b6f47, alpha);
+    this.background.strokeRoundedRect(0, 0, 280, 400, 20);
 
-    const iconSize = 40;
-    const iconX = 60 - iconSize / 2;
-    const iconY = 20;
+    this.background.fillStyle(0xf5deb3, alpha);
+    this.background.fillRoundedRect(15, 15, 250, 210, 12);
 
-    let cardColor = 0xffffff;
-    if (UnitRegistry.hasSpec(this.config.type)) {
-      const spec = UnitRegistry.getSpec(this.config.type);
-      cardColor = spec.cardColor || 0xffffff;
+    this.background.fillStyle(0xfff8dc, alpha);
+    this.background.fillRoundedRect(15, 230, 250, 45, 10);
+
+    this.background.fillStyle(0x5a4a3a, alpha * 0.9);
+    this.background.fillRoundedRect(15, 280, 250, 70, 10);
+
+    this.background.fillStyle(0x3a2a2a, alpha * 0.9);
+    this.background.fillRoundedRect(15, 355, 250, 35, 10);
+
+    this.background.fillStyle(0x4a9eff, alpha);
+    this.background.fillCircle(45, 45, 32);
+    this.background.lineStyle(4, 0xffffff, alpha);
+    this.background.strokeCircle(45, 45, 32);
+
+    if (hover) {
+      this.background.lineStyle(6, borderColor, alpha);
+      this.background.strokeRoundedRect(0, 0, 280, 400, 20);
     }
-
-    this.background.fillStyle(cardColor, alpha);
-    this.background.fillCircle(60, iconY + iconSize / 2, iconSize / 2);
   }
 
   setEnabled(enabled: boolean): void {
     this.isEnabled = enabled;
     this.drawCard(enabled);
     this.nameText.setAlpha(enabled ? 1 : 0.5);
+    this.descText.setAlpha(enabled ? 1 : 0.5);
+    this.statsText.setAlpha(enabled ? 1 : 0.5);
     this.costText.setAlpha(enabled ? 1 : 0.5);
   }
 
@@ -133,6 +207,10 @@ export default class UnitCard {
 
   getCost(): number {
     return this.config.cost;
+  }
+
+  setVisible(visible: boolean): void {
+    this.container.setVisible(visible);
   }
 
   destroy(): void {

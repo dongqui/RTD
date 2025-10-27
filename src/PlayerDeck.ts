@@ -30,7 +30,7 @@ export default class PlayerDeck {
   }
 
   private initializeDefaultDeck(): void {
-    const defaultUnitTypes: UnitType[] = ["warrior", "archer", "lightning_wizard"];
+    const defaultUnitTypes: UnitType[] = ["warrior", "archer", "lightning_wizard", "frozen_wizard"];
 
     const defaultCards: CardData[] = defaultUnitTypes.map(type => {
       const spec = UnitRegistry.getSpec(type);

@@ -147,6 +147,14 @@ export default class CardManager {
     return [...this.cardPool];
   }
 
+  setVisible(visible: boolean): void {
+    this.cards.forEach((card) => {
+      if (card) {
+        card.setVisible(visible);
+      }
+    });
+  }
+
   destroy(): void {
     this.clearCards();
   }

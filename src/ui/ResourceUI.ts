@@ -48,6 +48,10 @@ export default class ResourceUI {
     this.fillBar.fillRoundedRect(5, barY, fillWidth, barHeight, 4);
   }
 
+  setVisible(visible: boolean): void {
+    this.container.setVisible(visible);
+  }
+
   destroy(): void {
     this.container.destroy();
   }

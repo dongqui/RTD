@@ -127,4 +127,12 @@ export default class Base {
   getSprite(): Phaser.GameObjects.Sprite {
     return this.sprite;
   }
+
+  reset(): void {
+    this.currentHealth = this.maxHealth;
+    this.isDestroyed = false;
+    this.sprite.setAlpha(1);
+    this.sprite.y = this.sprite.y;
+    this.updateHealthBar();
+  }
 }

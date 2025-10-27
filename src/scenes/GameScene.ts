@@ -9,6 +9,7 @@ import UnitCard from "../ui/UnitCard";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
+import BottomNavigation from "../ui/BottomNavigation";
 
 export default class GameScene extends Phaser.Scene {
   private cameraManager: CameraManager;
@@ -21,6 +22,10 @@ export default class GameScene extends Phaser.Scene {
   private cardManager: CardManager;
   private playerBase: Base;
   private enemyBase: Base;
+  private navigation: BottomNavigation;
+  private infoText: Phaser.GameObjects.Text;
+  private startButton: Phaser.GameObjects.Rectangle;
+  private startButtonText: Phaser.GameObjects.Text;
 
   constructor() {
     super("GameScene");
@@ -38,6 +43,19 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    const { width, height } = this.scale.gameSize;
+
+    const background = this.add
+      .image(width / 2, height / 2, "background_game")
+      .setOrigin(0.5)
+      .setDepth(-1);
+
+    const scaleX = width / background.width;
+    const scaleY = height / background.height;
+    const scale = Math.max(scaleX, scaleY);
+
+    background.setScale(scale);
+
     this.gameManager = new GameManager(this);
     this.cameraManager = new CameraManager(this);
     this.gameManager.setCameraManager(this.cameraManager);
@@ -56,7 +74,10 @@ export default class GameScene extends Phaser.Scene {
 
     this.cameraManager.setupCameraDrag();
 
-    this.gameManager.startBattle();
+    this.navigation = new BottomNavigation(this);
+
+    this.hideGameElements();
+    this.createStartButton();
   }
 
   private setupBases(): void {
@@ -141,7 +162,7 @@ export default class GameScene extends Phaser.Scene {
     const { width, height } = this.scale.gameSize;
     const isMobile = width < 800 || height < 600;
 
-    const infoText = this.add
+    this.infoText = this.add
       .text(20, 20, "", {
         fontSize: isMobile ? "20px" : "16px",
         color: "#ffffff",
@@ -155,7 +176,7 @@ export default class GameScene extends Phaser.Scene {
       const text = isMobile
         ? `Player HP: ${this.gameManager.getPlayerBaseHealth()} | Enemy HP: ${this.gameManager.getEnemyBaseHealth()} | Gold: ${this.gameManager.getGold()}`
         : `Player Base: ${this.gameManager.getPlayerBaseHealth()} | Enemy Base: ${this.gameManager.getEnemyBaseHealth()} | Gold: ${this.gameManager.getGold()}`;
-      infoText.setText(text);
+      this.infoText.setText(text);
     };
 
     this.events.on("player-base-damaged", updateInfo);
@@ -168,7 +189,7 @@ export default class GameScene extends Phaser.Scene {
   private showGameOverScreen(): void {
     const { width, height } = this.scale.gameSize;
 
-    this.add
+    const resultText = this.add
       .text(width / 2, height / 2, "GAME OVER", {
         fontSize: "64px",
         color: "#ff0000",
@@ -180,12 +201,18 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(10000);
 
     this.spawnManager.stop();
+    this.hideGameElements();
+
+    this.time.delayedCall(2000, () => {
+      resultText.destroy();
+      this.resetToInitialState();
+    });
   }
 
   private showGameClearScreen(): void {
     const { width, height } = this.scale.gameSize;
 
-    this.add
+    const resultText = this.add
       .text(width / 2, height / 2, "VICTORY!", {
         fontSize: "64px",
         color: "#00ff00",
@@ -197,6 +224,12 @@ export default class GameScene extends Phaser.Scene {
       .setDepth(10000);
 
     this.spawnManager.stop();
+    this.hideGameElements();
+
+    this.time.delayedCall(2000, () => {
+      resultText.destroy();
+      this.resetToInitialState();
+    });
   }
 
   private setupResourceUI(): void {
@@ -273,6 +306,86 @@ export default class GameScene extends Phaser.Scene {
 
     const currentResource = this.resourceManager.getCurrentResource();
     this.cardManager.updateCardStates(currentResource);
+  }
+
+  private createStartButton(): void {
+    const { width, height } = this.scale.gameSize;
+
+    this.startButton = this.add
+      .rectangle(width / 2, height / 2, 300, 100, 0x4a9eff)
+      .setInteractive({ useHandCursor: true })
+      .setDepth(10000);
+
+    this.startButtonText = this.add
+      .text(width / 2, height / 2, "START", {
+        fontSize: "48px",
+        color: "#ffffff",
+        fontStyle: "bold",
+      })
+      .setOrigin(0.5)
+      .setDepth(10001);
+
+    this.startButton.on("pointerover", () => {
+      this.startButton.setFillStyle(0x5aafff);
+      this.startButtonText.setScale(1.1);
+    });
+
+    this.startButton.on("pointerout", () => {
+      this.startButton.setFillStyle(0x4a9eff);
+      this.startButtonText.setScale(1);
+    });
+
+    this.startButton.on("pointerdown", () => {
+      this.startButton.setFillStyle(0x3a8eef);
+      this.startButtonText.setScale(0.95);
+    });
+
+    this.startButton.on("pointerup", () => {
+      this.startGame();
+      this.startButton.destroy();
+      this.startButtonText.destroy();
+    });
+  }
+
+  private startGame(): void {
+    this.navigation.hide();
+    this.showGameElements();
+    this.spawnManager.start();
+    this.gameManager.startBattle();
+  }
+
+  private hideGameElements(): void {
+    if (this.resourceUI) {
+      this.resourceUI.setVisible(false);
+    }
+    if (this.cardManager) {
+      this.cardManager.setVisible(false);
+    }
+    if (this.infoText) {
+      this.infoText.setVisible(false);
+    }
+  }
+
+  private showGameElements(): void {
+    if (this.resourceUI) {
+      this.resourceUI.setVisible(true);
+    }
+    if (this.cardManager) {
+      this.cardManager.setVisible(true);
+    }
+    if (this.infoText) {
+      this.infoText.setVisible(true);
+    }
+  }
+
+  private resetToInitialState(): void {
+    this.hideGameElements();
+    this.monsterManager.clear();
+    this.unitManager.clear();
+    this.gameManager.reset();
+    this.cardManager.resetCards();
+    this.navigation.show();
+    this.createStartButton();
   }
 
   update(): void {

@@ -28,8 +28,6 @@ export class SpawnManager {
 
     this.enemySpawnX = this.scene.cameras.main.width - 100;
     this.spawnY = this.scene.cameras.main.height / 2;
-
-    this.setupAutoSpawn();
   }
 
   private setupAutoSpawn(): void {
@@ -42,6 +40,10 @@ export class SpawnManager {
 
   private spawnEnemyMonster(): void {
     this.monsterManager.spawnMonster("basic", this.enemySpawnX, this.spawnY);
+  }
+
+  start(): void {
+    this.setupAutoSpawn();
   }
 
   stop(): void {
