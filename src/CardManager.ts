@@ -25,12 +25,12 @@ export default class CardManager {
 
   private calculateCardPositions(): void {
     const { width, height } = this.scene.scale.gameSize;
-    const cardWidth = 120;
-    const cardSpacing = 20;
+    const cardWidth = 112;
+    const cardSpacing = 15;
     const totalWidth =
       this.maxCards * cardWidth + (this.maxCards - 1) * cardSpacing;
-    const startX = (width - totalWidth) / 2;
-    const cardY = height - 100;
+    const startX = (width - totalWidth) / 2 + cardWidth * 0.5;
+    const cardY = height - 120;
 
     this.cardPositions = [];
     for (let i = 0; i < this.maxCards; i++) {
