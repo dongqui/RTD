@@ -27,7 +27,7 @@ export const worriorSpec: UnitSpec = {
       "bottom/bottom_f_1",
       "eyes/eyes_f_9",
       "gear_right/gear_right_f_11",
-      "gear_left/gear_left_f_11",
+      "gear_left/gear_left_f_16",
       "hair_short/hair_short_f_1",
       "mouth/mouth_f_2",
       "skin/skin_1",
