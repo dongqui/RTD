@@ -88,7 +88,7 @@ export const lightningWizardSpec: UnitSpec = {
   stats: {
     health: 30,
     speed: 50,
-    attackRange: 150,
+    attackRange: 300,
     attackDamage: 10,
     attackSpeed: 800,
   },

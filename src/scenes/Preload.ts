@@ -67,6 +67,8 @@ export default class Preload extends Phaser.Scene {
       frameHeight: 128,
     });
 
+    this.load.image("Arrow", "assets/Arrow.png");
+
     const width = this.progressBar.width;
 
     this.load.on("progress", (value: number) => {
