@@ -119,7 +119,7 @@ export abstract class BaseUnit implements CombatEntity {
       }
     });
 
-    this.spineObject.setScale(-0.25, 0.25);
+    this.spineObject.setScale(-0.5, 0.5);
     this.playRunAnimation();
   }
 
