@@ -14,7 +14,7 @@ export interface CardPool {
 
 export default class CardManager {
   private scene: Phaser.Scene;
-  private cards: (UnitCard | SkillCard)[];
+  private cards: (UnitCard | SkillCard | null)[];
   private availableCards: CardPool[];
   private usedCards: Map<string, CardPool>;
   private cardsInHand: Set<string>;
@@ -120,7 +120,7 @@ export default class CardManager {
     return availableNotInHand[0];
   }
 
-  private handleCardClick(card: UnitCard, index: number): void {
+  private handleCardClick(card: UnitCard | SkillCard, index: number): void {
     if (this.onCardUsed) {
       this.onCardUsed(card);
     }
@@ -169,7 +169,7 @@ export default class CardManager {
     this.onCardUsed = callback;
   }
 
-  getCards(): (UnitCard | SkillCard)[] {
+  getCards(): (UnitCard | SkillCard | null)[] {
     return this.cards;
   }
 
