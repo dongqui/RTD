@@ -1,4 +1,3 @@
-import CameraManager from "../CameraManager";
 import GameManager from "../GameManager";
 import { MonsterManager } from "../MonsterManager";
 import { UnitManager } from "../UnitManager";
@@ -10,9 +9,9 @@ import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
 import BottomNavigation from "../ui/BottomNavigation";
+import { UnitRegistry } from "../units/UnitRegistry";
 
 export default class GameScene extends Phaser.Scene {
-  private cameraManager: CameraManager;
   private gameManager: GameManager;
   private monsterManager: MonsterManager;
   private unitManager: UnitManager;
@@ -57,8 +56,6 @@ export default class GameScene extends Phaser.Scene {
     background.setScale(scale);
 
     this.gameManager = new GameManager(this);
-    this.cameraManager = new CameraManager(this);
-    this.gameManager.setCameraManager(this.cameraManager);
 
     this.monsterManager = new MonsterManager(this);
     this.unitManager = new UnitManager(this);
@@ -68,11 +65,8 @@ export default class GameScene extends Phaser.Scene {
     this.setupBases();
     this.setupSpawnManager();
     this.setupGameEventHandlers();
-    this.setupMobileOptimization();
     this.setupResourceUI();
     this.setupUnitCards();
-
-    this.cameraManager.setupCameraDrag();
 
     this.navigation = new BottomNavigation(this);
 
@@ -83,8 +77,8 @@ export default class GameScene extends Phaser.Scene {
   private setupBases(): void {
     const { width, height } = this.scale.gameSize;
 
-    const playerBaseX = 150;
-    const enemyBaseX = width - 150;
+    const playerBaseX = 0;
+    const enemyBaseX = width;
     const baseY = height / 2;
 
     this.playerBase = new Base(this, playerBaseX, baseY, BaseTeam.PLAYER, 100);
@@ -101,24 +95,6 @@ export default class GameScene extends Phaser.Scene {
       this.unitManager,
       this.monsterManager
     );
-  }
-
-  private setupMobileOptimization(): void {
-    this.input.addPointer(2);
-    this.scale.on("resize", this.handleResize, this);
-    this.handleResize();
-  }
-
-  private handleResize(): void {
-    const { width, height } = this.scale.gameSize;
-
-    this.cameras.main.setBounds(0, 0, width, height);
-
-    if (width < 800 || height < 600) {
-      this.cameras.main.setZoom(0.8);
-    } else {
-      this.cameras.main.setZoom(1);
-    }
   }
 
   private setupGameEventHandlers(): void {
@@ -255,17 +231,6 @@ export default class GameScene extends Phaser.Scene {
       weight: 1,
     }));
 
-    if (cardPool.length === 0) {
-      console.warn("No cards in deck! Using default cards.");
-      const { UnitRegistry } = require("../units/UnitRegistry");
-      const warriorSpec = UnitRegistry.getSpec("warrior");
-      const archerSpec = UnitRegistry.getSpec("archer");
-      cardPool.push(
-        { type: warriorSpec.id, cost: warriorSpec.cost, name: warriorSpec.name, weight: 1 },
-        { type: archerSpec.id, cost: archerSpec.cost, name: archerSpec.name, weight: 1 }
-      );
-    }
-
     this.cardManager = new CardManager(this, cardPool);
     this.cardManager.initializeCards();
 
@@ -379,11 +344,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private resetToInitialState(): void {
-    this.hideGameElements();
     this.monsterManager.clear();
     this.unitManager.clear();
     this.gameManager.reset();
     this.cardManager.resetCards();
+    this.hideGameElements();
     this.navigation.show();
     this.createStartButton();
   }

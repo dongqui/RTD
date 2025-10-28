@@ -22,9 +22,7 @@ class Boot extends Phaser.Scene {
 
 window.addEventListener("load", function () {
   const game = new Phaser.Game({
-    type: Phaser.AUTO,
-    width: window.innerWidth * window.devicePixelRatio,
-    height: window.innerHeight * window.devicePixelRatio,
+    type: Phaser.AUTO,    
     backgroundColor: "#0099db",
     parent: "game-container",
     plugins: {
@@ -39,8 +37,8 @@ window.addEventListener("load", function () {
     scale: {
       mode: Phaser.Scale.ENVELOP,
       autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: window.innerWidth * window.devicePixelRatio,
-      height: window.innerHeight * window.devicePixelRatio,
+      width: 720,
+      height: 1280,
     },
     physics: {
       default: "arcade",
