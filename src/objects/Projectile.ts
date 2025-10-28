@@ -35,12 +35,6 @@ export class Projectile {
     if (!this.active) {
       return false;
     }
-
-    if (this.target.isDead && this.target.isDead()) {
-      this.destroy();
-      return false;
-    }
-
     const targetX = this.target.getX();
     const targetY = this.target.getY();
 
