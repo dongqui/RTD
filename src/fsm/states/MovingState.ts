@@ -27,9 +27,11 @@ export class MovingState implements State<CombatEntity> {
         entity.stateMachine.changeState(BehaviorState.ATTACKING);
         return;
       }
-    }
 
-    entity.move(delta);
+      entity.moveTowards(target.getX(), target.getY(), delta);
+    } else {
+      entity.move(delta);
+    }
   }
 
   exit(_entity: CombatEntity): void {

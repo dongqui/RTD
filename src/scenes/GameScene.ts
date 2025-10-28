@@ -139,7 +139,7 @@ export default class GameScene extends Phaser.Scene {
     const isMobile = width < 800 || height < 600;
 
     this.infoText = this.add
-      .text(20, 20, "", {
+      .text(10, 10, "", {
         fontSize: isMobile ? "20px" : "16px",
         color: "#ffffff",
         backgroundColor: "#000000",
@@ -211,7 +211,7 @@ export default class GameScene extends Phaser.Scene {
   private setupResourceUI(): void {
     const { height } = this.scale.gameSize;
 
-    this.resourceUI = new ResourceUI(this, 20, height - 80, 10);
+    this.resourceUI = new ResourceUI(this, 10, height - 180, 10);
     this.resourceUI.updateResource(this.resourceManager.getCurrentResource());
 
     this.events.on("resource-changed", (currentResource: number) => {
@@ -250,9 +250,9 @@ export default class GameScene extends Phaser.Scene {
     }
 
     const { height } = this.scale.gameSize;
-    const playerBaseX = 50;
-    const spawnX = playerBaseX + 120;
-    const spawnY = height / 2;
+    const spawnX = this.playerBase.getX() - 20;
+    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const spawnY = height / 2 + randomYOffset;
 
     const unitType = card.getType();
 

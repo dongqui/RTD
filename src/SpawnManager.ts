@@ -26,7 +26,7 @@ export class SpawnManager {
     this.unitManager = unitManager;
     this.monsterManager = monsterManager;
 
-    this.enemySpawnX = this.scene.cameras.main.width - 100;
+    this.enemySpawnX = this.scene.cameras.main.width + 20;
     this.spawnY = this.scene.cameras.main.height / 2;
   }
 
@@ -39,7 +39,9 @@ export class SpawnManager {
   }
 
   private spawnEnemyMonster(): void {
-    this.monsterManager.spawnMonster("basic", this.enemySpawnX, this.spawnY);
+    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const spawnY = this.spawnY + randomYOffset;
+    this.monsterManager.spawnMonster("basic", this.enemySpawnX, spawnY);
   }
 
   start(): void {

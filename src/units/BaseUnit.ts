@@ -224,6 +224,21 @@ export abstract class BaseUnit implements CombatEntity {
     this.spineObject.x += moveDistance;
   }
 
+  moveTowards(targetX: number, targetY: number, delta: number): void {
+    const speed = this.getSpeed();
+    const moveDistance = (speed * delta) / 1000;
+
+    const angle = Phaser.Math.Angle.Between(
+      this.spineObject.x,
+      this.spineObject.y,
+      targetX,
+      targetY
+    );
+
+    this.spineObject.x += Math.cos(angle) * moveDistance;
+    this.spineObject.y += Math.sin(angle) * moveDistance;
+  }
+
   findTarget(): CombatEntity | Base | null {
     const monsters = this.scene.data.get("monsters") || [];
     const enemyBase = this.scene.data.get("enemyBase");
