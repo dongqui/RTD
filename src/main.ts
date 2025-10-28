@@ -6,6 +6,21 @@ import HomeScene from "./scenes/HomeScene";
 import DeckScene from "./scenes/DeckScene";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 
+
+// Base(가상 좌표계)
+export const BASE_W = 720;
+export const BASE_H = 1280;
+
+// Safe area (ENVELOP, 19.5:9 ~ 4:3 커버)
+export const SAFE_AREA = {
+  left: 64,
+  right: BASE_W - 64,   // 656
+  top: 160,
+  bottom: BASE_H - 160, // 1120
+  width: BASE_W - 64 * 2,   // 592
+  height: BASE_H - 160 * 2, // 960
+};
+
 class Boot extends Phaser.Scene {
   constructor() {
     super("Boot");
@@ -37,8 +52,9 @@ window.addEventListener("load", function () {
     scale: {
       mode: Phaser.Scale.ENVELOP,
       autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 720,
-      height: 1280,
+      width: SAFE_AREA.width,
+      height: SAFE_AREA.height,
+      
     },
     physics: {
       default: "arcade",

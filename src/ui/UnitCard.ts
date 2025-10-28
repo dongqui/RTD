@@ -33,7 +33,8 @@ export default class UnitCard {
     this.container = this.scene.add.container(x, y);
     this.container.setScrollFactor(0);
     this.container.setDepth(9999);
-    this.container.setSize(280, 400);
+    this.container.setSize(112, 168);
+    this.container.setScale(0.7);
 
     this.background = this.scene.add.graphics();
     this.drawCard(true);
@@ -42,7 +43,7 @@ export default class UnitCard {
       ? UnitRegistry.getSpec(config.type)
       : null;
 
-    this.nameText = this.scene.add.text(140, 250, config.name, {
+    this.nameText = this.scene.add.text(80, 125, config.name, {
       fontSize: "32px",
       color: "#2a2a3a",
       fontStyle: "bold",
@@ -50,18 +51,18 @@ export default class UnitCard {
     });
     this.nameText.setOrigin(0.5);
 
-    this.descText = this.scene.add.text(140, 315, spec?.description || "", {
+    this.descText = this.scene.add.text(80, 152.5, spec?.description || "", {
       fontSize: "20px",
       color: "#ffffff",
       fontFamily: "Arial",
       align: "center",
-      wordWrap: { width: 230 },
+      wordWrap: { width: 160 },
     });
     this.descText.setOrigin(0.5);
 
     this.statsText = this.scene.add.text(
-      140,
-      372,
+      80,
+      186,
       spec ? `⚔️${spec.stats.attackDamage} ❤️${spec.stats.health}` : "",
       {
         fontSize: "24px",
@@ -71,7 +72,7 @@ export default class UnitCard {
     );
     this.statsText.setOrigin(0.5);
 
-    this.costText = this.scene.add.text(45, 45, `${config.cost}`, {
+    this.costText = this.scene.add.text(40, 60, `${config.cost}`, {
       fontSize: "48px",
       color: "#ffffff",
       fontStyle: "bold",
@@ -90,7 +91,7 @@ export default class UnitCard {
 
     this.loadCharacterImage();
 
-    const hitArea = new Phaser.Geom.Rectangle(0, 0, 280, 400);
+    const hitArea = new Phaser.Geom.Rectangle(0, 0, 160, 240);
     this.container.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
 
     this.container.on(
@@ -141,11 +142,11 @@ export default class UnitCard {
     const imageKey = `unit_portrait_${this.config.type}`;
 
     if (this.scene.textures.exists(imageKey)) {
-      this.characterImage = this.scene.add.image(140, 120, imageKey);
-      this.characterImage.setDisplaySize(250, 200);
+      this.characterImage = this.scene.add.image(80, 60, imageKey);
+      this.characterImage.setDisplaySize(125, 100);
       this.container.add(this.characterImage);
     } else {
-      const placeholderText = this.scene.add.text(140, 120, "📷", {
+      const placeholderText = this.scene.add.text(80, 60, "📷", {
         fontSize: "80px",
       });
       placeholderText.setOrigin(0.5);
@@ -158,27 +159,27 @@ export default class UnitCard {
 
     const alpha = enabled ? 1 : 0.5;
     const borderColor = hover ? 0xffff44 : 0xffffff;
-    const scale = hover ? 1.05 : 1;
+    const scale = hover ? 0.75 : 0.7;
 
     this.container.setScale(scale);
 
     this.background.lineStyle(6, 0x8b6f47, alpha);
-    this.background.strokeRoundedRect(0, 0, 280, 400, 20);
+    this.background.strokeRoundedRect(0, 0, 160, 240, 20);
 
     this.background.fillStyle(0xf5deb3, alpha);
-    this.background.fillRoundedRect(15, 15, 250, 210, 12);
+    this.background.fillRoundedRect(15, 15, 125, 105, 12);
 
     this.background.fillStyle(0xfff8dc, alpha);
-    this.background.fillRoundedRect(15, 230, 250, 45, 10);
+    this.background.fillRoundedRect(15, 115, 125, 22.5, 10);
 
     this.background.fillStyle(0x5a4a3a, alpha * 0.9);
-    this.background.fillRoundedRect(15, 280, 250, 70, 10);
+    this.background.fillRoundedRect(15, 137.5, 125, 35, 10);
 
     this.background.fillStyle(0x3a2a2a, alpha * 0.9);
-    this.background.fillRoundedRect(15, 355, 250, 35, 10);
+    this.background.fillRoundedRect(15, 177.5, 125, 17.5, 10);
 
     this.background.fillStyle(0x4a9eff, alpha);
-    this.background.fillCircle(45, 45, 32);
+    this.background.fillCircle(22.5, 22.5, 16);
     this.background.lineStyle(4, 0xffffff, alpha);
     this.background.strokeCircle(45, 45, 32);
 
