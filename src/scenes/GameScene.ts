@@ -5,11 +5,14 @@ import { SpawnManager } from "../SpawnManager";
 import ResourceManager from "../ResourceManager";
 import ResourceUI from "../ui/ResourceUI";
 import UnitCard from "../ui/UnitCard";
+import { SkillCard } from "../cards/SkillCard";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
 import BottomNavigation from "../ui/BottomNavigation";
 import { UnitRegistry } from "../units/UnitRegistry";
+import { registerAllSkills } from "../skills/SkillIndex";
+import { SkillContext } from "../skills/SkillTypes";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -42,6 +45,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    registerAllSkills();
+
     const { width, height } = this.scale.gameSize;
 
     const background = this.add
@@ -247,6 +252,7 @@ export default class GameScene extends Phaser.Scene {
 
     const cardPool = deckCards.map(card => ({
       id: card.id,
+      cardType: card.cardType,
       type: card.type,
       cost: card.cost,
       name: card.name,
@@ -257,10 +263,18 @@ export default class GameScene extends Phaser.Scene {
     this.cardManager.initializeCards();
 
     this.cardManager.setOnCardUsed((card) => {
-      this.spawnUnitFromCard(card);
+      this.handleCardUsed(card);
     });
 
     this.updateCardStates();
+  }
+
+  private handleCardUsed(card: UnitCard | SkillCard): void {
+    if (card instanceof SkillCard) {
+      this.useSkillCard(card);
+    } else {
+      this.spawnUnitFromCard(card);
+    }
   }
 
   private spawnUnitFromCard(card: UnitCard): void {
@@ -284,6 +298,51 @@ export default class GameScene extends Phaser.Scene {
     this.cardManager.useCard(cardId);
 
     console.log(`Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`);
+
+    const cardIndex = this.cardManager.getCards().indexOf(card);
+    if (cardIndex !== -1) {
+      this.cardManager.replaceCard(cardIndex);
+    }
+  }
+
+  private useSkillCard(card: SkillCard): void {
+    const cost = card.getCost();
+
+    if (!this.resourceManager.spendResource(cost)) {
+      console.log("Not enough resources!");
+      return;
+    }
+
+    const skill = card.getSkill();
+    if (!skill) {
+      console.error("Skill not found for card");
+      return;
+    }
+
+    const context: SkillContext = {
+      scene: this,
+      unitManager: this.unitManager,
+      monsterManager: this.monsterManager,
+      resourceManager: this.resourceManager,
+      playerBase: this.playerBase,
+      enemyBase: this.enemyBase,
+    };
+
+    if (!skill.canExecute(context)) {
+      console.log("Cannot execute skill");
+      this.resourceManager.addResource(cost);
+      return;
+    }
+
+    skill.execute(context);
+
+    const cardId = card.getCardId();
+
+    if (skill.isConsumable()) {
+      this.cardManager.removeCardFromPool(cardId);
+    }
+
+    console.log(`Used skill ${skill.getName()} for ${cost} resources (cardId: ${cardId})`);
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {

@@ -1,9 +1,12 @@
 import UnitCard, { UnitCardConfig } from "./ui/UnitCard";
+import { SkillCard, SkillCardConfig } from "./cards/SkillCard";
 import type { UnitType } from "./UnitManager";
+import { CardType } from "./skills/SkillTypes";
 
 export interface CardPool {
   id: string;
-  type: UnitType;
+  cardType: CardType;
+  type: string;
   cost: number;
   name: string;
   weight?: number;
@@ -11,13 +14,13 @@ export interface CardPool {
 
 export default class CardManager {
   private scene: Phaser.Scene;
-  private cards: UnitCard[];
+  private cards: (UnitCard | SkillCard)[];
   private availableCards: CardPool[];
   private usedCards: Map<string, CardPool>;
   private cardsInHand: Set<string>;
   private maxCards: number = 3;
   private cardPositions: { x: number; y: number }[];
-  private onCardUsed: ((card: UnitCard) => void) | null = null;
+  private onCardUsed: ((card: UnitCard | SkillCard) => void) | null = null;
 
   constructor(scene: Phaser.Scene, cardPool: CardPool[]) {
     this.scene = scene;
@@ -64,15 +67,26 @@ export default class CardManager {
 
     this.cardsInHand.add(cardData.id);
 
-    const config: UnitCardConfig = {
-      id: cardData.id,
-      type: cardData.type,
-      cost: cardData.cost,
-      name: cardData.name,
-    };
-
     const pos = this.cardPositions[index];
-    const card = new UnitCard(this.scene, pos.x, pos.y, config);
+    let card: UnitCard | SkillCard;
+
+    if (cardData.cardType === CardType.SKILL) {
+      const skillConfig: SkillCardConfig = {
+        id: cardData.id,
+        skillType: cardData.type,
+        cost: cardData.cost,
+        name: cardData.name,
+      };
+      card = new SkillCard(this.scene, pos.x, pos.y, skillConfig);
+    } else {
+      const unitConfig: UnitCardConfig = {
+        id: cardData.id,
+        type: cardData.type as UnitType,
+        cost: cardData.cost,
+        name: cardData.name,
+      };
+      card = new UnitCard(this.scene, pos.x, pos.y, unitConfig);
+    }
 
     card.setOnClick(() => {
       this.handleCardClick(card, index);
@@ -151,11 +165,11 @@ export default class CardManager {
     });
   }
 
-  setOnCardUsed(callback: (card: UnitCard) => void): void {
+  setOnCardUsed(callback: (card: UnitCard | SkillCard) => void): void {
     this.onCardUsed = callback;
   }
 
-  getCards(): UnitCard[] {
+  getCards(): (UnitCard | SkillCard)[] {
     return this.cards;
   }
 
