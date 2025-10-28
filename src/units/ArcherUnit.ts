@@ -7,8 +7,8 @@ import { Projectile } from "../objects/Projectile";
 export class ArcherUnit extends BaseUnit {
   private projectiles: Projectile[] = [];
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "archer");
+  constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
+    super(scene, x, y, "archer", cardId);
   }
 
   attack(target: CombatEntity | Base): void {

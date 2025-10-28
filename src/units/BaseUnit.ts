@@ -28,6 +28,7 @@ export abstract class BaseUnit implements CombatEntity {
   protected static readonly RUN_ANIM_KEY = "Run";
 
   protected spec: UnitSpec;
+  protected cardId: string;
 
   protected maxHealth: number;
   protected currentHealth: number;
@@ -48,9 +49,10 @@ export abstract class BaseUnit implements CombatEntity {
   public attackDamageMultiplier: number = 1;
   public attackSpeedMultiplier: number = 1;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, unitType: UnitType) {
+  constructor(scene: Phaser.Scene, x: number, y: number, unitType: UnitType, cardId: string = "") {
     this.scene = scene;
     this.spec = UnitRegistry.getSpec(unitType);
+    this.cardId = cardId;
 
     this.maxHealth = this.spec.stats.health;
     this.currentHealth = this.spec.stats.health;
@@ -199,6 +201,7 @@ export abstract class BaseUnit implements CombatEntity {
 
     this.healthBar.destroy();
     this.scene.events.emit("unit-killed", this);
+    this.scene.events.emit("unit-died", this.cardId);
 
     this.scene.time.delayedCall(1000, () => {
       if (this.spineObject) {

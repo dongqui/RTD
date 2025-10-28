@@ -2,6 +2,7 @@ import type { UnitType } from "../UnitManager";
 import { UnitRegistry } from "../units/UnitRegistry";
 
 export interface UnitCardConfig {
+  id: string;
   type: UnitType;
   cost: number;
   name: string;
@@ -200,6 +201,10 @@ export default class UnitCard {
 
   setOnClick(callback: () => void): void {
     this.onClick = callback;
+  }
+
+  getCardId(): string {
+    return this.config.id;
   }
 
   getType(): UnitType {

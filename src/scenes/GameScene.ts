@@ -131,7 +131,28 @@ export default class GameScene extends Phaser.Scene {
       this.showGameClearScreen();
     });
 
+    this.events.on("unit-died", (cardId: string) => {
+      this.onUnitDied(cardId);
+    });
+
     this.createUI();
+  }
+
+  private onUnitDied(cardId: string): void {
+    if (!cardId) return;
+
+    this.cardManager.returnCard(cardId);
+    console.log(`Card returned to deck: ${cardId}`);
+
+    for (let i = 0; i < this.cardManager.getCards().length; i++) {
+      const card = this.cardManager.getCards()[i];
+      if (!card) {
+        this.cardManager.replaceCard(i);
+        break;
+      }
+    }
+
+    this.updateCardStates();
   }
 
   private createUI(): void {
@@ -225,6 +246,7 @@ export default class GameScene extends Phaser.Scene {
     const deckCards = deck.getCards();
 
     const cardPool = deckCards.map(card => ({
+      id: card.id,
       type: card.type,
       cost: card.cost,
       name: card.name,
@@ -255,10 +277,13 @@ export default class GameScene extends Phaser.Scene {
     const spawnY = height / 2 + randomYOffset;
 
     const unitType = card.getType();
+    const cardId = card.getCardId();
 
-    this.unitManager.spawnUnit(unitType, spawnX, spawnY);
+    this.unitManager.spawnUnit(unitType, spawnX, spawnY, cardId);
 
-    console.log(`Spawned ${unitType} unit for ${cost} resources`);
+    this.cardManager.useCard(cardId);
+
+    console.log(`Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`);
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {

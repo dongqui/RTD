@@ -8,8 +8,8 @@ export class LightningWizard extends BaseUnit {
   private attackSpeedPerStack: number = 0.1;
   private static lightningAnimCreated: boolean = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "lightning_wizard");
+  constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
+    super(scene, x, y, "lightning_wizard", cardId);
 
     if (!LightningWizard.lightningAnimCreated && this.scene.anims) {
       this.scene.anims.create({

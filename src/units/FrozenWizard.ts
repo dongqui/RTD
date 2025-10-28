@@ -8,8 +8,8 @@ export class FrozenWizard extends BaseUnit {
   private static freezedAnimCreated: boolean = false;
   private aoeRadius: number = 100;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "frozen_wizard");
+  constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
+    super(scene, x, y, "frozen_wizard", cardId);
 
     if (!FrozenWizard.frozenAnimCreated && this.scene.anims) {
       this.scene.anims.create({
