@@ -142,6 +142,12 @@ export default class CardManager {
   resetCards(): void {
     this.clearCards();
     this.cardsInHand.clear();
+
+    this.usedCards.forEach((card) => {
+      this.availableCards.push(card);
+    });
+    this.usedCards.clear();
+
     this.initializeCards();
   }
 
