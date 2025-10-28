@@ -11,7 +11,7 @@ export class SpawnManager {
   private enemySpawnX: number;
   private spawnY: number;
 
-  private enemySpawnInterval: number = 5000;
+  private enemySpawnInterval: number = 2000;
 
   private enemySpawnTimer: Phaser.Time.TimerEvent;
 

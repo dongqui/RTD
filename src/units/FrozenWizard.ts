@@ -56,17 +56,37 @@ export class FrozenWizard extends BaseUnit {
     const targetX = target.getX();
     const targetY = target.getY();
 
-    const frozen = this.scene.add.sprite(targetX, targetY, "frozen");
-    frozen.setScale(1.5);
-    frozen.setAlpha(0.9);
-    frozen.setBlendMode(Phaser.BlendModes.ADD);
-    frozen.setOrigin(0.5, 0.5);
+    for (let i = 0; i < 4; i++) {
+      this.scene.time.delayedCall(i * 150, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const distance = Math.random() * this.aoeRadius;
+        const offsetX = Math.cos(angle) * distance;
+        const offsetY = Math.sin(angle) * distance;
 
-    frozen.play("frozen_attack");
+        const finalX = targetX + offsetX;
+        const finalY = targetY + offsetY;
+        const startY = finalY - 100;
 
-    frozen.on("animationcomplete", () => {
-      frozen.destroy();
-    });
+        const frozen = this.scene.add.sprite(finalX, startY, "frozen");
+        frozen.setScale(2.2);
+        frozen.setAlpha(0.9);
+        frozen.setBlendMode(Phaser.BlendModes.ADD);
+        frozen.setOrigin(0.5, 0.5);
+
+        this.scene.tweens.add({
+          targets: frozen,
+          y: finalY,
+          duration: 300,
+          ease: "Cubic.easeIn",
+        });
+
+        frozen.play("frozen_attack");
+
+        frozen.on("animationcomplete", () => {
+          frozen.destroy();
+        });
+      });
+    }
   }
 
   private dealAoeDamage(target: CombatEntity | Base): void {
@@ -102,6 +122,7 @@ export class FrozenWizard extends BaseUnit {
       target.sprite.y,
       "freezed"
     );
+    freezedSprite.setScale(0.7);
     freezedSprite.setAlpha(0.8);
     freezedSprite.setBlendMode(Phaser.BlendModes.NORMAL);
     freezedSprite.setOrigin(0.5, 0.5);
@@ -111,7 +132,7 @@ export class FrozenWizard extends BaseUnit {
 
     freezedSprite.on("animationcomplete", () => {
       freezedSprite.anims.pause();
-      freezedSprite.setFrame(10);
+      freezedSprite.setFrame(5);
     });
 
     const updateFreezedPosition = () => {
@@ -126,7 +147,7 @@ export class FrozenWizard extends BaseUnit {
       loop: true,
     });
 
-    this.scene.time.delayedCall(1000, () => {
+    this.scene.time.delayedCall(2000, () => {
       target.speedMultiplier = originalSpeedMultiplier;
       updateEvent.remove();
       freezedSprite.destroy();
@@ -145,7 +166,7 @@ export const frozenWizardSpec: UnitSpec = {
     speed: 50,
     attackRange: 300,
     attackDamage: 10,
-    attackSpeed: 800,
+    attackSpeed: 2000,
   },
   visual: {
     skinColor: "#ffd7b8",

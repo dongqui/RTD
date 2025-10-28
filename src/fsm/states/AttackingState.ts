@@ -3,7 +3,8 @@ import { BehaviorState } from "../StateTypes";
 import { CombatEntity } from "../CombatEntity";
 
 export class AttackingState implements State<CombatEntity> {
-  enter(_entity: CombatEntity): void {
+  enter(entity: CombatEntity): void {
+    entity.playIdleAnimation();
   }
 
   update(entity: CombatEntity, _delta: number): void {
