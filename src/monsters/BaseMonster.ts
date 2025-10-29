@@ -90,6 +90,21 @@ export abstract class BaseMonster implements CombatEntity {
     this.sprite.x -= moveDistance;
   }
 
+  moveTowards(targetX: number, targetY: number, delta: number): void {
+    const speed = this.getSpeed();
+    const moveDistance = (speed * delta) / 1000;
+
+    const angle = Phaser.Math.Angle.Between(
+      this.sprite.x,
+      this.sprite.y,
+      targetX,
+      targetY
+    );
+
+    this.sprite.x += Math.cos(angle) * moveDistance;
+    this.sprite.y += Math.sin(angle) * moveDistance;
+  }
+
   findTarget(): CombatEntity | Base | null {
     const units = this.scene.data.get("units") || [];
     const playerBase = this.scene.data.get("playerBase");

@@ -12,7 +12,7 @@ export class UnitManager {
     this.scene.data.set("units", this.units);
   }
 
-  spawnUnit(type: string, x: number, y: number): BaseUnit | null {
+  spawnUnit(type: string, x: number, y: number, cardId: string = ""): BaseUnit | null {
     if (!UnitRegistry.hasSpec(type)) {
       console.error(`Unknown unit type: ${type}`);
       return null;
@@ -20,7 +20,7 @@ export class UnitManager {
 
     const spec = UnitRegistry.getSpec(type);
     const UnitClass = spec.unitClass as any;
-    const unit = new UnitClass(this.scene, x, y) as BaseUnit;
+    const unit = new UnitClass(this.scene, x, y, cardId) as BaseUnit;
 
     this.units.push(unit);
     this.scene.data.set("units", this.units);

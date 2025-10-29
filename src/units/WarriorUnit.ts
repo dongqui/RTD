@@ -1,8 +1,8 @@
 import { BaseUnit } from "./BaseUnit";
 import { UnitSpec } from "./UnitRegistry";
 export class WarriorUnit extends BaseUnit {
-  constructor(scene: Phaser.Scene, x: number, y: number) {
-    super(scene, x, y, "warrior");
+  constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
+    super(scene, x, y, "warrior", cardId);
   }
 }
 
@@ -27,7 +27,7 @@ export const worriorSpec: UnitSpec = {
       "bottom/bottom_f_1",
       "eyes/eyes_f_9",
       "gear_right/gear_right_f_11",
-      "gear_left/gear_left_f_11",
+      "gear_left/gear_left_f_16",
       "hair_short/hair_short_f_1",
       "mouth/mouth_f_2",
       "skin/skin_1",

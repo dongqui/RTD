@@ -11,6 +11,7 @@ export interface CombatEntity {
   attackSpeedMultiplier: number;
 
   move(delta: number): void;
+  moveTowards(targetX: number, targetY: number, delta: number): void;
   findTarget(): CombatEntity | Base | null;
   attack(target: CombatEntity | Base): void;
   takeDamage(damage: number): void;

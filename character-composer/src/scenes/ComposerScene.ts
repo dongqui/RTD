@@ -27,16 +27,13 @@ export default class ComposerScene extends Phaser.Scene {
   create() {
     console.log("ComposerScene created");
     this.spineObject = this.add.spine(
-      256,
-      256,
+      512,
+      512,
       "fantasy_character",
       "fantasy_character-atlas"
     );
 
-    this.spineObject.setPosition(
-      this.spineObject.width,
-      this.spineObject.height
-    );
+
     console.log("Spine object created:", this.spineObject);
     console.log("Available skins:", this.spineObject.skeleton.data.skins);
 
@@ -92,8 +89,8 @@ export default class ComposerScene extends Phaser.Scene {
     //
     renderTexture.draw(this.spineObject);
 
-    // this.spineObject.setPosition(originalX, originalY);
-    // this.spineObject.setScale(originalScale);
+    this.spineObject.setPosition(originalX, originalY);
+    this.spineObject.setScale(originalScale);
 
     renderTexture.snapshot((image: any) => {
       this.downloadImage(image, unitType);

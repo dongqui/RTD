@@ -1,8 +1,12 @@
 import UnitCard, { UnitCardConfig } from "./ui/UnitCard";
+import { SkillCard, SkillCardConfig } from "./cards/SkillCard";
 import type { UnitType } from "./UnitManager";
+import { CardType } from "./skills/SkillTypes";
 
 export interface CardPool {
-  type: UnitType;
+  id: string;
+  cardType: CardType;
+  type: string;
   cost: number;
   name: string;
   weight?: number;
@@ -10,27 +14,31 @@ export interface CardPool {
 
 export default class CardManager {
   private scene: Phaser.Scene;
-  private cards: UnitCard[];
-  private cardPool: CardPool[];
+  private cards: (UnitCard | SkillCard | null)[];
+  private availableCards: CardPool[];
+  private usedCards: Map<string, CardPool>;
+  private cardsInHand: Set<string>;
   private maxCards: number = 3;
   private cardPositions: { x: number; y: number }[];
-  private onCardUsed: ((card: UnitCard) => void) | null = null;
+  private onCardUsed: ((card: UnitCard | SkillCard) => void) | null = null;
 
   constructor(scene: Phaser.Scene, cardPool: CardPool[]) {
     this.scene = scene;
-    this.cardPool = cardPool;
+    this.availableCards = [...cardPool];
+    this.usedCards = new Map();
+    this.cardsInHand = new Set();
     this.cards = [];
     this.calculateCardPositions();
   }
 
   private calculateCardPositions(): void {
     const { width, height } = this.scene.scale.gameSize;
-    const cardWidth = 120;
-    const cardSpacing = 20;
+    const cardWidth = 112;
+    const cardSpacing = 15;
     const totalWidth =
       this.maxCards * cardWidth + (this.maxCards - 1) * cardSpacing;
-    const startX = (width - totalWidth) / 2;
-    const cardY = height - 100;
+    const startX = (width - totalWidth) / 2 + cardWidth * 0.5;
+    const cardY = height - 120;
 
     this.cardPositions = [];
     for (let i = 0; i < this.maxCards; i++) {
@@ -51,9 +59,34 @@ export default class CardManager {
   private addRandomCard(index: number): void {
     if (index >= this.maxCards) return;
 
-    const config = this.getRandomCardConfig();
+    const cardData = this.getRandomCardFromAvailable();
+    if (!cardData) {
+      this.cards[index] = null;
+      return;
+    }
+
+    this.cardsInHand.add(cardData.id);
+
     const pos = this.cardPositions[index];
-    const card = new UnitCard(this.scene, pos.x, pos.y, config);
+    let card: UnitCard | SkillCard;
+
+    if (cardData.cardType === CardType.SKILL) {
+      const skillConfig: SkillCardConfig = {
+        id: cardData.id,
+        skillType: cardData.type,
+        cost: cardData.cost,
+        name: cardData.name,
+      };
+      card = new SkillCard(this.scene, pos.x, pos.y, skillConfig);
+    } else {
+      const unitConfig: UnitCardConfig = {
+        id: cardData.id,
+        type: cardData.type as UnitType,
+        cost: cardData.cost,
+        name: cardData.name,
+      };
+      card = new UnitCard(this.scene, pos.x, pos.y, unitConfig);
+    }
 
     card.setOnClick(() => {
       this.handleCardClick(card, index);
@@ -62,28 +95,32 @@ export default class CardManager {
     this.cards[index] = card;
   }
 
-  private getRandomCardConfig(): UnitCardConfig {
-    const totalWeight = this.cardPool.reduce(
+  private getRandomCardFromAvailable(): CardPool | null {
+    const availableNotInHand = this.availableCards.filter(
+      card => !this.cardsInHand.has(card.id) && !this.usedCards.has(card.id)
+    );
+
+    if (availableNotInHand.length === 0) {
+      return null;
+    }
+
+    const totalWeight = availableNotInHand.reduce(
       (sum, card) => sum + (card.weight || 1),
       0
     );
     let random = Math.random() * totalWeight;
 
-    for (const cardData of this.cardPool) {
+    for (const cardData of availableNotInHand) {
       random -= cardData.weight || 1;
       if (random <= 0) {
-        return {
-          type: cardData.type,
-          cost: cardData.cost,
-          name: cardData.name,
-        };
+        return cardData;
       }
     }
 
-    return this.cardPool[0];
+    return availableNotInHand[0];
   }
 
-  private handleCardClick(card: UnitCard, index: number): void {
+  private handleCardClick(card: UnitCard | SkillCard, index: number): void {
     if (this.onCardUsed) {
       this.onCardUsed(card);
     }
@@ -94,6 +131,7 @@ export default class CardManager {
 
     const oldCard = this.cards[index];
     if (oldCard) {
+      this.cardsInHand.delete(oldCard.getCardId());
       oldCard.destroy();
     }
 
@@ -103,6 +141,13 @@ export default class CardManager {
 
   resetCards(): void {
     this.clearCards();
+    this.cardsInHand.clear();
+
+    this.usedCards.forEach((card) => {
+      this.availableCards.push(card);
+    });
+    this.usedCards.clear();
+
     this.initializeCards();
   }
 
@@ -113,6 +158,7 @@ export default class CardManager {
       }
     });
     this.cards = [];
+    this.cardsInHand.clear();
   }
 
   updateCardStates(currentResource?: number): void {
@@ -125,26 +171,43 @@ export default class CardManager {
     });
   }
 
-  setOnCardUsed(callback: (card: UnitCard) => void): void {
+  setOnCardUsed(callback: (card: UnitCard | SkillCard) => void): void {
     this.onCardUsed = callback;
   }
 
-  getCards(): UnitCard[] {
+  getCards(): (UnitCard | SkillCard | null)[] {
     return this.cards;
   }
 
+  useCard(cardId: string): void {
+    const cardIndex = this.availableCards.findIndex(card => card.id === cardId);
+    if (cardIndex !== -1) {
+      const card = this.availableCards.splice(cardIndex, 1)[0];
+      this.usedCards.set(cardId, card);
+    }
+  }
+
+  returnCard(cardId: string): void {
+    const card = this.usedCards.get(cardId);
+    if (card) {
+      this.usedCards.delete(cardId);
+      this.availableCards.push(card);
+    }
+  }
+
   addCardToPool(cardData: CardPool): void {
-    this.cardPool.push(cardData);
+    this.availableCards.push(cardData);
   }
 
-  removeCardFromPool(type: UnitType, name: string): void {
-    this.cardPool = this.cardPool.filter(
-      (card) => !(card.type === type && card.name === name)
-    );
+  removeCardFromPool(cardId: string): void {
+    const index = this.availableCards.findIndex(card => card.id === cardId);
+    if (index !== -1) {
+      this.availableCards.splice(index, 1);
+    }
   }
 
-  getCardPool(): CardPool[] {
-    return [...this.cardPool];
+  getAvailableCards(): CardPool[] {
+    return [...this.availableCards];
   }
 
   setVisible(visible: boolean): void {

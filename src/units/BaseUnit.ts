@@ -28,6 +28,7 @@ export abstract class BaseUnit implements CombatEntity {
   protected static readonly RUN_ANIM_KEY = "Run";
 
   protected spec: UnitSpec;
+  protected cardId: string;
 
   protected maxHealth: number;
   protected currentHealth: number;
@@ -48,9 +49,10 @@ export abstract class BaseUnit implements CombatEntity {
   public attackDamageMultiplier: number = 1;
   public attackSpeedMultiplier: number = 1;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, unitType: UnitType) {
+  constructor(scene: Phaser.Scene, x: number, y: number, unitType: UnitType, cardId: string = "") {
     this.scene = scene;
     this.spec = UnitRegistry.getSpec(unitType);
+    this.cardId = cardId;
 
     this.maxHealth = this.spec.stats.health;
     this.currentHealth = this.spec.stats.health;
@@ -119,7 +121,7 @@ export abstract class BaseUnit implements CombatEntity {
       }
     });
 
-    this.spineObject.setScale(-0.25, 0.25);
+    this.spineObject.setScale(-0.5, 0.5);
     this.playRunAnimation();
   }
 
@@ -199,6 +201,7 @@ export abstract class BaseUnit implements CombatEntity {
 
     this.healthBar.destroy();
     this.scene.events.emit("unit-killed", this);
+    this.scene.events.emit("unit-died", this.cardId);
 
     this.scene.time.delayedCall(1000, () => {
       if (this.spineObject) {
@@ -222,6 +225,21 @@ export abstract class BaseUnit implements CombatEntity {
     const speed = this.getSpeed();
     const moveDistance = (speed * delta) / 1000;
     this.spineObject.x += moveDistance;
+  }
+
+  moveTowards(targetX: number, targetY: number, delta: number): void {
+    const speed = this.getSpeed();
+    const moveDistance = (speed * delta) / 1000;
+
+    const angle = Phaser.Math.Angle.Between(
+      this.spineObject.x,
+      this.spineObject.y,
+      targetX,
+      targetY
+    );
+
+    this.spineObject.x += Math.cos(angle) * moveDistance;
+    this.spineObject.y += Math.sin(angle) * moveDistance;
   }
 
   findTarget(): CombatEntity | Base | null {

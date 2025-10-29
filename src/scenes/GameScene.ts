@@ -1,4 +1,3 @@
-import CameraManager from "../CameraManager";
 import GameManager from "../GameManager";
 import { MonsterManager } from "../MonsterManager";
 import { UnitManager } from "../UnitManager";
@@ -6,13 +5,16 @@ import { SpawnManager } from "../SpawnManager";
 import ResourceManager from "../ResourceManager";
 import ResourceUI from "../ui/ResourceUI";
 import UnitCard from "../ui/UnitCard";
+import { SkillCard } from "../cards/SkillCard";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
 import BottomNavigation from "../ui/BottomNavigation";
+import { UnitRegistry } from "../units/UnitRegistry";
+import { registerAllSkills } from "../skills/SkillIndex";
+import { SkillContext } from "../skills/SkillTypes";
 
 export default class GameScene extends Phaser.Scene {
-  private cameraManager: CameraManager;
   private gameManager: GameManager;
   private monsterManager: MonsterManager;
   private unitManager: UnitManager;
@@ -43,6 +45,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    registerAllSkills();
+
     const { width, height } = this.scale.gameSize;
 
     const background = this.add
@@ -57,8 +61,6 @@ export default class GameScene extends Phaser.Scene {
     background.setScale(scale);
 
     this.gameManager = new GameManager(this);
-    this.cameraManager = new CameraManager(this);
-    this.gameManager.setCameraManager(this.cameraManager);
 
     this.monsterManager = new MonsterManager(this);
     this.unitManager = new UnitManager(this);
@@ -68,11 +70,8 @@ export default class GameScene extends Phaser.Scene {
     this.setupBases();
     this.setupSpawnManager();
     this.setupGameEventHandlers();
-    this.setupMobileOptimization();
     this.setupResourceUI();
     this.setupUnitCards();
-
-    this.cameraManager.setupCameraDrag();
 
     this.navigation = new BottomNavigation(this);
 
@@ -83,8 +82,8 @@ export default class GameScene extends Phaser.Scene {
   private setupBases(): void {
     const { width, height } = this.scale.gameSize;
 
-    const playerBaseX = 150;
-    const enemyBaseX = width - 150;
+    const playerBaseX = 0;
+    const enemyBaseX = width;
     const baseY = height / 2;
 
     this.playerBase = new Base(this, playerBaseX, baseY, BaseTeam.PLAYER, 100);
@@ -101,24 +100,6 @@ export default class GameScene extends Phaser.Scene {
       this.unitManager,
       this.monsterManager
     );
-  }
-
-  private setupMobileOptimization(): void {
-    this.input.addPointer(2);
-    this.scale.on("resize", this.handleResize, this);
-    this.handleResize();
-  }
-
-  private handleResize(): void {
-    const { width, height } = this.scale.gameSize;
-
-    this.cameras.main.setBounds(0, 0, width, height);
-
-    if (width < 800 || height < 600) {
-      this.cameras.main.setZoom(0.8);
-    } else {
-      this.cameras.main.setZoom(1);
-    }
   }
 
   private setupGameEventHandlers(): void {
@@ -155,7 +136,28 @@ export default class GameScene extends Phaser.Scene {
       this.showGameClearScreen();
     });
 
+    this.events.on("unit-died", (cardId: string) => {
+      this.onUnitDied(cardId);
+    });
+
     this.createUI();
+  }
+
+  private onUnitDied(cardId: string): void {
+    if (!cardId) return;
+
+    this.cardManager.returnCard(cardId);
+    console.log(`Card returned to deck: ${cardId}`);
+
+    for (let i = 0; i < this.cardManager.getCards().length; i++) {
+      const card = this.cardManager.getCards()[i];
+      if (!card) {
+        this.cardManager.replaceCard(i);
+        break;
+      }
+    }
+
+    this.updateCardStates();
   }
 
   private createUI(): void {
@@ -163,7 +165,7 @@ export default class GameScene extends Phaser.Scene {
     const isMobile = width < 800 || height < 600;
 
     this.infoText = this.add
-      .text(20, 20, "", {
+      .text(10, 10, "", {
         fontSize: isMobile ? "20px" : "16px",
         color: "#ffffff",
         backgroundColor: "#000000",
@@ -235,7 +237,7 @@ export default class GameScene extends Phaser.Scene {
   private setupResourceUI(): void {
     const { height } = this.scale.gameSize;
 
-    this.resourceUI = new ResourceUI(this, 20, height - 80, 10);
+    this.resourceUI = new ResourceUI(this, 10, height - 180, 10);
     this.resourceUI.updateResource(this.resourceManager.getCurrentResource());
 
     this.events.on("resource-changed", (currentResource: number) => {
@@ -249,31 +251,30 @@ export default class GameScene extends Phaser.Scene {
     const deckCards = deck.getCards();
 
     const cardPool = deckCards.map(card => ({
+      id: card.id,
+      cardType: card.cardType,
       type: card.type,
       cost: card.cost,
       name: card.name,
       weight: 1,
     }));
 
-    if (cardPool.length === 0) {
-      console.warn("No cards in deck! Using default cards.");
-      const { UnitRegistry } = require("../units/UnitRegistry");
-      const warriorSpec = UnitRegistry.getSpec("warrior");
-      const archerSpec = UnitRegistry.getSpec("archer");
-      cardPool.push(
-        { type: warriorSpec.id, cost: warriorSpec.cost, name: warriorSpec.name, weight: 1 },
-        { type: archerSpec.id, cost: archerSpec.cost, name: archerSpec.name, weight: 1 }
-      );
-    }
-
     this.cardManager = new CardManager(this, cardPool);
     this.cardManager.initializeCards();
 
     this.cardManager.setOnCardUsed((card) => {
-      this.spawnUnitFromCard(card);
+      this.handleCardUsed(card);
     });
 
     this.updateCardStates();
+  }
+
+  private handleCardUsed(card: UnitCard | SkillCard): void {
+    if (card instanceof SkillCard) {
+      this.useSkillCard(card);
+    } else {
+      this.spawnUnitFromCard(card);
+    }
   }
 
   private spawnUnitFromCard(card: UnitCard): void {
@@ -285,15 +286,63 @@ export default class GameScene extends Phaser.Scene {
     }
 
     const { height } = this.scale.gameSize;
-    const playerBaseX = 50;
-    const spawnX = playerBaseX + 120;
-    const spawnY = height / 2;
+    const spawnX = this.playerBase.getX() - 20;
+    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const spawnY = height / 2 + randomYOffset;
 
     const unitType = card.getType();
+    const cardId = card.getCardId();
 
-    this.unitManager.spawnUnit(unitType, spawnX, spawnY);
+    this.unitManager.spawnUnit(unitType, spawnX, spawnY, cardId);
 
-    console.log(`Spawned ${unitType} unit for ${cost} resources`);
+    this.cardManager.useCard(cardId);
+
+    console.log(`Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`);
+
+    const cardIndex = this.cardManager.getCards().indexOf(card);
+    if (cardIndex !== -1) {
+      this.cardManager.replaceCard(cardIndex);
+    }
+  }
+
+  private useSkillCard(card: SkillCard): void {
+    const cost = card.getCost();
+
+    if (!this.resourceManager.spendResource(cost)) {
+      console.log("Not enough resources!");
+      return;
+    }
+
+    const skill = card.getSkill();
+    if (!skill) {
+      console.error("Skill not found for card");
+      return;
+    }
+
+    const context: SkillContext = {
+      scene: this,
+      unitManager: this.unitManager,
+      monsterManager: this.monsterManager,
+      resourceManager: this.resourceManager,
+      playerBase: this.playerBase,
+      enemyBase: this.enemyBase,
+    };
+
+    if (!skill.canExecute(context)) {
+      console.log("Cannot execute skill");
+      this.resourceManager.addResource(cost);
+      return;
+    }
+
+    skill.execute(context);
+
+    const cardId = card.getCardId();
+
+    if (skill.isConsumable()) {
+      this.cardManager.removeCardFromPool(cardId);
+    }
+
+    console.log(`Used skill ${skill.getName()} for ${cost} resources (cardId: ${cardId})`);
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {
@@ -379,11 +428,11 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private resetToInitialState(): void {
-    this.hideGameElements();
     this.monsterManager.clear();
     this.unitManager.clear();
     this.gameManager.reset();
     this.cardManager.resetCards();
+    this.hideGameElements();
     this.navigation.show();
     this.createStartButton();
   }
