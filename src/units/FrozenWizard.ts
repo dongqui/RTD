@@ -147,7 +147,7 @@ export class FrozenWizard extends BaseUnit {
       loop: true,
     });
 
-    this.scene.time.delayedCall(2000, () => {
+    this.scene.time.delayedCall(1000, () => {
       target.speedMultiplier = originalSpeedMultiplier;
       updateEvent.remove();
       freezedSprite.destroy();
@@ -186,6 +186,8 @@ export const frozenWizardSpec: UnitSpec = {
       "top/top_f_53",
     ],
     attackAnimKey: "Attack3",
+    idleAnimKey: "Idle",
   },
   unitClass: FrozenWizard,
+  isRanged: true,
 };

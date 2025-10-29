@@ -45,6 +45,7 @@ export interface UnitVisual {
   skinColor: string;
   hairColor: string;
   skinKeys: string[];
+  idleAnimKey: string;
   attackAnimKey: string;
 }
 
@@ -57,6 +58,7 @@ export interface UnitSpec {
   stats: UnitStats;
   visual: UnitVisual;
   unitClass: typeof BaseUnit;
+  isRanged?: boolean;
 }
 
 export class UnitRegistry {

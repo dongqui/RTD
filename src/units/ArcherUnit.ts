@@ -73,7 +73,9 @@ export const archerSpec: UnitSpec = {
       "skin/skin_1",
       "top/top_f_56",
     ],
+    idleAnimKey: "Idle_Bow",
     attackAnimKey: "Attack_Bow",
   },
   unitClass: ArcherUnit,
+  isRanged: true,
 };

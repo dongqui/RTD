@@ -33,6 +33,7 @@ export const worriorSpec: UnitSpec = {
       "skin/skin_1",
       "top/top_f_56",
     ],
+    idleAnimKey: "Idle",
     attackAnimKey: "Attack3",
   },
   unitClass: WarriorUnit,

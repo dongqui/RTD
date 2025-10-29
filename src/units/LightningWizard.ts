@@ -106,7 +106,9 @@ export const lightningWizardSpec: UnitSpec = {
       "skin/skin_1",
       "top/top_f_41",
     ],
+    idleAnimKey: "Idle",
     attackAnimKey: "Attack3",
   },
   unitClass: LightningWizard,
+  isRanged: true,
 };

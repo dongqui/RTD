@@ -145,7 +145,12 @@ export abstract class BaseUnit implements CombatEntity {
 
     const listener = {
       complete: () => {
-        this.playRunAnimation();
+        const currentState = this.stateMachine.getCurrentStateType();
+        if (currentState === BehaviorState.ATTACKING) {
+          this.playIdleAnimation();
+        } else {
+          this.playRunAnimation();
+        }
         this.spineObject.animationState.removeListener(listener);
       },
     };
@@ -231,15 +236,19 @@ export abstract class BaseUnit implements CombatEntity {
     const speed = this.getSpeed();
     const moveDistance = (speed * delta) / 1000;
 
-    const angle = Phaser.Math.Angle.Between(
-      this.spineObject.x,
-      this.spineObject.y,
-      targetX,
-      targetY
-    );
+    if (this.spec.isRanged) {
+      this.spineObject.x += moveDistance;
+    } else {
+      const angle = Phaser.Math.Angle.Between(
+        this.spineObject.x,
+        this.spineObject.y,
+        targetX,
+        targetY
+      );
 
-    this.spineObject.x += Math.cos(angle) * moveDistance;
-    this.spineObject.y += Math.sin(angle) * moveDistance;
+      this.spineObject.x += Math.cos(angle) * moveDistance;
+      this.spineObject.y += Math.sin(angle) * moveDistance;
+    }
   }
 
   findTarget(): CombatEntity | Base | null {
@@ -291,7 +300,15 @@ export abstract class BaseUnit implements CombatEntity {
   }
 
   playIdleAnimation(): void {
-    this.playRunAnimation();
+    const currentAnim = this.spineObject.animationState.getCurrent(0);
+    if (currentAnim && currentAnim.animation?.name === this.spec.visual.idleAnimKey) {
+      return;
+    }
+    this.spineObject.animationState.setAnimation(
+      0,
+      this.spec.visual.idleAnimKey,
+      true
+    );
   }
 
   playMoveAnimation(): void {
