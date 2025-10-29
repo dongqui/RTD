@@ -12,6 +12,7 @@ import PlayerDeck from "../PlayerDeck";
 import BottomNavigation from "../ui/BottomNavigation";
 import { UnitRegistry } from "../units/UnitRegistry";
 import { registerAllSkills } from "../skills/SkillIndex";
+import { SAFE_AREA } from "../main";
 import { SkillContext } from "../skills/SkillTypes";
 
 export default class GameScene extends Phaser.Scene {
@@ -82,8 +83,8 @@ export default class GameScene extends Phaser.Scene {
   private setupBases(): void {
     const { width, height } = this.scale.gameSize;
 
-    const playerBaseX = 0;
-    const enemyBaseX = width;
+    const playerBaseX = SAFE_AREA.left;
+    const enemyBaseX = SAFE_AREA.right;
     const baseY = height / 2;
 
     this.playerBase = new Base(this, playerBaseX, baseY, BaseTeam.PLAYER, 100);
@@ -250,7 +251,7 @@ export default class GameScene extends Phaser.Scene {
     const deck = PlayerDeck.getInstance();
     const deckCards = deck.getCards();
 
-    const cardPool = deckCards.map(card => ({
+    const cardPool = deckCards.map((card) => ({
       id: card.id,
       cardType: card.cardType,
       type: card.type,
@@ -297,7 +298,9 @@ export default class GameScene extends Phaser.Scene {
 
     this.cardManager.useCard(cardId);
 
-    console.log(`Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`);
+    console.log(
+      `Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`
+    );
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {
@@ -342,7 +345,9 @@ export default class GameScene extends Phaser.Scene {
       this.cardManager.removeCardFromPool(cardId);
     }
 
-    console.log(`Used skill ${skill.getName()} for ${cost} resources (cardId: ${cardId})`);
+    console.log(
+      `Used skill ${skill.getName()} for ${cost} resources (cardId: ${cardId})`
+    );
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {
