@@ -54,7 +54,7 @@ export default class Preload extends Phaser.Scene {
 
   preload() {
     this.editorCreate();
-
+    this.load.pack("asset-pack", "assets/asset-pack.json");
     this.load.spritesheet("frozen", "assets/skills/frozen.png", {
       frameWidth: 128,
       frameHeight: 128,
