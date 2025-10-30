@@ -79,5 +79,16 @@ export default class GameManager {
     }
 
     this.scene.events.emit('gold-changed', this.gold);
+    this.scene.events.emit('game-reset');
+  }
+
+  gameOver(): void {
+    this.currentState = GameState.GAME_OVER;
+    this.scene.events.emit('game-over');
+  }
+
+  gameClear(): void {
+    this.currentState = GameState.GAME_CLEAR;
+    this.scene.events.emit('game-clear');
   }
 }

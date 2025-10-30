@@ -14,6 +14,9 @@ import { UnitRegistry } from "../units/UnitRegistry";
 import { registerAllSkills } from "../skills/SkillIndex";
 import { SAFE_AREA } from "../main";
 import { SkillContext } from "../skills/SkillTypes";
+import { WaveManager } from "../WaveManager";
+import { WaveUI } from "../ui/WaveUI";
+import { CardDrawUI } from "../ui/CardDrawUI";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -29,6 +32,9 @@ export default class GameScene extends Phaser.Scene {
   private infoText: Phaser.GameObjects.Text;
   private startButton: Phaser.GameObjects.Rectangle;
   private startButtonText: Phaser.GameObjects.Text;
+  private waveManager: WaveManager;
+  private waveUI: WaveUI;
+  private cardDrawUI: CardDrawUI;
 
   constructor() {
     super("GameScene");
@@ -70,6 +76,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.setupBases();
     this.setupSpawnManager();
+    this.setupWaveManager();
     this.setupGameEventHandlers();
     this.setupResourceUI();
     this.setupUnitCards();
@@ -101,6 +108,62 @@ export default class GameScene extends Phaser.Scene {
       this.unitManager,
       this.monsterManager
     );
+  }
+
+  private setupWaveManager(): void {
+    const { width } = this.scale.gameSize;
+
+    this.waveManager = WaveManager.getInstance();
+    this.waveManager.initialize(this, this.spawnManager, this.monsterManager);
+
+    this.waveUI = new WaveUI(this, width / 2, 50);
+    this.waveUI.updateWave(
+      this.waveManager.getCurrentWave(),
+      this.waveManager.getTotalWaves()
+    );
+    this.waveUI.setVisible(false);
+
+    this.cardDrawUI = new CardDrawUI(this, PlayerDeck.getInstance());
+    this.cardDrawUI.setVisible(false);
+
+    this.events.on("wave-monster-spawned", () => {
+      this.waveManager.onMonsterSpawned();
+    });
+
+    this.events.on("wave-started", (waveNumber: number) => {
+      console.log(`Wave ${waveNumber} started`);
+      this.waveUI.setVisible(true);
+      this.waveUI.showWaveStartAnimation(waveNumber);
+      this.waveUI.updateWave(waveNumber, this.waveManager.getTotalWaves());
+    });
+
+    this.events.on("wave-completed", (waveNumber: number) => {
+      console.log(`Wave ${waveNumber} completed (received event)`);
+
+      if (waveNumber === -1) {
+        console.log("Enemy base destroyed, completing wave");
+        const currentWave = this.waveManager.getCurrentWave();
+        const totalWaves = this.waveManager.getTotalWaves();
+
+        this.waveUI.showWaveCompletedAnimation(currentWave);
+
+        if (currentWave >= totalWaves) {
+          console.log("Last wave completed!");
+          this.time.delayedCall(2500, () => {
+            this.gameManager.gameClear();
+          });
+        } else {
+          console.log("Showing reward selection");
+          this.time.delayedCall(2500, () => {
+            this.showRewardSelection();
+          });
+        }
+      }
+    });
+
+    this.events.on("wave-failed", () => {
+      this.gameManager.gameOver();
+    });
   }
 
   private setupGameEventHandlers(): void {
@@ -404,8 +467,56 @@ export default class GameScene extends Phaser.Scene {
   private startGame(): void {
     this.navigation.hide();
     this.showGameElements();
-    this.spawnManager.start();
     this.gameManager.startBattle();
+    this.startWave();
+  }
+
+  private startWave(): void {
+    this.waveManager.startWave();
+  }
+
+  private showRewardSelection(): void {
+    this.spawnManager.stop();
+    this.cardManager.setVisible(false);
+    this.resourceUI.setVisible(false);
+
+    this.cardDrawUI.show((selectedCard) => {
+      console.log("Selected reward card:", selectedCard);
+
+      const deck = PlayerDeck.getInstance();
+      const added = deck.addCard({
+        cardType: selectedCard.cardType,
+        type: selectedCard.type,
+        cost: selectedCard.cost,
+        name: selectedCard.name,
+      });
+
+      if (added) {
+        console.log(`Added ${selectedCard.name} to deck`);
+      } else {
+        console.warn("Failed to add card to deck (deck might be full)");
+      }
+
+      this.cardDrawUI.hide();
+      this.cardManager.setVisible(true);
+      this.resourceUI.setVisible(true);
+
+      this.waveManager.onRewardSelected();
+
+      this.resetToNextWave();
+    });
+  }
+
+  private resetToNextWave(): void {
+    this.monsterManager.clear();
+    this.unitManager.clear();
+    this.playerBase.reset();
+    this.enemyBase.reset();
+    this.cardManager.resetCards();
+    this.hideGameElements();
+    this.waveUI.setVisible(false);
+    this.navigation.show();
+    this.createStartButton();
   }
 
   private hideGameElements(): void {
@@ -436,6 +547,12 @@ export default class GameScene extends Phaser.Scene {
     this.monsterManager.clear();
     this.unitManager.clear();
     this.gameManager.reset();
+    this.waveManager.reset();
+    this.waveUI.updateWave(0, this.waveManager.getTotalWaves());
+    this.waveUI.hideStartButton();
+
+    PlayerDeck.getInstance().reset();
+
     this.cardManager.resetCards();
     this.hideGameElements();
     this.navigation.show();
@@ -451,6 +568,10 @@ export default class GameScene extends Phaser.Scene {
     }
     if (this.resourceManager) {
       this.resourceManager.update(this.time.now);
+    }
+    if (this.waveManager && this.waveUI) {
+      const remaining = this.waveManager.getMonstersRemaining();
+      this.waveUI.updateEnemies(remaining);
     }
   }
 }

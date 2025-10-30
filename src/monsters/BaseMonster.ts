@@ -234,6 +234,20 @@ export abstract class BaseMonster implements CombatEntity {
     return this.attackRange;
   }
 
+  setHealthMultiplier(multiplier: number): void {
+    const healthRatio = this.currentHealth / this.maxHealth;
+    this.maxHealth = Math.floor(this.maxHealth * multiplier);
+    this.currentHealth = Math.floor(this.maxHealth * healthRatio);
+  }
+
+  setSpeedMultiplier(multiplier: number): void {
+    this.speedMultiplier = multiplier;
+  }
+
+  setRewardMultiplier(multiplier: number): void {
+    this.reward = Math.floor(this.reward * multiplier);
+  }
+
   isDead(): boolean {
     return this.currentHealth <= 0;
   }

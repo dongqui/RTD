@@ -92,9 +92,9 @@ export default class Base {
       duration: 1000,
       onComplete: () => {
         if (this.team === BaseTeam.PLAYER) {
-          this.scene.events.emit("game-over");
+          this.scene.events.emit("wave-failed");
         } else {
-          this.scene.events.emit("game-clear");
+          this.scene.events.emit("wave-completed", -1);
         }
       },
     });

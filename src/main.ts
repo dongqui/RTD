@@ -25,10 +25,6 @@ class Boot extends Phaser.Scene {
     super("Boot");
   }
 
-  preload() {
-    this.load.pack("pack", "assets/preload-asset-pack.json");
-  }
-
   create() {
     this.scene.start("Preload");
   }

@@ -1,56 +1,57 @@
 import PlayerDeck, { CardData } from "../PlayerDeck";
-import { UnitType } from "../UnitManager";
 import { UnitRegistry } from "../units/UnitRegistry";
+import { SkillRegistry } from "../skills/SkillRegistry";
+import { CardType } from "../skills/SkillTypes";
 
-interface CardOption {
-  type: UnitType;
-  cost: number;
-  name: string;
+interface CardOption extends CardData {
+  weight?: number;
 }
 
-export default class CardDrawUI {
+export class CardDrawUI {
   private scene: Phaser.Scene;
   private container: Phaser.GameObjects.Container;
-  private onClose: () => void;
+  private onSelectCallback: ((card: CardData) => void) | null = null;
   private cardOptions: CardOption[] = [];
+  private deck: PlayerDeck;
 
-  constructor(scene: Phaser.Scene, onClose: () => void) {
+  constructor(scene: Phaser.Scene, deck: PlayerDeck) {
     this.scene = scene;
-    this.onClose = onClose;
+    this.deck = deck;
 
     this.container = this.scene.add.container(0, 0);
     this.container.setDepth(10000);
-
-    this.generateCardOptions();
-    this.createUI();
+    this.container.setVisible(false);
   }
 
   private generateCardOptions(): void {
-    const allSpecs = UnitRegistry.getAllSpecs();
-    const cardPool = allSpecs.map(spec => ({
-      type: spec.id,
-      cost: spec.cost,
-      name: spec.name,
-      weight: 50
-    }));
+    const cardPool: CardOption[] = [];
 
-    const totalWeight = cardPool.reduce((sum, card) => sum + card.weight, 0);
+    const unitSpecs = UnitRegistry.getAllSpecs();
+    unitSpecs.forEach(spec => {
+      cardPool.push({
+        cardType: CardType.UNIT,
+        type: spec.id,
+        cost: spec.cost,
+        name: spec.name,
+        id: `temp_${spec.id}`,
+        weight: 1
+      });
+    });
 
-    for (let i = 0; i < 3; i++) {
-      let random = Math.random() * totalWeight;
+    const skillSpecs = SkillRegistry.getAllSpecs();
+    skillSpecs.forEach(spec => {
+      cardPool.push({
+        cardType: CardType.SKILL,
+        type: spec.id,
+        cost: spec.cost,
+        name: spec.name,
+        id: `temp_${spec.id}`,
+        weight: 1
+      });
+    });
 
-      for (const cardData of cardPool) {
-        random -= cardData.weight;
-        if (random <= 0) {
-          this.cardOptions.push({
-            type: cardData.type,
-            cost: cardData.cost,
-            name: cardData.name,
-          });
-          break;
-        }
-      }
-    }
+    const shuffled = [...cardPool].sort(() => Math.random() - 0.5);
+    this.cardOptions = shuffled.slice(0, 3);
   }
 
   private createUI(): void {
@@ -85,11 +86,11 @@ export default class CardDrawUI {
       })
       .setOrigin(0.5);
 
-    this.createCardOptions(panelX, panelY, panelWidth, panelHeight);
-
     const skipButton = this.createSkipButton(panelX, panelY + panelHeight / 2 - 40);
 
     this.container.add([overlay, panel, title, subtitle, skipButton]);
+
+    this.createCardOptions(panelX, panelY, panelWidth, panelHeight);
   }
 
   private createCardOptions(
@@ -125,15 +126,15 @@ export default class CardDrawUI {
       .setStrokeStyle(3, 0x5555ff)
       .setInteractive();
 
-    const unitColors: Record<string, number> = {
-      warrior: 0xff4444,
-      archer: 0x44ff44,
-    };
-
-    const icon = this.scene.add.circle(0, -50, 30, unitColors[option.type] || 0xffffff);
+    const typeLabel = this.scene.add
+      .text(0, -60, option.cardType === CardType.SKILL ? "SKILL" : "UNIT", {
+        fontSize: "16px",
+        color: "#888888",
+      })
+      .setOrigin(0.5);
 
     const nameText = this.scene.add
-      .text(0, 0, option.name, {
+      .text(0, -20, option.name, {
         fontSize: "20px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -183,7 +184,7 @@ export default class CardDrawUI {
       this.selectCard(option);
     });
 
-    container.add([bg, icon, nameText, costLabel, costText]);
+    container.add([bg, typeLabel, nameText, costLabel, costText]);
     this.container.add(container);
 
     this.scene.tweens.add({
@@ -198,19 +199,45 @@ export default class CardDrawUI {
   }
 
   private selectCard(option: CardOption): void {
-    const deck = PlayerDeck.getInstance();
-
-    if (deck.isFull()) {
+    if (this.deck.isFull()) {
       alert("덱이 가득 찼습니다! (최대 20장)");
       return;
     }
 
-    const added = deck.addCard(option);
+    const added = this.deck.addCard(option);
 
-    if (added) {
-      this.destroy();
-      this.onClose();
+    if (added && this.onSelectCallback) {
+      this.hide();
+      this.onSelectCallback(option as CardData);
     }
+  }
+
+  show(onSelect: (card: CardData) => void): void {
+    if (this.container.visible) {
+      console.warn("CardDrawUI is already visible, skipping show()");
+      return;
+    }
+
+    this.onSelectCallback = onSelect;
+    this.cardOptions = [];
+    this.container.removeAll(true);
+
+    this.generateCardOptions();
+    this.createUI();
+    this.container.setVisible(true);
+  }
+
+  hide(): void {
+    this.container.setVisible(false);
+  }
+
+  setVisible(visible: boolean): void {
+    if (this.container.visible === visible) return;
+    this.container.setVisible(visible);
+  }
+
+  destroy(): void {
+    this.container.destroy();
   }
 
   private createSkipButton(x: number, y: number): Phaser.GameObjects.Container {
@@ -239,16 +266,14 @@ export default class CardDrawUI {
     });
 
     bg.on("pointerdown", () => {
-      this.destroy();
-      this.onClose();
+      this.hide();
+      if (this.onSelectCallback) {
+        this.onSelectCallback(null as any);
+      }
     });
 
     buttonContainer.add([bg, text]);
 
     return buttonContainer;
-  }
-
-  destroy(): void {
-    this.container.destroy();
   }
 }

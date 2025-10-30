@@ -56,6 +56,10 @@ export class MonsterManager {
     return [...this.activeMonsters];
   }
 
+  getAliveMonsters(): BaseMonster[] {
+    return this.activeMonsters.filter(monster => !monster.isDead());
+  }
+
   getActiveMonsterCount(): number {
     return this.activeMonsters.length;
   }
