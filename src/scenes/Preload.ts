@@ -55,8 +55,6 @@ export default class Preload extends Phaser.Scene {
   preload() {
     this.editorCreate();
 
-    this.load.pack("asset-pack", "assets/asset-pack.json");
-
     this.load.spritesheet("frozen", "assets/skills/frozen.png", {
       frameWidth: 128,
       frameHeight: 128,
@@ -69,10 +67,15 @@ export default class Preload extends Phaser.Scene {
 
     this.load.image("Arrow", "assets/Arrow.png");
 
+    this.load.image("button_red", "assets/Button_01_Mian_s_Bg_Red.png");
     const width = this.progressBar.width;
 
     this.load.on("progress", (value: number) => {
       this.progressBar.width = width * value;
+    });
+
+    this.load.on("complete", () => {
+      this.scene.start("HomeScene");
     });
   }
 
@@ -88,7 +91,7 @@ export default class Preload extends Phaser.Scene {
       }
     }
 
-    this.scene.start("HomeScene");
+    // this.scene.start("HomeScene");
   }
 
   /* END-USER-CODE */
