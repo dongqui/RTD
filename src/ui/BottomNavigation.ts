@@ -1,8 +1,17 @@
+import { BottomTab, BottomTabConfig } from "./BottomTab";
+
+interface ButtonData {
+  key: string;
+  icon: string;
+  label: string;
+  scene: string;
+}
+
 export default class BottomNavigation {
   private scene: Phaser.Scene;
   private container: Phaser.GameObjects.Container;
   private background: Phaser.GameObjects.Rectangle;
-  private buttons: Map<string, Phaser.GameObjects.Container> = new Map();
+  private buttons: Map<string, BottomTab> = new Map();
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
@@ -45,79 +54,64 @@ export default class BottomNavigation {
 
     this.buttonData.forEach((buttonData, index) => {
       const x = columnWidth * index + columnWidth / 2;
-      const button = this.createButton(x, buttonY, buttonData);
-      this.buttons.set(buttonData.key, button);
-      this.container.add(button);
+      const tab = this.createTab(x, buttonY, columnWidth, buttonData);
+      this.buttons.set(buttonData.key, tab);
+      this.container.add(tab);
+      if (index === 0) {
+        tab.select(false);
+        this.selectedTabKey = buttonData.key;
+      } else {
+        tab.deselect(false);
+      }
     });
   }
 
-  private buttonData: Array<{ key: string; icon: string; label: string; scene: string }> = [];
+  private buttonData: ButtonData[] = [];
 
-  private createButton(
+  private selectedTabKey?: string;
+
+  private readonly tabHeight = 140;
+
+  private createTab(
     x: number,
     y: number,
-    data: { key: string; icon: string; label: string; scene: string }
-  ): Phaser.GameObjects.Container {
-    const buttonContainer = this.scene.add.container(x, y);
-    const { width } = this.scene.scale.gameSize;
-    const columnWidth = width / 3;
+    columnWidth: number,
+    data: ButtonData
+  ): BottomTab {
+    const config: BottomTabConfig = {
+      key: data.key,
+      width: columnWidth,
+      height: this.tabHeight,
+      icon: data.icon,
+      label: data.label,
+      raisedOffset: 38,
+      onSelect: () => this.handleTabSelect(data.key),
+    };
 
-    const buttonBg = this.scene.add.rectangle(
-      0,
-      0,
-      columnWidth,
-      150,
-      0x5a5a7e,
-      1
-    );
-    buttonBg.setStrokeStyle(1, 0x4a4a6e);
+    const tab = new BottomTab(this.scene, x, y, config);
+    tab.setBasePosition(x, y);
+    return tab;
+  }
 
-    const iconText = this.scene.add.text(0, -25, data.icon, {
-      fontSize: "56px",
-    });
-    iconText.setOrigin(0.5);
+  private handleTabSelect(key: string): void {
+    if (this.selectedTabKey === key) {
+      return;
+    }
 
-    const labelText = this.scene.add.text(0, 35, data.label, {
-      fontSize: "24px",
-      color: "#e0e0e0",
-      fontFamily: "Arial",
-      fontStyle: "bold",
-    });
-    labelText.setOrigin(0.5);
+    if (this.selectedTabKey) {
+      const current = this.buttons.get(this.selectedTabKey);
+      current?.deselect();
+    }
 
-    buttonContainer.add([buttonBg, iconText, labelText]);
+    const next = this.buttons.get(key);
+    next?.select();
 
-    buttonBg.setInteractive({ useHandCursor: true });
+    this.selectedTabKey = key;
 
-    buttonBg.on("pointerover", () => {
-      buttonBg.setFillStyle(0x6a6a8e);
-      iconText.setScale(1.1);
-      labelText.setScale(1.05);
-    });
-
-    buttonBg.on("pointerout", () => {
-      buttonBg.setFillStyle(0x5a5a7e);
-      iconText.setScale(1);
-      labelText.setScale(1);
-    });
-
-    buttonBg.on("pointerdown", () => {
-      buttonBg.setFillStyle(0x4a4a6e);
-      iconText.setScale(0.95);
-      labelText.setScale(0.95);
-    });
-
-    buttonBg.on("pointerup", () => {
-      buttonBg.setFillStyle(0x6a6a8e);
-      iconText.setScale(1.1);
-      labelText.setScale(1.05);
-
-      if (this.scene.scene.key !== data.scene) {
-        this.scene.scene.start(data.scene);
-      }
-    });
-
-    return buttonContainer;
+    const data = this.buttonData.find((entry) => entry.key === key);
+    if (data && this.scene.scene.key !== data.scene) {
+      this.scene.scene.start(data.scene);
+    }
   }
 
   private setupResize(): void {
@@ -134,14 +128,10 @@ export default class BottomNavigation {
     const buttons = Array.from(this.buttons.values());
     const columnWidth = width / buttons.length;
 
-    buttons.forEach((button, index) => {
+    buttons.forEach((tab, index) => {
       const x = columnWidth * index + columnWidth / 2;
-      button.setPosition(x, buttonY);
-
-      const buttonBg = button.getAt(0) as Phaser.GameObjects.Rectangle;
-      if (buttonBg) {
-        buttonBg.setSize(columnWidth, 150);
-      }
+      tab.setTabWidth(columnWidth);
+      tab.setBasePosition(x, buttonY);
     });
   }
 

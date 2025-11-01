@@ -45,6 +45,26 @@
         "type": "image",
         "key": "background_game",
         "url": "assets/Background_04.png"
+      },
+      {
+        "type": "image",
+        "key": "tab_bottom_bg",
+        "url": "assets/components/Tab_BottomFlush_01_White_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "tab_bottom_border",
+        "url": "assets/components/Tab_BottomFlush_01_White_Border.png"
+      },
+      {
+        "type": "image",
+        "key": "tab_bottom_light",
+        "url": "assets/components/Tab_BottomFlush_01_White_Light.png"
+      },
+      {
+        "type": "image",
+        "key": "tab_bottom_inner_shadow",
+        "url": "assets/components/Tab_BottomFlush_01_White_InnerShadow.png"
       }
     ]
   },
