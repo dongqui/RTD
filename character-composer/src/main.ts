@@ -6,8 +6,8 @@ import ComposerScene from "./scenes/ComposerScene";
 window.addEventListener("load", () => {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 256,
+    height: 256,
     parent: "game-container",
     backgroundColor: "#c3cfe2",
     plugins: {

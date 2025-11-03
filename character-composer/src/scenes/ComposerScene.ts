@@ -27,12 +27,11 @@ export default class ComposerScene extends Phaser.Scene {
   create() {
     console.log("ComposerScene created");
     this.spineObject = this.add.spine(
-      512,
-      512,
+      this.scale.gameSize.width,
+      this.scale.gameSize.height,
       "fantasy_character",
       "fantasy_character-atlas"
     );
-
 
     console.log("Spine object created:", this.spineObject);
     console.log("Available skins:", this.spineObject.skeleton.data.skins);
@@ -75,23 +74,34 @@ export default class ComposerScene extends Phaser.Scene {
       return;
     }
 
+    // renderTexture를 (0, 0)에 생성 (월드 좌표 계산 간단화)
     const renderTexture = this.add.renderTexture(
       0,
       0,
-      this.spineObject.width * 2,
-      this.spineObject.height * 2
+      this.scale.gameSize.width,
+      this.scale.gameSize.height
     );
 
+    // 원본 위치와 스케일 저장
     const originalX = this.spineObject.x;
     const originalY = this.spineObject.y;
-    const originalScale = this.spineObject.scaleX;
+    const originalScaleX = this.spineObject.scaleX;
+    const originalScaleY = this.spineObject.scaleY;
 
-    //
+    const spineHeight =
+      this.spineObject.skeleton.data.height * this.spineObject.scaleY;
+    this.spineObject.setPosition(
+      this.scale.gameSize.width / 2,
+      this.scale.gameSize.height / 2 + spineHeight / 2
+    );
+    // renderTexture에 그리기
     renderTexture.draw(this.spineObject);
 
+    // 원래 위치와 스케일로 복원
     this.spineObject.setPosition(originalX, originalY);
-    this.spineObject.setScale(originalScale);
+    this.spineObject.setScale(originalScaleX);
 
+    // 스냅샷 생성
     renderTexture.snapshot((image: any) => {
       this.downloadImage(image, unitType);
       renderTexture.destroy();
