@@ -65,6 +65,46 @@
         "type": "image",
         "key": "tab_bottom_inner_shadow",
         "url": "assets/components/Tab_BottomFlush_01_White_InnerShadow.png"
+      },
+      {
+        "type": "image",
+        "key": "blue_border_gem_card_frame",
+        "url": "assets/components/CardFrame_Rectangle_01_Blue_BorderGem.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_bg_blue",
+        "url": "assets/components/CardFrame_Rectangle_01_Blue_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_resource",
+        "url": "assets/icons/icon_resource.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_archer",
+        "url": "assets/portraits/unit_portrait_archer.png"
+      },
+      {
+        "type": "image",
+        "key": "title_ribon_blue",
+        "url": "assets/components/Title_Flag_01_Sky.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_health",
+        "url": "assets/icons/icon_health.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_swoard",
+        "url": "assets/icons/icon_swoard.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_swoard2",
+        "url": "assets/icons/icon_swoard2.png"
       }
     ]
   },

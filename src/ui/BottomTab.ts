@@ -231,21 +231,6 @@ export class BottomTab extends Phaser.GameObjects.Container {
         )
         .setOrigin(0.5, 1)
         .setTint(BORDER_CONFIG.tint),
-      this.scene.add
-        .nineslice(
-          0,
-          0,
-          LIGHT_CONFIG.key,
-          undefined,
-          this.bodyWidth - 15,
-          this.bodyHeight - 2,
-          LIGHT_CONFIG.borders.left,
-          LIGHT_CONFIG.borders.right,
-          LIGHT_CONFIG.borders.top,
-          LIGHT_CONFIG.borders.bottom
-        )
-        .setOrigin(0.5, 0)
-        .setTint(LIGHT_CONFIG.tint),
     ];
 
     // this.slices = sliceConfigs.map((config) =>
