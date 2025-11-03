@@ -1,4 +1,10 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(findstr:*)"
+    ]
+  },
   "hooks": {
     "Notification": [
       {
@@ -11,10 +17,5 @@
       }
     ]
   },
-  "outputStyle": "default",
-  "permissions": {
-    "allow": [
-      "Bash(dir:*)"
-    ]
-  }
+  "outputStyle": "default"
 }
