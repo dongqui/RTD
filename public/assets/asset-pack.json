@@ -6,24 +6,7 @@
         "key": "castle",
         "url": "assets/Castle.png"
       },
-      {
-        "type": "spritesheet",
-        "key": "archer_idle",
-        "url": "assets/Archer_Idle.png",
-        "frameConfig": { "frameWidth": 192, "frameHeight": 192, "endFrame": 5 }
-      },
-      {
-        "type": "spritesheet",
-        "key": "archer_attack",
-        "url": "assets/Archer_Shoot.png",
-        "frameConfig": { "frameWidth": 192, "frameHeight": 192, "endFrame": 7 }
-      },
-      {
-        "type": "spritesheet",
-        "key": "king_idle",
-        "url": "assets/king_idle.png",
-        "frameConfig": { "frameWidth": 192, "frameHeight": 192, "endFrame": 5 }
-      },
+
       {
         "type": "image",
         "key": "arrow",
@@ -68,13 +51,48 @@
       },
       {
         "type": "image",
-        "key": "blue_border_gem_card_frame",
-        "url": "assets/components/CardFrame_Rectangle_01_Blue_BorderGem.png"
+        "key": "card_frame_blue_border_gem",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Blue_BorderGem.png"
       },
       {
         "type": "image",
         "key": "card_frame_bg_blue",
-        "url": "assets/components/CardFrame_Rectangle_01_Blue_Bg.png"
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Blue_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_bg_yellow",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Yellow_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_bg_red",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Red_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_bg_green",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Green_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_green_border_gem",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Green_BorderGem.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_purple_border_gem",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Purple_BorderGem.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_red_border_gem",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Red_BorderGem.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_yellow_border_gem",
+        "url": "assets/components/cardframe/CardFrame_Rectangle_01_Yellow_BorderGem.png"
       },
       {
         "type": "image",
@@ -88,8 +106,23 @@
       },
       {
         "type": "image",
-        "key": "title_ribon_blue",
-        "url": "assets/components/Title_Flag_01_Sky.png"
+        "key": "unit_portrait_frozen_wizard",
+        "url": "assets/portraits/unit_portrait_frozen_wizard.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_fire_wizard",
+        "url": "assets/portraits/unit_portrait_fire_wizard.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_lightning_wizard",
+        "url": "assets/portraits/unit_portrait_lightning_wizard.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_warrior",
+        "url": "assets/portraits/unit_portrait_warrior.png"
       },
       {
         "type": "image",
@@ -105,6 +138,11 @@
         "type": "image",
         "key": "icon_swoard2",
         "url": "assets/icons/icon_swoard2.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_flip",
+        "url": "assets/icons/icon_flip.png"
       }
     ]
   },

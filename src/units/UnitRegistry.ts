@@ -3,12 +3,14 @@ import { worriorSpec } from "./WarriorUnit";
 import { archerSpec } from "./ArcherUnit";
 import { lightningWizardSpec } from "./LightningWizard";
 import { frozenWizardSpec } from "./FrozenWizard";
+import { fireWizardSpec } from "./FireWizard";
 
 export type UnitType =
   | "warrior"
   | "archer"
   | "lightning_wizard"
-  | "frozen_wizard";
+  | "frozen_wizard"
+  | "fire_wizard";
 
 export interface UnitStats {
   health: number;
@@ -53,6 +55,7 @@ export interface UnitSpec {
   id: UnitType;
   name: string;
   cost: number;
+  rate: 1 | 2 | 3;
   description: string;
   cardColor?: number;
   stats: UnitStats;
@@ -67,10 +70,12 @@ export class UnitRegistry {
     archer: archerSpec,
     lightning_wizard: lightningWizardSpec,
     frozen_wizard: frozenWizardSpec,
+    fire_wizard: fireWizardSpec,
   };
 
   static getSpec(type: UnitType): UnitSpec {
     const spec = this.specs[type];
+    console.log(spec, type);
     if (!spec) {
       throw new Error(`Unit spec not found for type: ${type}`);
     }

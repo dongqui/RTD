@@ -8,9 +8,10 @@ export class WarriorUnit extends BaseUnit {
 
 export const worriorSpec: UnitSpec = {
   id: "warrior",
-  name: "전사",
+  name: "수습 전사",
   cost: 2,
-  description: "근접 탱커",
+  rate: 1,
+  description: "",
   cardColor: 0xff4444,
   stats: {
     health: 300,

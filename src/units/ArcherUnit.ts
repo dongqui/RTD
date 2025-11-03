@@ -48,9 +48,10 @@ export class ArcherUnit extends BaseUnit {
 
 export const archerSpec: UnitSpec = {
   id: "archer",
-  name: "궁수",
+  name: "수습 궁수",
   cost: 3,
-  description: "원거리 공격",
+  rate: 1,
+  description: "",
   cardColor: 0x44ff44,
   stats: {
     health: 30,
@@ -65,6 +66,7 @@ export const archerSpec: UnitSpec = {
     skinKeys: [
       "back/back_f_21",
       "boots/boots_f_2",
+      "brow/brow_f_8",
       "bottom/bottom_f_1",
       "eyes/eyes_f_9",
       "gear_right/gear_right_f_25",

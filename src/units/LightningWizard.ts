@@ -81,9 +81,10 @@ export class LightningWizard extends BaseUnit {
 
 export const lightningWizardSpec: UnitSpec = {
   id: "lightning_wizard",
-  name: "전격 마도사",
+  name: "전격 마법사",
   cost: 6,
-  description: "공격할수록 공속 증가, 이동 시 초기화",
+  rate: 2,
+  description: "적 공격시 공격 속도 증가. \n\n이동시 공격 속도 초기화.",
   cardColor: 0xffff44,
   stats: {
     health: 30,

@@ -159,7 +159,8 @@ export const frozenWizardSpec: UnitSpec = {
   id: "frozen_wizard",
   name: "냉기 마도사",
   cost: 6,
-  description: "냉기 속성 공격",
+  rate: 2,
+  description: "일정 범위의 적을 공격하며 얼립니다.",
   cardColor: 0x44ffff,
   stats: {
     health: 30,

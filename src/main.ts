@@ -18,6 +18,7 @@ export const SAFE_AREA = {
   bottom: BASE_H - 160, // 1120
   width: BASE_W - 64 * 2, // 592
   height: BASE_H - 160 * 2, // 960
+  padding: 64,
 };
 
 class Boot extends Phaser.Scene {

@@ -1,25 +1,32 @@
+import { CARD_HEIGHT, CARD_WIDTH } from "../constants";
+
 export interface CardConfig {
   cost: number;
   name: string;
   imageKey: string;
-  attack?: number;
-  health?: number;
+  attack: number;
+  health: number;
+  description: string;
+  rate: 1 | 2 | 3;
 }
 
 class Card extends Phaser.GameObjects.Container {
   private frame: Phaser.GameObjects.NineSlice;
   private costIcon: Phaser.GameObjects.Image;
   private costText: Phaser.GameObjects.Text;
+  private flipButton: Phaser.GameObjects.Text;
   private cardImage: Phaser.GameObjects.Image | null = null;
   private titleContainer: Phaser.GameObjects.Container;
   private titleText: Phaser.GameObjects.Text;
+  private descriptionText: Phaser.GameObjects.Text;
   private attackIcon: Phaser.GameObjects.Image | null = null;
   private attackText: Phaser.GameObjects.Text | null = null;
   private healthIcon: Phaser.GameObjects.Image | null = null;
   private healthText: Phaser.GameObjects.Text | null = null;
-  private cardWidth: number = 200;
-  private cardHeight: number = 280;
+  private cardWidth: number = CARD_WIDTH;
+  private cardHeight: number = CARD_HEIGHT;
   private cardConfig: CardConfig;
+  private isFlipped: boolean = false;
   constructor(scene: Phaser.Scene, x: number, y: number, config: CardConfig) {
     super(scene, x, y);
 
@@ -29,7 +36,9 @@ class Card extends Phaser.GameObjects.Container {
     this.createFrame();
     this.createImage(this.cardConfig.imageKey);
     this.createTitleRibbon(this.cardConfig.name);
+    this.createDescription(this.cardConfig.description);
     this.createCostUI();
+    this.createFlipButton();
     this.createAttackIcon();
     this.createHealthIcon();
 
@@ -38,7 +47,8 @@ class Card extends Phaser.GameObjects.Container {
   private createCostUI() {
     const iconSize = 50;
 
-    const iconOffsetX = this.cardWidth / 2 - iconSize / 2 + 10;
+    // 왼쪽 위로 변경
+    const iconOffsetX = -this.cardWidth / 2 + iconSize / 2 - 10;
     const iconOffsetY = -this.cardHeight / 2 + iconSize / 2 - 10;
 
     this.costIcon = this.scene.add.image(
@@ -55,6 +65,7 @@ class Card extends Phaser.GameObjects.Container {
       iconOffsetY,
       this.cardConfig.cost.toString(),
       {
+        fontFamily: "Germania One",
         fontSize: "28px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -64,6 +75,35 @@ class Card extends Phaser.GameObjects.Container {
     );
     this.costText.setOrigin(0.5);
     this.add(this.costText);
+  }
+
+  private createFlipButton() {
+    if (!this.cardConfig.description) return;
+
+    const iconSize = 50;
+
+    // 오른쪽 위 위치
+    const iconOffsetX = this.cardWidth / 2 - iconSize / 2 + 10;
+    const iconOffsetY = -this.cardHeight / 2 + iconSize / 2 - 10;
+
+    this.flipButton = this.scene.add.text(iconOffsetX, iconOffsetY, "↻", {
+      fontFamily: "Arial",
+      fontSize: "60px",
+      color: "#ffffff",
+      fontStyle: "bold",
+      stroke: "#000000",
+      strokeThickness: 4,
+    });
+    this.flipButton.setOrigin(0.5);
+    this.flipButton.setAngle(90); // 90도 회전
+    this.flipButton.setInteractive({ useHandCursor: true });
+
+    // 클릭 이벤트로 카드 뒤집기
+    this.flipButton.on("pointerdown", () => {
+      this.flip();
+    });
+
+    this.add(this.flipButton);
   }
 
   private createAttackIcon(): void {
@@ -86,6 +126,7 @@ class Card extends Phaser.GameObjects.Container {
       iconOffsetY,
       this.cardConfig.attack!.toString(),
       {
+        fontFamily: "Germania One",
         fontSize: "24px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -117,6 +158,7 @@ class Card extends Phaser.GameObjects.Container {
       iconOffsetY,
       this.cardConfig.health!.toString(),
       {
+        fontFamily: "Germania One",
         fontSize: "28px",
         color: "#ffffff",
         fontStyle: "bold",
@@ -133,41 +175,39 @@ class Card extends Phaser.GameObjects.Container {
     const imageWidth = 160;
     const imageHeight = 140;
 
-    this.cardImage = this.scene.add.image(0, -50, imageKey);
+    this.cardImage = this.scene.add.image(0, 25, imageKey);
     this.cardImage.setDisplaySize(imageWidth, imageHeight);
     this.add(this.cardImage);
   }
 
   // 카드 이름 컨테이너 생성
   private createTitleRibbon(name: string): void {
-    // 이미지 위치: 0, -50
-    // 이미지 높이: 140
-    // 이미지 하단: -50 + 140/2 = 20
-    // 이름을 이미지 바로 아래에 배치
-    const titleY = 15; // 이미지 하단 + 약간의 여백
+    // 카드 최상단에 배치
+    const titleY = -this.cardHeight / 2 + 60; // 카드 최상단 + 약간의 여백
 
     const containerWidth = this.cardWidth - 40;
-    const containerHeight = 40;
-    const radius = 10; // 모서리 둥글기
+    // const containerHeight = 40;
+    // const radius = 10; // 모서리 둥글기
 
     // 배경 박스 생성 (반투명 검은색 배경, 둥근 모서리)
-    const background = this.scene.add.graphics();
-    background.fillStyle(0x000000, 1);
-    background.fillRoundedRect(
-      -containerWidth / 2,
-      -containerHeight / 2,
-      containerWidth,
-      containerHeight,
-      radius
-    );
+    // const background = this.scene.add.graphics();
+    // background.fillStyle(0x000000, 1);
+    // background.fillRoundedRect(
+    //   -containerWidth / 2,
+    //   -containerHeight / 2,
+    //   containerWidth,
+    //   containerHeight,
+    //   radius
+    // );
 
     // 이름 텍스트
     this.titleText = this.scene.add.text(0, 0, name, {
+      fontFamily: "Germania One",
       fontSize: "18px",
       color: "#ffffff",
       fontStyle: "bold",
       stroke: "#000000",
-      strokeThickness: 2,
+      strokeThickness: 3,
       wordWrap: { width: containerWidth - 20 },
       align: "center",
     });
@@ -175,16 +215,52 @@ class Card extends Phaser.GameObjects.Container {
 
     // 컨테이너에 배경과 텍스트 추가
     this.titleContainer = this.scene.add.container(0, titleY);
-    this.titleContainer.add([background, this.titleText]);
+    this.titleContainer.add([this.titleText]);
     this.add(this.titleContainer);
+  }
+
+  // 카드 설명 텍스트 생성
+  private createDescription(description: string): void {
+    if (!description) return;
+
+    const containerWidth = this.cardWidth - 25; // 더 넓게 설정
+    const fontSize = 16;
+
+    this.descriptionText = this.scene.add.text(0, 0, description, {
+      fontFamily: "Germania One",
+      fontSize: `${fontSize}px`,
+      color: "#ffffff",
+      fontStyle: "bold",
+      stroke: "#000000",
+      strokeThickness: 3,
+      wordWrap: { width: containerWidth },
+      align: "center",
+    });
+    this.descriptionText.setOrigin(0.5, 0.5);
+    // 초기에는 description 숨김
+    this.descriptionText.setVisible(false);
+    this.add(this.descriptionText);
   }
 
   createFrame(): void {
     // NineSlice로 카드 프레임 생성 (크기 조절 가능)
+
+    let color;
+    switch (this.cardConfig.rate) {
+      case 1:
+        color = "blue";
+        break;
+      case 2:
+        color = "yellow";
+        break;
+      case 3:
+        color = "yellow";
+    }
+
     this.frame = this.scene.add.nineslice(
       0,
       0,
-      "blue_border_gem_card_frame",
+      `card_frame_${color}_border_gem`,
       undefined,
       this.cardWidth,
       this.cardHeight,
@@ -195,11 +271,59 @@ class Card extends Phaser.GameObjects.Container {
     );
     this.frame.setOrigin(0.5);
     this.add(this.frame);
-    // 배경 이미지: 프레임과 동일한 크기로 설정 (프레임이 위에 렌더링되어 테두리가 보임)
-    const background = this.scene.add.image(0, 0, "card_frame_bg_blue");
+
+    // 배경: Graphics로 밝은 회색 사각형 생성
+    // const background = this.scene.add.graphics();
+    // background.fillStyle(0xcccccc, 1); // 밝은 회색
+    // const bgWidth = this.cardWidth - 20;
+    // const bgHeight = this.cardHeight - 20;
+    // background.fillRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight);
+    // this.addAt(background, 0);
+
+    // 기존 이미지 방식 (주석처리)
+    const background = this.scene.add.image(0, 0, `card_frame_bg_${color}`);
     background.setDisplaySize(this.cardWidth - 20, this.cardHeight - 20);
     background.setOrigin(0.5);
+
     this.addAt(background, 0);
+  }
+
+  // 카드 뒤집기 메서드
+  private flip(): void {
+    // 애니메이션 중복 방지
+    if (this.scene.tweens.isTweening(this)) return;
+
+    this.isFlipped = !this.isFlipped;
+
+    // Y축 회전 애니메이션
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: 0,
+      duration: 150,
+      ease: "Power2",
+      onComplete: () => {
+        // 90도에서 이미지/description 전환
+        if (this.isFlipped) {
+          // 뒤집힌 상태: description만 표시
+          this.cardImage?.setVisible(false);
+          this.titleContainer.setVisible(false);
+          this.descriptionText.setVisible(true);
+        } else {
+          // 앞면 상태: 이미지와 타이틀 표시
+          this.cardImage?.setVisible(true);
+          this.titleContainer.setVisible(true);
+          this.descriptionText.setVisible(false);
+        }
+
+        // 다시 펼치기
+        this.scene.tweens.add({
+          targets: this,
+          scaleX: 1,
+          duration: 150,
+          ease: "Power2",
+        });
+      },
+    });
   }
 
   // 카드 크기 변경 메서드
@@ -208,9 +332,9 @@ class Card extends Phaser.GameObjects.Container {
     this.cardHeight = height;
     this.frame.setSize(width, height);
 
-    // 아이콘 위치 재조정
+    // 아이콘 위치 재조정 (왼쪽 위로 변경)
     const iconSize = 50;
-    const iconOffsetX = width / 2 - iconSize / 2 + 20;
+    const iconOffsetX = -width / 2 + iconSize / 2 - 10;
     const iconOffsetY = -height / 2 + iconSize / 2 - 10;
 
     this.costIcon.setPosition(iconOffsetX, iconOffsetY);

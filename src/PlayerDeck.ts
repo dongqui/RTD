@@ -5,7 +5,7 @@ import { SkillRegistry } from "./skills/SkillRegistry";
 
 export interface CardData {
   cardType: CardType;
-  type: string;
+  type: UnitType;
   cost: number;
   name: string;
   id: string;
@@ -33,33 +33,38 @@ export default class PlayerDeck {
   }
 
   private initializeDefaultDeck(): void {
-    const defaultUnitTypes: UnitType[] = ["warrior", "archer", "lightning_wizard", "frozen_wizard"];
+    const defaultUnitTypes: UnitType[] = [
+      "warrior",
+      "archer",
+      "lightning_wizard",
+      "frozen_wizard",
+    ];
 
-    const unitCards: CardData[] = defaultUnitTypes.map(type => {
+    const unitCards: CardData[] = defaultUnitTypes.map((type) => {
       const spec = UnitRegistry.getSpec(type);
       return {
         cardType: CardType.UNIT,
         type: spec.id,
         cost: spec.cost,
         name: spec.name,
-        id: this.generateId()
+        id: this.generateId(),
       };
     });
 
     const defaultSkillTypes = ["resource_boost", "heal_all"];
 
-    const skillCards: CardData[] = defaultSkillTypes.map(skillType => {
-      const spec = SkillRegistry.getSpec(skillType);
-      return {
-        cardType: CardType.SKILL,
-        type: spec.id,
-        cost: spec.cost,
-        name: spec.name,
-        id: this.generateId()
-      };
-    });
+    // const skillCards: CardData[] = defaultSkillTypes.map((skillType) => {
+    //   const spec = SkillRegistry.getSpec(skillType);
+    //   return {
+    //     cardType: CardType.SKILL,
+    //     type: skillType as SkillType,
+    //     cost: spec.cost,
+    //     name: spec.name,
+    //     id: this.generateId(),
+    //   };
+    // });
 
-    [...unitCards, ...skillCards].forEach(card => this.addCard(card));
+    [...unitCards].forEach((card) => this.addCard(card));
   }
 
   addCard(card: Omit<CardData, "id">): boolean {
@@ -79,7 +84,7 @@ export default class PlayerDeck {
   }
 
   removeCard(id: string): boolean {
-    const index = this.cards.findIndex(card => card.id === id);
+    const index = this.cards.findIndex((card) => card.id === id);
 
     if (index === -1) {
       return false;

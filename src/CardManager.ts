@@ -82,8 +82,6 @@ export default class CardManager {
       const unitConfig: UnitCardConfig = {
         id: cardData.id,
         type: cardData.type as UnitType,
-        cost: cardData.cost,
-        name: cardData.name,
       };
       card = new UnitCard(this.scene, pos.x, pos.y, unitConfig);
     }
@@ -97,7 +95,7 @@ export default class CardManager {
 
   private getRandomCardFromAvailable(): CardPool | null {
     const availableNotInHand = this.availableCards.filter(
-      card => !this.cardsInHand.has(card.id) && !this.usedCards.has(card.id)
+      (card) => !this.cardsInHand.has(card.id) && !this.usedCards.has(card.id)
     );
 
     if (availableNotInHand.length === 0) {
@@ -180,7 +178,9 @@ export default class CardManager {
   }
 
   useCard(cardId: string): void {
-    const cardIndex = this.availableCards.findIndex(card => card.id === cardId);
+    const cardIndex = this.availableCards.findIndex(
+      (card) => card.id === cardId
+    );
     if (cardIndex !== -1) {
       const card = this.availableCards.splice(cardIndex, 1)[0];
       this.usedCards.set(cardId, card);
@@ -200,7 +200,7 @@ export default class CardManager {
   }
 
   removeCardFromPool(cardId: string): void {
-    const index = this.availableCards.findIndex(card => card.id === cardId);
+    const index = this.availableCards.findIndex((card) => card.id === cardId);
     if (index !== -1) {
       this.availableCards.splice(index, 1);
     }
