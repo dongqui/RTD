@@ -27,8 +27,8 @@ export default class ComposerScene extends Phaser.Scene {
   create() {
     console.log("ComposerScene created");
     this.spineObject = this.add.spine(
-      this.scale.gameSize.width,
-      this.scale.gameSize.height,
+      this.scale.gameSize.width / 2,
+      this.scale.gameSize.height / 2 + 100,
       "fantasy_character",
       "fantasy_character-atlas"
     );
