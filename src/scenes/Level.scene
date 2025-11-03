@@ -32,7 +32,7 @@
             "originY": 0.5,
             "text": "Phaser 3 + Phaser Editor v4\nVite + TypeScript",
             "align": "center",
-            "fontFamily": "Arial",
+            "fontFamily": "Germania One",
             "fontSize": "3em"
         }
     ],

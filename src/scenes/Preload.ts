@@ -37,7 +37,7 @@ export default class Preload extends Phaser.Scene {
     loadingText.text = "Loading...";
     loadingText.setStyle({
       color: "#e0e0e0",
-      fontFamily: "arial",
+      fontFamily: "Germania One",
       fontSize: "20px",
     });
 

@@ -44,7 +44,7 @@ export class SkillCard extends BaseCard {
       fontSize: "28px",
       color: "#2a2a3a",
       fontStyle: "bold",
-      fontFamily: "Arial",
+      fontFamily: "Germania One",
     });
     this.nameText.setOrigin(0.5);
 
@@ -52,13 +52,14 @@ export class SkillCard extends BaseCard {
     this.descText = this.scene.add.text(80, 167.5, description, {
       fontSize: "18px",
       color: "#ffffff",
-      fontFamily: "Arial",
+      fontFamily: "Germania One",
       align: "center",
       wordWrap: { width: 110 },
     });
     this.descText.setOrigin(0.5);
 
     this.costText = this.scene.add.text(40, 60, `${this.config.cost}`, {
+      fontFamily: "Germania One",
       fontSize: "48px",
       color: "#ffffff",
       fontStyle: "bold",

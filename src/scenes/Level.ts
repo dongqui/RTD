@@ -25,7 +25,7 @@ export default class Level extends Phaser.Scene {
 		const text = this.add.text(640, 458, "", {});
 		text.setOrigin(0.5, 0.5);
 		text.text = "Phaser 3 + Phaser Editor v4\nVite + TypeScript";
-		text.setStyle({ "align": "center", "fontFamily": "Arial", "fontSize": "3em" });
+		text.setStyle({ "align": "center", "fontFamily": "Germania One", "fontSize": "3em" });
 
 		this.events.emit("scene-awake");
 	}

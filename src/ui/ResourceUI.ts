@@ -23,6 +23,7 @@ export default class ResourceUI {
     this.fillBar = this.scene.add.graphics();
 
     this.resourceText = this.scene.add.text(75, 30, '10 / 10', {
+      fontFamily: 'Germania One',
       fontSize: '24px',
       color: '#ffd700',
       fontStyle: 'bold',
