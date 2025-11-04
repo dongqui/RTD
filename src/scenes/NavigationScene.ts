@@ -1,17 +1,17 @@
 import BottomNavigation from "../ui/BottomNavigation";
 
-export default class UIScene extends Phaser.Scene {
+export default class NavigationScene extends Phaser.Scene {
   private navigation: BottomNavigation;
 
   constructor() {
-    super("UIScene");
+    super("NavigationScene");
   }
 
   create(): void {
     // 투명 배경으로 하위 씬들이 보이도록 설정
     this.cameras.main.setBackgroundColor("rgba(0,0,0,0)");
 
-    // UIScene을 최상위로 이동하여 항상 위에 렌더링되도록 함
+    // NavigationScene을 최상위로 이동하여 항상 위에 렌더링되도록 함
     this.scene.bringToTop();
 
     // BottomNavigation 생성 (싱글톤)

@@ -4,7 +4,8 @@ import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
 import SummonScene from "./scenes/SummonScene";
 import DeckScene from "./scenes/DeckScene";
-import UIScene from "./scenes/UIScene";
+import NavigationScene from "./scenes/NavigationScene";
+import HeaderScene from "./scenes/HeaderScene";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
 
 // Base(가상 좌표계)
@@ -60,7 +61,16 @@ window.addEventListener("load", function () {
       },
     },
 
-    scene: [Boot, Preload, UIScene, SummonScene, Level, GameScene, DeckScene],
+    scene: [
+      Boot,
+      Preload,
+      HeaderScene,
+      NavigationScene,
+      SummonScene,
+      Level,
+      GameScene,
+      DeckScene,
+    ],
   });
 
   // 화면 크기 변경 시 게임 크기 조정

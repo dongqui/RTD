@@ -141,6 +141,11 @@
       },
       {
         "type": "image",
+        "key": "icon_diamond",
+        "url": "assets/icons/icon_diamond.png"
+      },
+      {
+        "type": "image",
         "key": "icon_swoard2",
         "url": "assets/icons/icon_swoard2.png"
       },
@@ -158,6 +163,11 @@
         "type": "image",
         "key": "icon_book",
         "url": "assets/icons/icon_book.png"
+      },
+      {
+        "type": "image",
+        "key": "resource_bar_bg",
+        "url": "assets/components/ResourceBar_01_White_Bg.png"
       }
     ]
   },

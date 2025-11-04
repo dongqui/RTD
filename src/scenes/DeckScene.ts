@@ -3,7 +3,9 @@ import UnitCard from "../ui/UnitCard";
 import { CardType } from "../skills/SkillTypes";
 import { CARD_WIDTH, CARD_HEIGHT } from "../constants";
 
-const HEADER_HEIGHT = 120;
+const GLOBAL_HEADER_HEIGHT = 80; // HeaderScene 높이
+const DECK_HEADER_HEIGHT = 120; // DeckScene 헤더 높이
+const HEADER_HEIGHT = GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT; // 총 헤더 높이
 export default class DeckScene extends Phaser.Scene {
   private cards: UnitCard[] = [];
   private cardsContainer: Phaser.GameObjects.Container;
@@ -79,18 +81,17 @@ export default class DeckScene extends Phaser.Scene {
 
   private createHeader(): void {
     const { width } = this.scale.gameSize;
-    const headerHeight = 120;
-    const headerY = 60;
+    const headerY = GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT / 2;
 
     this.add
-      .rectangle(0, 0, width, headerHeight, 0x282340)
+      .rectangle(0, GLOBAL_HEADER_HEIGHT, width, DECK_HEADER_HEIGHT, 0x282340)
       .setOrigin(0, 0)
       .setDepth(10);
 
-    this.add.rectangle(0, 0, width, 10, 0x302a46).setOrigin(0, 0).setDepth(10);
+    this.add.rectangle(0, GLOBAL_HEADER_HEIGHT, width, 10, 0x302a46).setOrigin(0, 0).setDepth(10);
 
     this.add
-      .rectangle(0, headerHeight, width, 10, 0x302a46)
+      .rectangle(0, GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT, width, 10, 0x302a46)
       .setOrigin(0, 0)
       .setDepth(10);
 

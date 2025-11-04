@@ -140,10 +140,11 @@ export default class BottomNavigation {
       const sceneManager = this.scene.game.scene;
       const currentScenes = sceneManager.getScenes(true);
 
-      // UIScene을 제외한 활성 씬 찾기
+      // NavigationScene과 HeaderScene을 제외한 활성 씬 찾기
       const activeGameScene = currentScenes.find(
         (s) =>
-          s.scene.key !== "UIScene" &&
+          s.scene.key !== "NavigationScene" &&
+          s.scene.key !== "HeaderScene" &&
           s.scene.key !== "Boot" &&
           s.scene.key !== "Preload"
       );

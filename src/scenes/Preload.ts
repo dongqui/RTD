@@ -76,7 +76,8 @@ export default class Preload extends Phaser.Scene {
 
     this.load.on("complete", () => {
       this.scene.start("SummonScene");
-      this.scene.launch("UIScene");
+      this.scene.launch("NavigationScene");
+      this.scene.launch("HeaderScene");
     });
   }
 
@@ -87,7 +88,8 @@ export default class Preload extends Phaser.Scene {
       if (start) {
         console.log(`Development: jump to ${start}`);
         this.scene.start(start);
-        this.scene.launch("UIScene");
+        this.scene.launch("NavigationScene");
+        this.scene.launch("HeaderScene");
 
         return;
       }
