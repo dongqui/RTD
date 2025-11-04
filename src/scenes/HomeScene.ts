@@ -1,10 +1,7 @@
 import PlayerDeck from "../PlayerDeck";
-import BottomNavigation from "../ui/BottomNavigation";
 import { Button } from "../ui/Button";
 
 export default class HomeScene extends Phaser.Scene {
-  private navigation: BottomNavigation;
-
   constructor() {
     super("HomeScene");
   }
@@ -41,7 +38,5 @@ export default class HomeScene extends Phaser.Scene {
       height: 80,
       onClick: () => console.log("Button clicked!"),
     });
-
-    this.navigation = new BottomNavigation(this);
   }
 }

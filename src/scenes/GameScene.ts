@@ -9,7 +9,6 @@ import { SkillCard } from "../cards/SkillCard";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
-import BottomNavigation from "../ui/BottomNavigation";
 import { UnitRegistry } from "../units/UnitRegistry";
 import { registerAllSkills } from "../skills/SkillIndex";
 import { SAFE_AREA } from "../main";
@@ -17,6 +16,7 @@ import { SkillContext } from "../skills/SkillTypes";
 import { WaveManager } from "../WaveManager";
 import { WaveUI } from "../ui/WaveUI";
 import { CardDrawUI } from "../ui/CardDrawUI";
+import { Button } from "../ui/Button";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -28,9 +28,8 @@ export default class GameScene extends Phaser.Scene {
   private cardManager: CardManager;
   private playerBase: Base;
   private enemyBase: Base;
-  private navigation: BottomNavigation;
   private infoText: Phaser.GameObjects.Text;
-  private startButton: Phaser.GameObjects.Rectangle;
+  private startButton: Button;
   private startButtonText: Phaser.GameObjects.Text;
   private waveManager: WaveManager;
   private waveUI: WaveUI;
@@ -80,8 +79,6 @@ export default class GameScene extends Phaser.Scene {
     this.setupGameEventHandlers();
     this.setupResourceUI();
     this.setupUnitCards();
-
-    this.navigation = new BottomNavigation(this);
 
     this.hideGameElements();
     this.createStartButton();
@@ -428,44 +425,20 @@ export default class GameScene extends Phaser.Scene {
   private createStartButton(): void {
     const { width, height } = this.scale.gameSize;
 
-    this.startButton = this.add
-      .rectangle(width / 2, height / 2, 300, 100, 0x4a9eff)
-      .setInteractive({ useHandCursor: true })
-      .setDepth(10000);
-
-    this.startButtonText = this.add
-      .text(width / 2, height / 2, "START", {
-        fontSize: "48px",
-        color: "#ffffff",
-        fontStyle: "bold",
-      })
-      .setOrigin(0.5)
-      .setDepth(10001);
-
-    this.startButton.on("pointerover", () => {
-      this.startButton.setFillStyle(0x5aafff);
-      this.startButtonText.setScale(1.1);
-    });
-
-    this.startButton.on("pointerout", () => {
-      this.startButton.setFillStyle(0x4a9eff);
-      this.startButtonText.setScale(1);
-    });
-
-    this.startButton.on("pointerdown", () => {
-      this.startButton.setFillStyle(0x3a8eef);
-      this.startButtonText.setScale(0.95);
-    });
-
-    this.startButton.on("pointerup", () => {
-      this.startGame();
-      this.startButton.destroy();
-      this.startButtonText.destroy();
+    this.startButton = new Button(this, width / 2, height / 2, {
+      text: "START",
+      width: 300,
+      height: 100,
+      onClick: () => {
+        console.log("Start button clicked!");
+        this.startGame();
+        this.startButton.destroy();
+      },
     });
   }
 
   private startGame(): void {
-    this.navigation.hide();
+    this.game.events.emit("hideNavigation");
     this.showGameElements();
     this.gameManager.startBattle();
     this.startWave();
@@ -515,7 +488,7 @@ export default class GameScene extends Phaser.Scene {
     this.cardManager.resetCards();
     this.hideGameElements();
     this.waveUI.setVisible(false);
-    this.navigation.show();
+    this.game.events.emit("showNavigation");
     this.createStartButton();
   }
 
@@ -555,7 +528,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.cardManager.resetCards();
     this.hideGameElements();
-    this.navigation.show();
+    this.game.events.emit("showNavigation");
     this.createStartButton();
   }
 

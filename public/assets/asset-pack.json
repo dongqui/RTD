@@ -31,6 +31,11 @@
       },
       {
         "type": "image",
+        "key": "bg_cards",
+        "url": "assets/bg_cards.png"
+      },
+      {
+        "type": "image",
         "key": "tab_bottom_bg",
         "url": "assets/components/Tab_BottomFlush_01_White_Bg.png"
       },
@@ -143,6 +148,16 @@
         "type": "image",
         "key": "icon_flip",
         "url": "assets/icons/icon_flip.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_card",
+        "url": "assets/icons/icon_card.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_book",
+        "url": "assets/icons/icon_book.png"
       }
     ]
   },
