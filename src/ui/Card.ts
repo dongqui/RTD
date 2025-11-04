@@ -107,7 +107,7 @@ class Card extends Phaser.GameObjects.Container {
   }
 
   private createAttackIcon(): void {
-    const iconSize = 60;
+    const iconSize = 50;
     // 왼쪽 아래 위치 (카드 하단에서 약간 위, 왼쪽에서 살짝 삐져나오도록)
     const iconOffsetX = -this.cardWidth / 2 + iconSize / 2 - 10; // 살짝 삐져나오도록
     const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 10;
@@ -115,7 +115,7 @@ class Card extends Phaser.GameObjects.Container {
     this.attackIcon = this.scene.add.image(
       iconOffsetX,
       iconOffsetY,
-      "icon_swoard2"
+      "icon_swoard"
     );
     this.attackIcon.setDisplaySize(iconSize, iconSize);
     this.add(this.attackIcon);
@@ -127,7 +127,7 @@ class Card extends Phaser.GameObjects.Container {
       this.cardConfig.attack!.toString(),
       {
         fontFamily: "Germania One",
-        fontSize: "24px",
+        fontSize: "28px",
         color: "#ffffff",
         fontStyle: "bold",
         stroke: "#000000",
@@ -139,7 +139,7 @@ class Card extends Phaser.GameObjects.Container {
   }
 
   private createHealthIcon(): void {
-    const iconSize = 60;
+    const iconSize = 50;
     // 오른쪽 아래 위치 (카드 하단에서 약간 위, 오른쪽에서 살짝 삐져나오도록)
     const iconOffsetX = this.cardWidth / 2 - iconSize / 2 + 10; // 살짝 삐져나오도록
     const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 10;

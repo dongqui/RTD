@@ -157,10 +157,10 @@ export class FrozenWizard extends BaseUnit {
 
 export const frozenWizardSpec: UnitSpec = {
   id: "frozen_wizard",
-  name: "냉기 마도사",
+  name: "냉기 마법사",
   cost: 6,
   rate: 2,
-  description: "일정 범위의 적을 공격하며 얼립니다.",
+  description: "범위 공격 및 얼림 효과",
   cardColor: 0x44ffff,
   stats: {
     health: 30,
