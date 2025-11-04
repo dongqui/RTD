@@ -1,15 +1,15 @@
 import PlayerDeck from "../PlayerDeck";
 import { Button } from "../ui/Button";
 
-export default class HomeScene extends Phaser.Scene {
+export default class SummonScene extends Phaser.Scene {
   constructor() {
-    super("HomeScene");
+    super("SummonScene");
   }
 
   create(): void {
     const { width, height } = this.scale.gameSize;
 
-    this.add.rectangle(0, 0, width, height, 0x1a1a2e).setOrigin(0, 0);
+    this.createBackground();
 
     this.add
       .text(width / 2, height * 0.3, "RANDOM DEFENSE", {
@@ -38,5 +38,20 @@ export default class HomeScene extends Phaser.Scene {
       height: 80,
       onClick: () => console.log("Button clicked!"),
     });
+  }
+
+  private createBackground(): void {
+    const { width, height } = this.scale.gameSize;
+
+    const background = this.add
+      .image(width / 2, height / 2, "bg_cards")
+      .setOrigin(0.5)
+      .setDepth(-1);
+
+    const scaleX = width / background.width;
+    const scaleY = height / background.height;
+    const scale = Math.max(scaleX, scaleY);
+
+    background.setScale(scale);
   }
 }

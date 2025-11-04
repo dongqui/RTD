@@ -75,7 +75,7 @@ export default class Preload extends Phaser.Scene {
     });
 
     this.load.on("complete", () => {
-      this.scene.start("HomeScene");
+      this.scene.start("SummonScene");
       this.scene.launch("UIScene");
     });
   }

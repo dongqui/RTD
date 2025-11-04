@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
-import HomeScene from "./scenes/HomeScene";
+import SummonScene from "./scenes/SummonScene";
 import DeckScene from "./scenes/DeckScene";
 import UIScene from "./scenes/UIScene";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
@@ -60,7 +60,7 @@ window.addEventListener("load", function () {
       },
     },
 
-    scene: [Boot, Preload, UIScene, HomeScene, Level, GameScene, DeckScene],
+    scene: [Boot, Preload, UIScene, SummonScene, Level, GameScene, DeckScene],
   });
 
   // 화면 크기 변경 시 게임 크기 조정

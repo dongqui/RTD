@@ -51,7 +51,7 @@ export default class BottomNavigation {
         key: "home",
         imageKey: "icon_book",
         label: "카드 소환",
-        scene: "HomeScene",
+        scene: "SummonScene",
       },
       {
         key: "game",
