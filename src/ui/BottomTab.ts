@@ -99,12 +99,10 @@ export class BottomTab extends Phaser.GameObjects.Container {
     this.setSize(this.bodyWidth, this.bodyHeight);
     this.updateLayout(false);
 
-    // Container origin (0, 0) 기준, slice들이 origin (0.5, 1)로 y=0에 배치됨
-    // 따라서 히트 영역은 중앙 기준으로 width/2 왼쪽부터, height만큼 위로
     this.setInteractive({
       hitArea: new Phaser.Geom.Rectangle(
         0,
-        -this.bodyHeight,
+        -this.bodyHeight + this.offsetY + this.raisedOffset,
         this.bodyWidth,
         this.bodyHeight
       ),
@@ -318,8 +316,8 @@ export class BottomTab extends Phaser.GameObjects.Container {
   }
 
   private updateLayout(animate = true): void {
-    this.iconYSelected = -this.bodyHeight * 0.62;
-    this.iconYDeselected = -this.bodyHeight * 0.5;
+    this.iconYSelected = -this.bodyHeight * 0.65;
+    this.iconYDeselected = -this.bodyHeight * 0.6;
     this.labelY = -this.bodyHeight * 0.16;
 
     this.image.setY(
