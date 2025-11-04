@@ -107,10 +107,10 @@ class Card extends Phaser.GameObjects.Container {
   }
 
   private createAttackIcon(): void {
-    const iconSize = 50;
-    // 왼쪽 아래 위치 (카드 하단에서 약간 위, 왼쪽에서 살짝 삐져나오도록)
-    const iconOffsetX = -this.cardWidth / 2 + iconSize / 2 - 10; // 살짝 삐져나오도록
-    const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 10;
+    const iconSize = 40;
+    // 왼쪽 아래 위치 (카드 하단에서 약간 위, 왼쪽에서 살짝 안쪽으로)
+    const iconOffsetX = -this.cardWidth / 2 + iconSize / 2; // 살짝 안쪽으로
+    const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 3;
 
     this.attackIcon = this.scene.add.image(
       iconOffsetX,
@@ -139,10 +139,10 @@ class Card extends Phaser.GameObjects.Container {
   }
 
   private createHealthIcon(): void {
-    const iconSize = 50;
-    // 오른쪽 아래 위치 (카드 하단에서 약간 위, 오른쪽에서 살짝 삐져나오도록)
-    const iconOffsetX = this.cardWidth / 2 - iconSize / 2 + 10; // 살짝 삐져나오도록
-    const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 10;
+    const iconSize = 40;
+    // 오른쪽 아래 위치 (카드 하단에서 약간 위, 오른쪽에서 살짝 안쪽으로)
+    const iconOffsetX = this.cardWidth / 2 - iconSize / 2 - 3; // 살짝 안쪽으로
+    const iconOffsetY = this.cardHeight / 2 - iconSize / 2 + 3;
 
     this.healthIcon = this.scene.add.image(
       iconOffsetX,
@@ -333,7 +333,7 @@ class Card extends Phaser.GameObjects.Container {
     this.frame.setSize(width, height);
 
     // 아이콘 위치 재조정 (왼쪽 위로 변경)
-    const iconSize = 50;
+    const iconSize = 40;
     const iconOffsetX = -width / 2 + iconSize / 2 - 10;
     const iconOffsetY = -height / 2 + iconSize / 2 - 10;
 
