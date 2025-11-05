@@ -1,3 +1,5 @@
+export type ButtonColor = "red" | "sky" | "yellow";
+
 export interface ButtonConfig {
   text?: string;
   width?: number;
@@ -6,6 +8,7 @@ export interface ButtonConfig {
   paddingX?: number;
   paddingY?: number;
   onClick?: () => void;
+  color?: ButtonColor;
 }
 
 export class Button extends Phaser.GameObjects.Container {
@@ -47,11 +50,15 @@ export class Button extends Phaser.GameObjects.Container {
     const buttonWidth = config.width ?? textWidth + this.paddingX * 2;
     const buttonHeight = config.height ?? textHeight + this.paddingY * 2;
 
+    // Get button texture key based on color
+    const buttonColor = config.color ?? "red";
+    const buttonTextureKey = `button_${buttonColor}`;
+
     this.bg = scene.add
       .nineslice(
         0,
         0,
-        "button_red",
+        buttonTextureKey,
         undefined,
         buttonWidth,
         buttonHeight,

@@ -9,13 +9,13 @@ import { SkillCard } from "../cards/SkillCard";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
-import { UnitRegistry } from "../units/UnitRegistry";
+
 import { registerAllSkills } from "../skills/SkillIndex";
 import { SAFE_AREA } from "../main";
 import { SkillContext } from "../skills/SkillTypes";
 import { WaveManager } from "../WaveManager";
 import { WaveUI } from "../ui/WaveUI";
-import { CardDrawUI } from "../ui/CardDrawUI";
+import { RewardCardUI } from "../ui/RewardCardUI";
 import { Button } from "../ui/Button";
 
 export default class GameScene extends Phaser.Scene {
@@ -30,10 +30,9 @@ export default class GameScene extends Phaser.Scene {
   private enemyBase: Base;
   private infoText: Phaser.GameObjects.Text;
   private startButton: Button;
-  private startButtonText: Phaser.GameObjects.Text;
   private waveManager: WaveManager;
   private waveUI: WaveUI;
-  private cardDrawUI: CardDrawUI;
+  private rewardCardUI: RewardCardUI;
 
   constructor() {
     super("GameScene");
@@ -120,8 +119,8 @@ export default class GameScene extends Phaser.Scene {
     );
     this.waveUI.setVisible(false);
 
-    this.cardDrawUI = new CardDrawUI(this, PlayerDeck.getInstance());
-    this.cardDrawUI.setVisible(false);
+    this.rewardCardUI = new RewardCardUI(this, PlayerDeck.getInstance());
+    this.rewardCardUI.setVisible(false);
 
     this.events.on("wave-monster-spawned", () => {
       this.waveManager.onMonsterSpawned();
@@ -199,6 +198,11 @@ export default class GameScene extends Phaser.Scene {
 
     this.events.on("unit-died", (cardId: string) => {
       this.onUnitDied(cardId);
+    });
+
+    this.events.on("add-resource", (amount: number) => {
+      this.resourceManager.addResource(amount);
+      console.log(`Resource added: +${amount} (from thief death)`);
     });
 
     this.createUI();
@@ -453,24 +457,27 @@ export default class GameScene extends Phaser.Scene {
     this.cardManager.setVisible(false);
     this.resourceUI.setVisible(false);
 
-    this.cardDrawUI.show((selectedCard) => {
+    this.rewardCardUI.showRewardSelection((selectedCard) => {
       console.log("Selected reward card:", selectedCard);
 
-      const deck = PlayerDeck.getInstance();
-      const added = deck.addCard({
-        cardType: selectedCard.cardType,
-        type: selectedCard.type,
-        cost: selectedCard.cost,
-        name: selectedCard.name,
-      });
+      if (selectedCard) {
+        const deck = PlayerDeck.getInstance();
+        const added = deck.addCard({
+          cardType: selectedCard.cardType,
+          type: selectedCard.type,
+          cost: selectedCard.cost,
+          name: selectedCard.name,
+        });
 
-      if (added) {
-        console.log(`Added ${selectedCard.name} to deck`);
+        if (added) {
+          console.log(`Added ${selectedCard.name} to deck`);
+        } else {
+          console.warn("Failed to add card to deck (deck might be full)");
+        }
       } else {
-        console.warn("Failed to add card to deck (deck might be full)");
+        console.log("Reward skipped");
       }
 
-      this.cardDrawUI.hide();
       this.cardManager.setVisible(true);
       this.resourceUI.setVisible(true);
 
