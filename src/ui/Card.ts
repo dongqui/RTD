@@ -340,6 +340,11 @@ class Card extends Phaser.GameObjects.Container {
     this.costIcon.setPosition(iconOffsetX, iconOffsetY);
     this.costText.setPosition(iconOffsetX, iconOffsetY);
   }
+
+  // Getter for card configuration
+  public get cardData(): CardConfig {
+    return this.cardConfig;
+  }
 }
 
 export default Card;
