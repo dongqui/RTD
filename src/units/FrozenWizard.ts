@@ -94,6 +94,14 @@ export class FrozenWizard extends BaseUnit {
     const targetY = target.getY();
     const monsters = this.scene.data.get("monsters") || [];
 
+    // target이 Base인 경우 Base에도 데미지 적용
+    const isTargetBase =
+      (target as any).isActive !== undefined &&
+      (target as any).getTeam !== undefined;
+    if (isTargetBase && (target as Base).isActive()) {
+      target.takeDamage(this.getAttackDamage());
+    }
+
     for (const monster of monsters) {
       if (monster.getState && monster.getState() === "dead") continue;
 
