@@ -126,6 +126,16 @@
       },
       {
         "type": "image",
+        "key": "unit_portrait_thief",
+        "url": "assets/portraits/unit_portrait_thief.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_ironknight",
+        "url": "assets/portraits/unit_portrait_ironknight.png"
+      },
+      {
+        "type": "image",
         "key": "unit_portrait_warrior",
         "url": "assets/portraits/unit_portrait_warrior.png"
       },
@@ -168,6 +178,21 @@
         "type": "image",
         "key": "resource_bar_bg",
         "url": "assets/components/ResourceBar_01_White_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "title_ribbon_purple",
+        "url": "assets/components/Title_Ribbon_01_Purple.png"
+      },
+      {
+        "type": "image",
+        "key": "effect_light",
+        "url": "assets/effets/effect_light.png"
+      },
+      {
+        "type": "image",
+        "key": "effect_glow_circle",
+        "url": "assets/effets/effect_glow_circle.png"
       }
     ]
   },

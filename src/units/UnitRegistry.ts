@@ -4,13 +4,17 @@ import { archerSpec } from "./ArcherUnit";
 import { lightningWizardSpec } from "./LightningWizard";
 import { frozenWizardSpec } from "./FrozenWizard";
 import { fireWizardSpec } from "./FireWizard";
+import { thiefSpec } from "./ThiefUnit";
+import { ironKnightSpec } from "./IronKnightUnit";
 
 export type UnitType =
   | "warrior"
   | "archer"
   | "lightning_wizard"
   | "frozen_wizard"
-  | "fire_wizard";
+  | "fire_wizard"
+  | "thief"
+  | "iron_knight";
 
 export interface UnitStats {
   health: number;
@@ -71,6 +75,8 @@ export class UnitRegistry {
     lightning_wizard: lightningWizardSpec,
     frozen_wizard: frozenWizardSpec,
     fire_wizard: fireWizardSpec,
+    thief: thiefSpec,
+    iron_knight: ironKnightSpec,
   };
 
   static getSpec(type: UnitType): UnitSpec {
