@@ -97,7 +97,7 @@ export abstract class BaseUnit implements CombatEntity {
     this.spineObject.skeleton.setSkin(initSkin);
 
     const skinSlots = ["arm_r", "leg_l", "leg_r", "body", "head", "arm_l"];
-    const hairSlots = ["hair", "hair_back", "hair_front"];
+    const hairSlots = ["hair", "hair_back", "hair_front", "helmet_hair", "hair_hat"];
 
     const skinRgb = this.hexToRgb(this.spec.visual.skinColor);
     skinSlots.forEach((slotName) => {
@@ -382,5 +382,10 @@ export abstract class BaseUnit implements CombatEntity {
 
   getCost(): number {
     return this.cost;
+  }
+
+  destroy(): void {
+    // 기본 구현은 비어있음
+    // 하위 클래스에서 override하여 리소스 정리
   }
 }

@@ -19,11 +19,11 @@ export class ArcherUnit extends BaseUnit {
 
       const projectile = new Projectile(
         this.scene,
-        this.spineObject.x,
+        this.spineObject.x + 25,
         this.spineObject.y - 52,
         target,
         this.getAttackDamage(),
-        "Arrow",
+        "arrow",
         600
       );
 
@@ -43,6 +43,15 @@ export class ArcherUnit extends BaseUnit {
         this.projectiles.splice(i, 1);
       }
     }
+  }
+
+  destroy(): void {
+    // 모든 투사체 정리
+    this.projectiles.forEach((projectile) => {
+      projectile.destroy();
+    });
+    this.projectiles = [];
+    super.destroy();
   }
 }
 

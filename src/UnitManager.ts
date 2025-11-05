@@ -58,6 +58,7 @@ export class UnitManager {
 
   clear(): void {
     this.units.forEach((unit) => {
+      unit.destroy();
       if (unit.spineObject) {
         unit.spineObject.destroy();
       }
