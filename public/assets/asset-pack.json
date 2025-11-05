@@ -3,6 +3,26 @@
     "files": [
       {
         "type": "image",
+        "key": "glitter_1",
+        "url": "assets/effets/glitter_1.png"
+      },
+      {
+        "type": "image",
+        "key": "glitter_2",
+        "url": "assets/effets/glitter_2.png"
+      },
+      {
+        "type": "image",
+        "key": "glitter_3",
+        "url": "assets/effets/glitter_3.png"
+      },
+      {
+        "type": "image",
+        "key": "glitter_4",
+        "url": "assets/effets/glitter_4.png"
+      },
+      {
+        "type": "image",
         "key": "castle",
         "url": "assets/Castle.png"
       },
