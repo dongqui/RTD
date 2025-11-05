@@ -18,7 +18,7 @@ export const thiefSpec: UnitSpec = {
   name: "도둑",
   cost: 2,
   rate: 1,
-  description: "",
+  description: "사망시 룬(3) 충전",
   cardColor: 0x888888,
   stats: {
     health: 20,
