@@ -66,10 +66,10 @@ export default class BottomNavigation {
         scene: "DeckScene",
       },
       {
-        key: "settings",
-        imageKey: "icon_settings",
-        label: "설정",
-        scene: "SettingsScene",
+        key: "test",
+        imageKey: "icon_book",
+        label: "테스트",
+        scene: "TestScene",
       },
     ];
 

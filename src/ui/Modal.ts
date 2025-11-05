@@ -14,9 +14,11 @@ export class Modal extends Phaser.GameObjects.Container {
   public scene: Phaser.Scene;
   protected overlay: Phaser.GameObjects.Rectangle;
   protected panel: Phaser.GameObjects.Container;
-  protected background: Phaser.GameObjects.Rectangle;
-  protected topBorder: Phaser.GameObjects.Rectangle;
-  protected bottomBorder: Phaser.GameObjects.Rectangle;
+  protected background: Phaser.GameObjects.NineSlice;
+  protected border: Phaser.GameObjects.NineSlice;
+  protected innerBorder: Phaser.GameObjects.NineSlice;
+  protected decoLine?: Phaser.GameObjects.NineSlice;
+  protected deco?: Phaser.GameObjects.Image;
   protected titleText?: Phaser.GameObjects.Text;
   protected contentContainer: Phaser.GameObjects.Container;
   public config: ModalConfig;
@@ -53,37 +55,106 @@ export class Modal extends Phaser.GameObjects.Container {
     this.panel = this.scene.add.container(sceneWidth / 2, sceneHeight / 2);
     this.add(this.panel);
 
-    // Background
+    // Background (NineSlice)
+    // spriteBorder: left=63, right=65, top=65, bottom=66
+    // Color: #2B2242
     this.background = this.scene.add
-      .rectangle(0, 0, panelWidth, panelHeight, this.config.backgroundColor!)
-      .setOrigin(0.5);
+      .nineslice(
+        0,
+        0,
+        "popup_box_bg",
+        undefined,
+        panelWidth,
+        panelHeight,
+        63,
+        65,
+        65,
+        66
+      )
+      .setOrigin(0.5)
+      .setTint(0x2b2242);
     this.panel.add(this.background);
 
-    // Top border (lighter shade)
-    const borderColor = 0x3d2f5c;
-    const borderHeight = 4;
-    this.topBorder = this.scene.add
-      .rectangle(
+    // Border (NineSlice)
+    // spriteBorder: left=63, right=65, top=66, bottom=65
+    // Color: #1C112F
+    this.border = this.scene.add
+      .nineslice(
         0,
-        -panelHeight / 2 + borderHeight / 2,
+        0,
+        "popup_box_border",
+        undefined,
         panelWidth,
-        borderHeight,
-        borderColor
+        panelHeight,
+        63,
+        65,
+        66,
+        65
       )
-      .setOrigin(0.5);
-    this.panel.add(this.topBorder);
+      .setOrigin(0.5)
+      .setTint(0x1c112f);
+    this.panel.add(this.border);
 
-    // Bottom border
-    this.bottomBorder = this.scene.add
-      .rectangle(
+    // Inner Border (NineSlice)
+    // spriteBorder: left=60, right=60, top=59, bottom=60
+    // Color: #42365F
+    this.innerBorder = this.scene.add
+      .nineslice(
         0,
-        panelHeight / 2 - borderHeight / 2,
-        panelWidth,
-        borderHeight,
-        borderColor
+        0,
+        "popup_box_inner_border",
+        undefined,
+        panelWidth - 20,
+        panelHeight - 20,
+        60,
+        60,
+        59,
+        60
       )
-      .setOrigin(0.5);
-    this.panel.add(this.bottomBorder);
+      .setOrigin(0.5)
+      .setTint(0x42365f);
+    this.panel.add(this.innerBorder);
+
+    // Deco Line (Top decoration)
+    // spriteBorder: left=23, right=23, top=0, bottom=0
+    // Color: #514274
+    this.decoLine = this.scene.add
+      .nineslice(
+        0,
+        -panelHeight / 2 + 90,
+        "popup_box_deco_line",
+        undefined,
+        panelWidth - 80,
+        40,
+        23,
+        23,
+        0,
+        0
+      )
+      .setOrigin(0.5)
+      .setTint(0x514274);
+    this.panel.add(this.decoLine);
+
+    // Corner Decorations (NineSlice)
+    // spriteBorder: left=29, right=30, top=29, bottom=29
+    // Color: #514274
+
+    // const deco = this.scene.add
+    //   .nineslice(
+    //     0,
+    //     0,
+    //     "popup_box_deco",
+    //     undefined,
+    //     panelWidth - 50,
+    //     panelHeight - 50,
+    //     29,
+    //     30,
+    //     29,
+    //     29
+    //   )
+    //   .setOrigin(0.5)
+    //   .setTint(0x514274);
+    // this.panel.add(deco);
 
     // Title text if title is provided
     if (this.config.title) {
@@ -101,7 +172,11 @@ export class Modal extends Phaser.GameObjects.Container {
     }
   }
 
-  private createTitle(title: string, _panelWidth: number, panelHeight: number): void {
+  private createTitle(
+    title: string,
+    _panelWidth: number,
+    panelHeight: number
+  ): void {
     // Simple title text (no ribbon)
     this.titleText = new StyledText(this.scene, 0, -panelHeight / 2 + 40, {
       text: title,

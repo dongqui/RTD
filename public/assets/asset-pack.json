@@ -246,6 +246,31 @@
         "type": "image",
         "key": "button_yellow",
         "url": "assets/components/buttons/Button_01_Mian_s_Bg_Yellow.Png"
+      },
+      {
+        "type": "image",
+        "key": "popup_box_bg",
+        "url": "assets/components/popup/Popup_Box_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "popup_box_border",
+        "url": "assets/components/popup/Popup_Box_Border.png"
+      },
+      {
+        "type": "image",
+        "key": "popup_box_inner_border",
+        "url": "assets/components/popup/Popup_Box_InnerBorder1.png"
+      },
+      {
+        "type": "image",
+        "key": "popup_box_deco_line",
+        "url": "assets/components/popup/Popup_Box_DecoLine1.png"
+      },
+      {
+        "type": "image",
+        "key": "popup_box_deco",
+        "url": "assets/components/popup/Popup_Box_Deco1.png"
       }
     ]
   },
