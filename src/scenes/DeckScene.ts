@@ -34,6 +34,9 @@ export default class DeckScene extends Phaser.Scene {
     // 그라데이션 배경 생성
     this.createGradientBackground();
 
+    // HeaderScene 위쪽에 배경색과 같은 색의 rectangle 추가
+    this.createHeaderBackground();
+
     this.createHeader();
 
     // 스크롤 가능한 카드 컨테이너 생성
@@ -79,6 +82,16 @@ export default class DeckScene extends Phaser.Scene {
     this.add.image(0, 0, "gradient-bg").setOrigin(0, 0).setDepth(-1);
   }
 
+  private createHeaderBackground(): void {
+    const { width } = this.scale.gameSize;
+    // HeaderScene 위쪽에 배경색과 같은 색의 rectangle 추가
+    // 상단 색상: #3A2D5A 사용
+    this.add
+      .rectangle(0, 0, width, GLOBAL_HEADER_HEIGHT, 0x3a2d5a)
+      .setOrigin(0, 0)
+      .setDepth(5); // HeaderScene의 UI보다 낮은 depth로 설정하여 HeaderUI가 보이도록 함
+  }
+
   private createHeader(): void {
     const { width } = this.scale.gameSize;
     const headerY = GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT / 2;
@@ -88,10 +101,19 @@ export default class DeckScene extends Phaser.Scene {
       .setOrigin(0, 0)
       .setDepth(10);
 
-    this.add.rectangle(0, GLOBAL_HEADER_HEIGHT, width, 10, 0x302a46).setOrigin(0, 0).setDepth(10);
+    this.add
+      .rectangle(0, GLOBAL_HEADER_HEIGHT, width, 10, 0x302a46)
+      .setOrigin(0, 0)
+      .setDepth(10);
 
     this.add
-      .rectangle(0, GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT, width, 10, 0x302a46)
+      .rectangle(
+        0,
+        GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT,
+        width,
+        10,
+        0x302a46
+      )
       .setOrigin(0, 0)
       .setDepth(10);
 

@@ -45,12 +45,14 @@ export default class HeaderScene extends Phaser.Scene {
     );
     resourceBarBg.setOrigin(0.5);
     resourceBarBg.setTint(0x1a152d); // #1A152D 색상
+    resourceBarBg.setDepth(10); // DeckScene의 배경 rectangle보다 높은 depth
 
     // 다이아몬드 아이콘
     const iconSize = 35;
     const iconX = barX - barWidth / 2 + 35; // 왼쪽에서 35px
     const icon = this.add.image(iconX, barY, "icon_diamond");
     icon.setDisplaySize(iconSize, iconSize);
+    icon.setDepth(10); // DeckScene의 배경 rectangle보다 높은 depth
 
     // 다이아몬드 숫자 텍스트 (흰색)
     const textX = barX + 10; // 바 중앙보다 약간 오른쪽
@@ -61,6 +63,7 @@ export default class HeaderScene extends Phaser.Scene {
       fontStyle: "bold",
     });
     this.diamondText.setOrigin(0.5);
+    this.diamondText.setDepth(10); // DeckScene의 배경 rectangle보다 높은 depth
   }
 
   public updateDiamondCount(count: number): void {
