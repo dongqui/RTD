@@ -96,13 +96,18 @@ export class WaveUI {
 
   showWaveStartAnimation(waveNumber: number): void {
     const banner = this.scene.add
-      .text(this.scene.scale.width / 2, this.scene.scale.height / 2, `Wave ${waveNumber}`, {
-        fontSize: "64px",
-        fontStyle: "bold",
-        color: "#ffff00",
-        stroke: "#000000",
-        strokeThickness: 8,
-      })
+      .text(
+        this.scene.scale.width / 2,
+        this.scene.scale.height / 2,
+        `Wave ${waveNumber}`,
+        {
+          fontSize: "64px",
+          fontStyle: "bold",
+          color: "#ffff00",
+          stroke: "#000000",
+          strokeThickness: 8,
+        }
+      )
       .setOrigin(0.5)
       .setAlpha(0)
       .setDepth(200);

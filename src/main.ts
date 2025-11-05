@@ -1,5 +1,4 @@
 import Phaser from "phaser";
-import Level from "./scenes/Level";
 import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
 import SummonScene from "./scenes/SummonScene";
@@ -67,7 +66,7 @@ window.addEventListener("load", function () {
       HeaderScene,
       NavigationScene,
       SummonScene,
-      Level,
+
       GameScene,
       DeckScene,
     ],
