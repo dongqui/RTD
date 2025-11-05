@@ -25,6 +25,24 @@
         "frameConfig": { "frameWidth": 128, "frameHeight": 256, "endFrame": 4 }
       },
       {
+        "type": "spritesheet",
+        "key": "frozen",
+        "url": "assets/skills/frozen.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
+      {
+        "type": "spritesheet",
+        "key": "freezed",
+        "url": "assets/skills/freezed.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
+      {
+        "type": "spritesheet",
+        "key": "fire",
+        "url": "assets/skills/fire.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
+      {
         "type": "image",
         "key": "background_game",
         "url": "assets/Background_04.png"
@@ -193,6 +211,21 @@
         "type": "image",
         "key": "effect_glow_circle",
         "url": "assets/effets/effect_glow_circle.png"
+      },
+      {
+        "type": "image",
+        "key": "button_red",
+        "url": "assets/components/buttons/Button_01_Mian_s_Bg_Red.png"
+      },
+      {
+        "type": "image",
+        "key": "button_sky",
+        "url": "assets/components/buttons/Button_01_Mian_s_Bg_Sky.Png"
+      },
+      {
+        "type": "image",
+        "key": "button_yellow",
+        "url": "assets/components/buttons/Button_01_Mian_s_Bg_Yellow.Png"
       }
     ]
   },

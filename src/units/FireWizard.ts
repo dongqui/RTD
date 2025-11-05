@@ -5,10 +5,7 @@ import { UnitSpec } from "./UnitRegistry";
 
 export class FireWizard extends BaseUnit {
   private static fireAnimCreated: boolean = false;
-  private aoeRadius: number = 100;
-  private burnDuration: number = 3000;
-  private burnDamagePerTick: number = 2;
-  private burnTickInterval: number = 500;
+  private aoeRadius: number = 150;
 
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
     super(scene, x, y, "fire_wizard", cardId);
@@ -56,8 +53,8 @@ export class FireWizard extends BaseUnit {
         const startY = finalY - 100;
 
         const fire = this.scene.add.sprite(finalX, startY, "fire");
-        fire.setScale(2.2);
-        fire.setAlpha(0.9);
+        fire.setScale(1.5);
+
         fire.setBlendMode(Phaser.BlendModes.ADD);
         fire.setOrigin(0.5, 0.5);
 
@@ -94,92 +91,8 @@ export class FireWizard extends BaseUnit {
 
       if (distance <= this.aoeRadius) {
         monster.takeDamage(this.getAttackDamage());
-        this.applyBurnEffect(monster);
       }
     }
-  }
-
-  private applyBurnEffect(target: any): void {
-    if (!target.sprite) return;
-
-    // 이미 화상 효과가 있으면 중복 적용하지 않음 (또는 지속시간 갱신)
-    if (target.burnEffect) {
-      target.burnEffect.endTime = this.scene.time.now + this.burnDuration;
-      return;
-    }
-
-    const startTime = this.scene.time.now;
-    let lastTickTime = startTime;
-
-    const burnEffect = {
-      startTime: startTime,
-      endTime: startTime + this.burnDuration,
-      lastTickTime: lastTickTime,
-      tickInterval: this.burnTickInterval,
-      damagePerTick: this.burnDamagePerTick,
-    };
-
-    target.burnEffect = burnEffect;
-
-    // 화상 이펙트 스프라이트 생성
-    const burnSprite = this.scene.add.sprite(
-      target.sprite.x,
-      target.sprite.y,
-      "fire"
-    );
-    burnSprite.setScale(0.5);
-    burnSprite.setAlpha(0.6);
-    burnSprite.setBlendMode(Phaser.BlendModes.ADD);
-    burnSprite.setOrigin(0.5, 0.5);
-    burnSprite.setDepth(target.sprite.depth + 1);
-    burnSprite.setTint(0xff4444);
-
-    const updateBurnEffect = () => {
-      const currentTime = this.scene.time.now;
-
-      if (
-        !target.sprite ||
-        !target.burnEffect ||
-        currentTime >= burnEffect.endTime
-      ) {
-        if (burnSprite && burnSprite.active) {
-          burnSprite.destroy();
-        }
-        if (target.burnEffect) {
-          delete target.burnEffect;
-        }
-        return;
-      }
-
-      // 화상 스프라이트 위치 업데이트
-      if (burnSprite && burnSprite.active && target.sprite) {
-        burnSprite.setPosition(target.sprite.x, target.sprite.y);
-      }
-
-      // 틱 데미지 적용
-      if (currentTime - lastTickTime >= burnEffect.tickInterval) {
-        if (target.takeDamage && !target.isDead()) {
-          target.takeDamage(burnEffect.damagePerTick);
-          lastTickTime = currentTime;
-        }
-      }
-    };
-
-    const updateEvent = this.scene.time.addEvent({
-      delay: 100,
-      callback: updateBurnEffect,
-      loop: true,
-    });
-
-    this.scene.time.delayedCall(this.burnDuration, () => {
-      updateEvent.remove();
-      if (burnSprite && burnSprite.active) {
-        burnSprite.destroy();
-      }
-      if (target.burnEffect) {
-        delete target.burnEffect;
-      }
-    });
   }
 }
 
@@ -194,7 +107,7 @@ export const fireWizardSpec: UnitSpec = {
     health: 30,
     speed: 50,
     attackRange: 300,
-    attackDamage: 10,
+    attackDamage: 30,
     attackSpeed: 2000,
   },
   visual: {
