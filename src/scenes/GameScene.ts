@@ -84,7 +84,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private setupBases(): void {
-    const { width, height } = this.scale.gameSize;
+    const { height } = this.scale.gameSize;
 
     const playerBaseX = SAFE_AREA.left;
     const enemyBaseX = SAFE_AREA.right;
@@ -204,8 +204,6 @@ export default class GameScene extends Phaser.Scene {
       this.resourceManager.addResource(amount);
       console.log(`Resource added: +${amount} (from thief death)`);
     });
-
-    this.createUI();
   }
 
   private onUnitDied(cardId: string): void {
@@ -223,34 +221,6 @@ export default class GameScene extends Phaser.Scene {
     }
 
     this.updateCardStates();
-  }
-
-  private createUI(): void {
-    const { width, height } = this.scale.gameSize;
-    const isMobile = width < 800 || height < 600;
-
-    this.infoText = this.add
-      .text(10, 10, "", {
-        fontSize: isMobile ? "20px" : "16px",
-        color: "#ffffff",
-        backgroundColor: "#000000",
-        padding: { x: isMobile ? 15 : 10, y: isMobile ? 8 : 5 },
-      })
-      .setScrollFactor(0)
-      .setDepth(9999);
-
-    const updateInfo = () => {
-      const text = isMobile
-        ? `Player HP: ${this.gameManager.getPlayerBaseHealth()} | Enemy HP: ${this.gameManager.getEnemyBaseHealth()} | Gold: ${this.gameManager.getGold()}`
-        : `Player Base: ${this.gameManager.getPlayerBaseHealth()} | Enemy Base: ${this.gameManager.getEnemyBaseHealth()} | Gold: ${this.gameManager.getGold()}`;
-      this.infoText.setText(text);
-    };
-
-    this.events.on("player-base-damaged", updateInfo);
-    this.events.on("enemy-base-damaged", updateInfo);
-    this.events.on("gold-changed", updateInfo);
-
-    updateInfo();
   }
 
   private showGameOverScreen(): void {
