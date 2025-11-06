@@ -1,16 +1,16 @@
-import { BaseUnit } from "./BaseUnit";
-import { CombatEntity } from "../fsm/CombatEntity";
-import Base from "../Base";
-import { UnitSpec } from "./UnitRegistry";
+import { BaseHero } from "./BaseHero";
+import { CombatEntity } from "../../fsm/CombatEntity";
+import Base from "../../Base";
+import { HeroSpec, HeroRegistry } from "./HeroRegistry";
 
-export class FireWizard extends BaseUnit {
+export class FireWizardHero extends BaseHero {
   private static fireAnimCreated: boolean = false;
   private aoeRadius: number = 150;
 
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
     super(scene, x, y, "fire_wizard", cardId);
 
-    if (!FireWizard.fireAnimCreated && this.scene.anims) {
+    if (!FireWizardHero.fireAnimCreated && this.scene.anims) {
       this.scene.anims.create({
         key: "fire_attack",
         frames: this.scene.anims.generateFrameNumbers("fire", {
@@ -20,7 +20,7 @@ export class FireWizard extends BaseUnit {
         frameRate: 15,
         repeat: 0,
       });
-      FireWizard.fireAnimCreated = true;
+      FireWizardHero.fireAnimCreated = true;
     }
   }
 
@@ -69,7 +69,7 @@ export class FireWizard extends BaseUnit {
   private dealAoeDamage(target: CombatEntity | Base): void {
     const targetX = target.getX();
     const targetY = target.getY();
-    const monsters = this.scene.data.get("monsters") || [];
+    const enemies = this.scene.data.get("enemies") || [];
 
     // target이 Base인 경우 Base에도 데미지 적용
     const isTargetBase =
@@ -79,24 +79,24 @@ export class FireWizard extends BaseUnit {
       target.takeDamage(this.getAttackDamage());
     }
 
-    for (const monster of monsters) {
-      if (monster.getState && monster.getState() === "dead") continue;
+    for (const enemy of enemies) {
+      if (enemy.isDead && enemy.isDead()) continue;
 
       const distance = Phaser.Math.Distance.Between(
         targetX,
         targetY,
-        monster.sprite.x,
-        monster.sprite.y
+        enemy.spineObject.x,
+        enemy.spineObject.y
       );
 
       if (distance <= this.aoeRadius) {
-        monster.takeDamage(this.getAttackDamage());
+        enemy.takeDamage(this.getAttackDamage());
       }
     }
   }
 }
 
-export const fireWizardSpec: UnitSpec = {
+export const fireWizardSpec: HeroSpec = {
   id: "fire_wizard",
   name: "화염 마도사",
   cost: 6,
@@ -129,6 +129,9 @@ export const fireWizardSpec: UnitSpec = {
     attackAnimKey: "Attack_Magic",
     idleAnimKey: "Idle",
   },
-  unitClass: FireWizard,
+  heroClass: FireWizardHero,
   isRanged: true,
 };
+
+// Register the hero spec
+HeroRegistry.registerSpec(fireWizardSpec);

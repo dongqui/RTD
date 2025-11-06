@@ -1,6 +1,6 @@
 import { CARD_HEIGHT, CARD_WIDTH } from "../constants";
 
-export interface UnitCardConfig {
+export interface HeroCardConfig {
   cost: number;
   name: string;
   imageKey: string;
@@ -10,7 +10,7 @@ export interface UnitCardConfig {
   rate: 1 | 2 | 3;
 }
 
-class UnitCard extends Phaser.GameObjects.Container {
+class HeroCard extends Phaser.GameObjects.Container {
   private frame: Phaser.GameObjects.NineSlice;
   private costIcon: Phaser.GameObjects.Image;
   private costText: Phaser.GameObjects.Text;
@@ -25,7 +25,7 @@ class UnitCard extends Phaser.GameObjects.Container {
   private healthText: Phaser.GameObjects.Text | null = null;
   private cardWidth: number = CARD_WIDTH;
   private cardHeight: number = CARD_HEIGHT;
-  private cardConfig: UnitCardConfig;
+  private cardConfig: HeroCardConfig;
   private isFlipped: boolean = false;
   private onClick: (() => void) | null = null;
 
@@ -33,11 +33,10 @@ class UnitCard extends Phaser.GameObjects.Container {
     scene: Phaser.Scene,
     x: number,
     y: number,
-    config: UnitCardConfig
+    config: HeroCardConfig
   ) {
     super(scene, x, y);
 
-    // 이전 버전 호환성 (숫자만 전달된 경우)
     this.cardConfig = config;
 
     this.createFrame();
@@ -51,6 +50,7 @@ class UnitCard extends Phaser.GameObjects.Container {
 
     this.scene.add.existing(this);
   }
+
   private createCostUI() {
     const iconSize = 50;
 
@@ -266,15 +266,6 @@ class UnitCard extends Phaser.GameObjects.Container {
     this.frame.setOrigin(0.5);
     this.add(this.frame);
 
-    // 배경: Graphics로 밝은 회색 사각형 생성
-    // const background = this.scene.add.graphics();
-    // background.fillStyle(0xcccccc, 1); // 밝은 회색
-    // const bgWidth = this.cardWidth - 20;
-    // const bgHeight = this.cardHeight - 20;
-    // background.fillRect(-bgWidth / 2, -bgHeight / 2, bgWidth, bgHeight);
-    // this.addAt(background, 0);
-
-    // 기존 이미지 방식 (주석처리)
     const background = this.scene.add.image(0, 0, `card_frame_bg_${color}`);
     background.setDisplaySize(this.cardWidth - 20, this.cardHeight - 20);
     background.setOrigin(0.5);
@@ -336,7 +327,7 @@ class UnitCard extends Phaser.GameObjects.Container {
   }
 
   // Getter for card configuration
-  public get cardData(): UnitCardConfig {
+  public get cardData(): HeroCardConfig {
     return this.cardConfig;
   }
 
@@ -352,4 +343,4 @@ class UnitCard extends Phaser.GameObjects.Container {
   }
 }
 
-export default UnitCard;
+export default HeroCard;

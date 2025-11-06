@@ -1,5 +1,5 @@
 import { CardData } from "../PlayerDeck";
-import { UnitRegistry } from "../units/UnitRegistry";
+import { HeroRegistry } from "../units/heroes";
 import { SkillRegistry } from "../skills/SkillRegistry";
 import { CardType } from "../skills/SkillTypes";
 import { CardConfig } from "../ui/Card";
@@ -10,16 +10,16 @@ export interface CardOption extends CardData {
 
 export class CardDrawManager {
   /**
-   * Generate random card options from available units and skills
+   * Generate random card options from available heroes and skills
    * @param count Number of cards to generate
    * @returns Array of card options
    */
   static generateCardOptions(count: number = 3): CardOption[] {
     const cardPool: CardOption[] = [];
 
-    // Add all units to pool
-    const unitSpecs = UnitRegistry.getAllSpecs();
-    unitSpecs.forEach((spec) => {
+    // Add all heroes to pool
+    const heroSpecs = HeroRegistry.getAllSpecs();
+    heroSpecs.forEach((spec) => {
       cardPool.push({
         cardType: CardType.UNIT,
         type: spec.id,

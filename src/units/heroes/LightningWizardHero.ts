@@ -1,9 +1,10 @@
-import { BaseUnit } from "./BaseUnit";
-import { CombatEntity } from "../fsm/CombatEntity";
-import Base from "../Base";
-import { UnitSpec } from "./UnitRegistry";
-import { SoundManager } from "../utils/SoundManager";
-export class LightningWizard extends BaseUnit {
+import { BaseHero } from "./BaseHero";
+import { CombatEntity } from "../../fsm/CombatEntity";
+import Base from "../../Base";
+import { HeroSpec, HeroRegistry } from "./HeroRegistry";
+import { SoundManager } from "../../utils/SoundManager";
+
+export class LightningWizardHero extends BaseHero {
   private attackStack: number = 0;
   private maxAttackStack: number = 10;
   private attackSpeedPerStack: number = 0.1;
@@ -12,7 +13,7 @@ export class LightningWizard extends BaseUnit {
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
     super(scene, x, y, "lightning_wizard", cardId);
 
-    if (!LightningWizard.lightningAnimCreated && this.scene.anims) {
+    if (!LightningWizardHero.lightningAnimCreated && this.scene.anims) {
       this.scene.anims.create({
         key: "lightning_strike",
         frames: this.scene.anims.generateFrameNumbers("lightning", {
@@ -22,7 +23,7 @@ export class LightningWizard extends BaseUnit {
         frameRate: 15,
         repeat: 0,
       });
-      LightningWizard.lightningAnimCreated = true;
+      LightningWizardHero.lightningAnimCreated = true;
     }
   }
 
@@ -77,7 +78,7 @@ export class LightningWizard extends BaseUnit {
   }
 }
 
-export const lightningWizardSpec: UnitSpec = {
+export const lightningWizardSpec: HeroSpec = {
   id: "lightning_wizard",
   name: "전격 마법사",
   cost: 6,
@@ -108,6 +109,9 @@ export const lightningWizardSpec: UnitSpec = {
     idleAnimKey: "Idle",
     attackAnimKey: "Attack3",
   },
-  unitClass: LightningWizard,
+  heroClass: LightningWizardHero,
   isRanged: true,
 };
+
+// Register the hero spec
+HeroRegistry.registerSpec(lightningWizardSpec);

@@ -1,7 +1,7 @@
-import { BaseUnit } from "./BaseUnit";
-import { UnitSpec } from "./UnitRegistry";
+import { BaseHero } from "./BaseHero";
+import { HeroSpec, HeroRegistry } from "./HeroRegistry";
 
-export class ThiefUnit extends BaseUnit {
+export class ThiefHero extends BaseHero {
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
     super(scene, x, y, "thief", cardId);
   }
@@ -13,7 +13,7 @@ export class ThiefUnit extends BaseUnit {
   }
 }
 
-export const thiefSpec: UnitSpec = {
+export const thiefSpec: HeroSpec = {
   id: "thief",
   name: "도둑",
   cost: 2,
@@ -45,5 +45,8 @@ export const thiefSpec: UnitSpec = {
     idleAnimKey: "Idle2",
     attackAnimKey: "Attack1",
   },
-  unitClass: ThiefUnit,
+  heroClass: ThiefHero,
 };
+
+// Register the hero spec
+HeroRegistry.registerSpec(thiefSpec);

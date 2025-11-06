@@ -10,21 +10,21 @@ export class HealAllSkill extends BaseSkill {
   }
 
   execute(context: SkillContext): void {
-    const units = context.unitManager.getActiveUnits();
+    const heroes = context.heroManager.getActiveHeroes();
     let healedCount = 0;
 
-    units.forEach(unit => {
-      if (!unit.isDead()) {
-        unit.heal(this.healAmount);
+    heroes.forEach(hero => {
+      if (!hero.isDead()) {
+        hero.heal(this.healAmount);
         healedCount++;
       }
     });
 
-    console.log(`Healed ${healedCount} units for ${this.healAmount} HP each`);
+    console.log(`Healed ${healedCount} heroes for ${this.healAmount} HP each`);
   }
 
   canExecute(context: SkillContext): boolean {
-    return context.unitManager.getActiveUnitCount() > 0;
+    return context.heroManager.getActiveHeroCount() > 0;
   }
 }
 

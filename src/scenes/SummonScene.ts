@@ -276,7 +276,7 @@ export default class SummonScene extends Phaser.Scene {
         this.onCardSelected(option);
       });
 
-      this.cardsContainer!.add(card);
+      this.cardsContainer!.add(card.getContainer());
       this.cardInstances.push(card);
 
       // Entrance animation

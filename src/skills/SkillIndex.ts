@@ -2,13 +2,13 @@ import { SkillRegistry } from "./SkillRegistry";
 import { resourceBoostSkillSpec } from "./impl/ResourceBoostSkill";
 import { healAllSkillSpec } from "./impl/HealAllSkill";
 import { attackSpeedBoostSkillSpec } from "./impl/AttackSpeedBoostSkill";
-import { slowMonsterSkillSpec } from "./impl/SlowMonsterSkill";
+import { slowEnemySkillSpec } from "./impl/SlowMonsterSkill";
 
 export function registerAllSkills(): void {
   SkillRegistry.register(resourceBoostSkillSpec);
   SkillRegistry.register(healAllSkillSpec);
   SkillRegistry.register(attackSpeedBoostSkillSpec);
-  SkillRegistry.register(slowMonsterSkillSpec);
+  SkillRegistry.register(slowEnemySkillSpec);
 }
 
 registerAllSkills();

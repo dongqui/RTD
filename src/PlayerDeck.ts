@@ -1,11 +1,11 @@
-import { UnitType } from "./UnitManager";
-import { UnitRegistry } from "./units/UnitRegistry";
+import { HeroType } from "./HeroManager";
+import { HeroRegistry } from "./units/heroes";
 import { CardType } from "./skills/SkillTypes";
 import { SkillRegistry } from "./skills/SkillRegistry";
 
 export interface CardData {
   cardType: CardType;
-  type: UnitType | string; // UnitType for units, string for skills
+  type: HeroType | string; // HeroType for heroes, string for skills
   cost: number;
   name: string;
   id: string;
@@ -33,15 +33,15 @@ export default class PlayerDeck {
   }
 
   private initializeDefaultDeck(): void {
-    const defaultUnitTypes: UnitType[] = [
+    const defaultHeroTypes: HeroType[] = [
       "warrior",
       "archer",
       "lightning_wizard",
       "frozen_wizard",
     ];
 
-    const unitCards: CardData[] = defaultUnitTypes.map((type) => {
-      const spec = UnitRegistry.getSpec(type);
+    const heroCards: CardData[] = defaultHeroTypes.map((type) => {
+      const spec = HeroRegistry.getSpec(type);
       return {
         cardType: CardType.UNIT,
         type: spec.id,
@@ -64,7 +64,7 @@ export default class PlayerDeck {
     //   };
     // });
 
-    [...unitCards].forEach((card) => this.addCard(card));
+    [...heroCards].forEach((card) => this.addCard(card));
   }
 
   addCard(card: Omit<CardData, "id">): boolean {

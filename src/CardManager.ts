@@ -1,5 +1,7 @@
 import Card from "./ui/Card";
 import { CardType } from "./skills/SkillTypes";
+import { SAFE_AREA } from "./main";
+import { CARD_WIDTH, CARD_HEIGHT } from "./constants";
 
 export interface CardPool {
   id: string;
@@ -17,7 +19,7 @@ export default class CardManager {
   private usedCards: Map<string, CardPool>;
   private cardsInHand: Set<string>;
   private maxCards: number = 3;
-  private cardPositions: { x: number; y: number }[];
+  private cardPositions: { x: number; y: number; scale: number }[];
   private onCardUsed: ((card: Card) => void) | null = null;
 
   constructor(scene: Phaser.Scene, cardPool: CardPool[]) {
@@ -31,18 +33,39 @@ export default class CardManager {
 
   private calculateCardPositions(): void {
     const { width, height } = this.scene.scale.gameSize;
-    const cardWidth = 112;
-    const cardSpacing = 15;
+    const cardSpacing = 20; // DeckScene과 동일한 간격
+
+    // DeckScene과 동일한 스케일 계산
+    const sidePadding = 40;
+    const cardsPerRow = 3;
+    const availableWidth = width - sidePadding * 2;
+    const scaledCardWidth =
+      (availableWidth - cardSpacing * (cardsPerRow - 1)) / cardsPerRow;
+    const scale = scaledCardWidth / CARD_WIDTH; // DeckScene과 동일한 스케일
+    const scaledCardHeight = CARD_HEIGHT * scale;
+
     const totalWidth =
-      this.maxCards * cardWidth + (this.maxCards - 1) * cardSpacing;
-    const startX = (width - totalWidth) / 2 + cardWidth * 0.5;
-    const cardY = height - 120;
+      this.maxCards * scaledCardWidth + (this.maxCards - 1) * cardSpacing;
+
+    // ResourceUI는 바닥에서 80px 위에 있고, 높이는 80px
+    const resourceUIY = height - 80;
+    const resourceUIHeight = 80;
+
+    // 카드들을 ResourceUI 위에 배치
+    // ResourceUI 위쪽 + 여백(20px) + 카드 높이/2
+    const cardY =
+      resourceUIY - resourceUIHeight / 2 - 20 - scaledCardHeight / 2;
+
+    // SAFE_AREA 내에서 카드들을 수평 중앙 정렬
+    const centerX = (SAFE_AREA.left + SAFE_AREA.right) / 2;
+    const startX = centerX - totalWidth / 2 + scaledCardWidth / 2;
 
     this.cardPositions = [];
     for (let i = 0; i < this.maxCards; i++) {
       this.cardPositions.push({
-        x: startX + i * (cardWidth + cardSpacing),
+        x: startX + i * (scaledCardWidth + cardSpacing),
         y: cardY,
+        scale: scale, // 스케일 정보 추가
       });
     }
   }
@@ -72,6 +95,12 @@ export default class CardManager {
       id: cardData.id,
       type: cardData.type,
     });
+
+    // DeckScene과 동일한 스케일 적용
+    const cardContainer = (card as any).container;
+    if (cardContainer && pos.scale) {
+      cardContainer.setScale(pos.scale);
+    }
 
     card.setOnClick(() => {
       this.handleCardClick(card, index);

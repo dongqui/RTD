@@ -1,20 +1,20 @@
-import type { UnitType } from "../UnitManager";
-import { UnitRegistry } from "../units/UnitRegistry";
+import type { HeroType } from "../HeroManager";
+import { HeroRegistry } from "../units/heroes";
 import { SkillRegistry } from "../skills/SkillRegistry";
 import { CardType } from "../skills/SkillTypes";
-import UnitCard from "./UnitCard";
+import HeroCard from "./HeroCard";
 import SkillCard from "./SkillCard";
 import { CARD_WIDTH, CARD_HEIGHT } from "../constants";
 
 export interface CardConfig {
   cardType: CardType;
   id: string;
-  type: UnitType | string; // UnitType or SkillType
+  type: HeroType | string; // HeroType or SkillType
 }
 
 export default class Card {
   private scene: Phaser.Scene;
-  private card: UnitCard | SkillCard;
+  private card: HeroCard | SkillCard;
   private container: Phaser.GameObjects.Container;
   private characterImage: Phaser.GameObjects.Image | null = null;
   private config: CardConfig;
@@ -30,10 +30,10 @@ export default class Card {
     this.scene = scene;
     this.config = config;
 
-    // CardType에 따라 UnitCard 또는 SkillCard 생성
+    // CardType에 따라 HeroCard 또는 SkillCard 생성
     if (config.cardType === CardType.UNIT) {
-      const spec = UnitRegistry.getSpec(config.type as UnitType);
-      this.card = new UnitCard(scene, 0, 0, {
+      const spec = HeroRegistry.getSpec(config.type as HeroType);
+      this.card = new HeroCard(scene, 0, 0, {
         cost: spec.cost,
         name: spec.name,
         imageKey: `unit_portrait_${config.type}`,
@@ -115,7 +115,7 @@ export default class Card {
     return this.config.id;
   }
 
-  getType(): UnitType | string {
+  getType(): HeroType | string {
     return this.config.type;
   }
 
@@ -125,7 +125,7 @@ export default class Card {
 
   getCost(): number {
     if (this.config.cardType === CardType.UNIT) {
-      return UnitRegistry.getSpec(this.config.type as UnitType).cost;
+      return HeroRegistry.getSpec(this.config.type as HeroType).cost;
     } else {
       return SkillRegistry.getSpec(this.config.type).cost;
     }
@@ -149,6 +149,16 @@ export default class Card {
     return this;
   }
 
+  once(event: string, fn: Function, context?: any): this {
+    this.container.once(event, fn, context);
+    return this;
+  }
+
+  off(event: string, fn?: Function, context?: any, once?: boolean): this {
+    this.container.off(event, fn, context, once);
+    return this;
+  }
+
   setAlpha(alpha: number): this {
     this.container.setAlpha(alpha);
     return this;
@@ -163,8 +173,20 @@ export default class Card {
     return this.container.scaleX;
   }
 
+  set scaleX(value: number) {
+    this.container.scaleX = value;
+  }
+
   get scaleY(): number {
     return this.container.scaleY;
+  }
+
+  set scaleY(value: number) {
+    this.container.scaleY = value;
+  }
+
+  getContainer(): Phaser.GameObjects.Container {
+    return this.container;
   }
 
   destroy(): void {

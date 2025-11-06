@@ -1,6 +1,6 @@
 import { WaveConfig, WaveConfigManager } from "./WaveConfig";
 import { SpawnManager } from "./SpawnManager";
-import { MonsterManager } from "./MonsterManager";
+import { EnemyManager } from "./EnemyManager";
 
 export enum WaveState {
   PREPARING = "preparing",
@@ -14,15 +14,15 @@ export class WaveManager {
 
   private scene: Phaser.Scene | null = null;
   private spawnManager: SpawnManager | null = null;
-  private monsterManager: MonsterManager | null = null;
+  private enemyManager: EnemyManager | null = null;
 
   private currentWave: number = 0;
   private totalWaves: number;
   private waveState: WaveState = WaveState.PREPARING;
 
-  private monstersSpawnedThisWave: number = 0;
-  private monstersKilledThisWave: number = 0;
-  private allMonstersSpawned: boolean = false;
+  private enemiesSpawnedThisWave: number = 0;
+  private enemiesKilledThisWave: number = 0;
+  private allEnemiesSpawned: boolean = false;
 
   private constructor() {
     this.totalWaves = WaveConfigManager.getTotalWaves();
@@ -38,23 +38,23 @@ export class WaveManager {
   initialize(
     scene: Phaser.Scene,
     spawnManager: SpawnManager,
-    monsterManager: MonsterManager
+    enemyManager: EnemyManager
   ): void {
     this.scene = scene;
     this.spawnManager = spawnManager;
-    this.monsterManager = monsterManager;
+    this.enemyManager = enemyManager;
     this.setupEventListeners();
   }
 
   private setupEventListeners(): void {
     if (!this.scene) return;
 
-    this.scene.events.on("monster-manager-killed", () => {
-      this.onMonsterKilled();
+    this.scene.events.on("enemy-manager-killed", () => {
+      this.onEnemyKilled();
     });
 
     this.scene.events.on("wave-spawn-completed", () => {
-      this.allMonstersSpawned = true;
+      this.allEnemiesSpawned = true;
     });
   }
 
@@ -82,23 +82,23 @@ export class WaveManager {
     }
 
     this.waveState = WaveState.ACTIVE;
-    this.monstersSpawnedThisWave = 0;
-    this.monstersKilledThisWave = 0;
-    this.allMonstersSpawned = false;
+    this.enemiesSpawnedThisWave = 0;
+    this.enemiesKilledThisWave = 0;
+    this.allEnemiesSpawned = false;
 
     this.scene.events.emit("wave-started", this.currentWave, config);
 
     this.spawnManager.startWave(config);
   }
 
-  onMonsterSpawned(): void {
-    this.monstersSpawnedThisWave++;
+  onEnemySpawned(): void {
+    this.enemiesSpawnedThisWave++;
   }
 
-  private onMonsterKilled(): void {
+  private onEnemyKilled(): void {
     if (this.waveState !== WaveState.ACTIVE) return;
 
-    this.monstersKilledThisWave++;
+    this.enemiesKilledThisWave++;
   }
 
   onWaveCompleted(): void {
@@ -106,13 +106,13 @@ export class WaveManager {
 
     this.waveState = WaveState.COMPLETED;
     console.log(
-      `Wave ${this.currentWave} completed! Killed: ${this.monstersKilledThisWave}`
+      `Wave ${this.currentWave} completed! Killed: ${this.enemiesKilledThisWave}`
     );
 
     this.scene.events.emit(
       "wave-completed",
       this.currentWave,
-      this.monstersKilledThisWave
+      this.enemiesKilledThisWave
     );
 
     if (this.currentWave >= this.totalWaves) {
@@ -146,9 +146,9 @@ export class WaveManager {
   reset(): void {
     this.currentWave = 0;
     this.waveState = WaveState.PREPARING;
-    this.monstersSpawnedThisWave = 0;
-    this.monstersKilledThisWave = 0;
-    this.allMonstersSpawned = false;
+    this.enemiesSpawnedThisWave = 0;
+    this.enemiesKilledThisWave = 0;
+    this.allEnemiesSpawned = false;
   }
 
   getCurrentWave(): number {
@@ -163,17 +163,17 @@ export class WaveManager {
     return this.waveState;
   }
 
-  getMonstersSpawned(): number {
-    return this.monstersSpawnedThisWave;
+  getEnemiesSpawned(): number {
+    return this.enemiesSpawnedThisWave;
   }
 
-  getMonstersKilled(): number {
-    return this.monstersKilledThisWave;
+  getEnemiesKilled(): number {
+    return this.enemiesKilledThisWave;
   }
 
-  getMonstersRemaining(): number {
-    if (!this.monsterManager) return 0;
-    return this.monsterManager.getAliveMonsters().length;
+  getEnemiesRemaining(): number {
+    if (!this.enemyManager) return 0;
+    return this.enemyManager.getAliveEnemies().length;
   }
 
   isWaveActive(): boolean {

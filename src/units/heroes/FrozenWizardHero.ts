@@ -1,9 +1,9 @@
-import { BaseUnit } from "./BaseUnit";
-import { CombatEntity } from "../fsm/CombatEntity";
-import Base from "../Base";
-import { UnitSpec } from "./UnitRegistry";
+import { BaseHero } from "./BaseHero";
+import { CombatEntity } from "../../fsm/CombatEntity";
+import Base from "../../Base";
+import { HeroSpec, HeroRegistry } from "./HeroRegistry";
 
-export class FrozenWizard extends BaseUnit {
+export class FrozenWizardHero extends BaseHero {
   private static frozenAnimCreated: boolean = false;
   private static freezedAnimCreated: boolean = false;
   private aoeRadius: number = 100;
@@ -11,7 +11,7 @@ export class FrozenWizard extends BaseUnit {
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
     super(scene, x, y, "frozen_wizard", cardId);
 
-    if (!FrozenWizard.frozenAnimCreated && this.scene.anims) {
+    if (!FrozenWizardHero.frozenAnimCreated && this.scene.anims) {
       this.scene.anims.create({
         key: "frozen_attack",
         frames: this.scene.anims.generateFrameNumbers("frozen", {
@@ -21,10 +21,10 @@ export class FrozenWizard extends BaseUnit {
         frameRate: 15,
         repeat: 0,
       });
-      FrozenWizard.frozenAnimCreated = true;
+      FrozenWizardHero.frozenAnimCreated = true;
     }
 
-    if (!FrozenWizard.freezedAnimCreated && this.scene.anims) {
+    if (!FrozenWizardHero.freezedAnimCreated && this.scene.anims) {
       this.scene.anims.create({
         key: "freezed_effect",
         frames: this.scene.anims.generateFrameNumbers("freezed", {
@@ -35,7 +35,7 @@ export class FrozenWizard extends BaseUnit {
         repeat: 0,
         duration: 1000,
       });
-      FrozenWizard.freezedAnimCreated = true;
+      FrozenWizardHero.freezedAnimCreated = true;
     }
   }
 
@@ -84,7 +84,7 @@ export class FrozenWizard extends BaseUnit {
   private dealAoeDamage(target: CombatEntity | Base): void {
     const targetX = target.getX();
     const targetY = target.getY();
-    const monsters = this.scene.data.get("monsters") || [];
+    const enemies = this.scene.data.get("enemies") || [];
 
     // target이 Base인 경우 Base에도 데미지 적용
     const isTargetBase =
@@ -94,39 +94,39 @@ export class FrozenWizard extends BaseUnit {
       target.takeDamage(this.getAttackDamage());
     }
 
-    for (const monster of monsters) {
-      if (monster.getState && monster.getState() === "dead") continue;
+    for (const enemy of enemies) {
+      if (enemy.isDead && enemy.isDead()) continue;
 
       const distance = Phaser.Math.Distance.Between(
         targetX,
         targetY,
-        monster.sprite.x,
-        monster.sprite.y
+        enemy.spineObject.x,
+        enemy.spineObject.y
       );
 
       if (distance <= this.aoeRadius) {
-        monster.takeDamage(this.getAttackDamage());
-        this.applyFreezeEffect(monster);
+        enemy.takeDamage(this.getAttackDamage());
+        this.applyFreezeEffect(enemy);
       }
     }
   }
 
   private applyFreezeEffect(target: any): void {
-    if (!target.sprite) return;
+    if (!target.spineObject) return;
 
     const originalSpeedMultiplier = target.speedMultiplier || 1;
     target.speedMultiplier = 0;
 
     const freezedSprite = this.scene.add.sprite(
-      target.sprite.x,
-      target.sprite.y,
+      target.spineObject.x,
+      target.spineObject.y,
       "freezed"
     );
     freezedSprite.setScale(0.7);
     freezedSprite.setAlpha(0.8);
     freezedSprite.setBlendMode(Phaser.BlendModes.NORMAL);
     freezedSprite.setOrigin(0.5, 0.5);
-    freezedSprite.setDepth(target.sprite.depth + 1);
+    freezedSprite.setDepth(target.spineObject.depth + 1);
 
     freezedSprite.play("freezed_effect");
 
@@ -136,8 +136,8 @@ export class FrozenWizard extends BaseUnit {
     });
 
     const updateFreezedPosition = () => {
-      if (target.sprite && freezedSprite.active) {
-        freezedSprite.setPosition(target.sprite.x, target.sprite.y);
+      if (target.spineObject && freezedSprite.active) {
+        freezedSprite.setPosition(target.spineObject.x, target.spineObject.y);
       }
     };
 
@@ -155,7 +155,7 @@ export class FrozenWizard extends BaseUnit {
   }
 }
 
-export const frozenWizardSpec: UnitSpec = {
+export const frozenWizardSpec: HeroSpec = {
   id: "frozen_wizard",
   name: "냉기 마법사",
   cost: 6,
@@ -189,6 +189,9 @@ export const frozenWizardSpec: UnitSpec = {
     attackAnimKey: "Attack3",
     idleAnimKey: "Idle",
   },
-  unitClass: FrozenWizard,
+  heroClass: FrozenWizardHero,
   isRanged: true,
 };
+
+// Register the hero spec
+HeroRegistry.registerSpec(frozenWizardSpec);

@@ -2,7 +2,7 @@ import { BaseSkill } from "../BaseSkill";
 import { SkillConfig, SkillContext, SkillEffectType, SkillSpec } from "../SkillTypes";
 import { MoveSpeedEffect } from "../../fsm/effects/MoveSpeedEffect";
 
-export class SlowMonsterSkill extends BaseSkill {
+export class SlowEnemySkill extends BaseSkill {
   private duration: number;
   private multiplier: number;
 
@@ -13,32 +13,32 @@ export class SlowMonsterSkill extends BaseSkill {
   }
 
   execute(context: SkillContext): void {
-    const monsters = context.monsterManager.getActiveMonsters();
+    const enemies = context.enemyManager.getActiveEnemies();
 
-    if (monsters.length === 0) {
-      console.log("No monsters to slow");
+    if (enemies.length === 0) {
+      console.log("No enemies to slow");
       return;
     }
 
-    monsters.forEach(monster => {
+    enemies.forEach(enemy => {
       const effect = new MoveSpeedEffect(this.duration, this.multiplier);
-      monster.statusEffects.addEffect(effect);
+      enemy.statusEffects.addEffect(effect);
     });
 
-    console.log(`Applied slow debuff to ${monsters.length} monsters`);
+    console.log(`Applied slow debuff to ${enemies.length} enemies`);
   }
 
   canExecute(context: SkillContext): boolean {
-    return context.monsterManager.getActiveMonsterCount() > 0;
+    return context.enemyManager.getActiveEnemyCount() > 0;
   }
 }
 
-export const slowMonsterSkillSpec: SkillSpec = {
-  id: "slow_monster",
+export const slowEnemySkillSpec: SkillSpec = {
+  id: "slow_enemy",
   name: "빙결",
   description: "5초간 모든 적 이동 속도 -80%",
   cost: 6,
   consumable: true,
   effectType: SkillEffectType.DURATION,
-  skillClass: SlowMonsterSkill,
+  skillClass: SlowEnemySkill,
 };

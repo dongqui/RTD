@@ -1,11 +1,11 @@
-import { BaseUnit } from "./BaseUnit";
-import { UnitSpec } from "./UnitRegistry";
-import { CombatEntity } from "../fsm/CombatEntity";
-import Base from "../Base";
-import { Projectile } from "../objects/Projectile";
-import { SoundManager } from "../utils/SoundManager";
+import { BaseHero } from "./BaseHero";
+import { HeroSpec, HeroRegistry } from "./HeroRegistry";
+import { CombatEntity } from "../../fsm/CombatEntity";
+import Base from "../../Base";
+import { Projectile } from "../../objects/Projectile";
+import { SoundManager } from "../../utils/SoundManager";
 
-export class ArcherUnit extends BaseUnit {
+export class ArcherHero extends BaseHero {
   private projectiles: Projectile[] = [];
 
   constructor(scene: Phaser.Scene, x: number, y: number, cardId: string = "") {
@@ -54,7 +54,7 @@ export class ArcherUnit extends BaseUnit {
   }
 }
 
-export const archerSpec: UnitSpec = {
+export const archerSpec: HeroSpec = {
   id: "archer",
   name: "수습 궁수",
   cost: 3,
@@ -86,6 +86,9 @@ export const archerSpec: UnitSpec = {
     idleAnimKey: "Idle_Bow",
     attackAnimKey: "Attack_Bow",
   },
-  unitClass: ArcherUnit,
+  heroClass: ArcherHero,
   isRanged: true,
 };
+
+// Register the hero spec
+HeroRegistry.registerSpec(archerSpec);

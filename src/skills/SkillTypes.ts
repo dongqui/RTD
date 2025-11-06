@@ -1,6 +1,6 @@
 import GameScene from "../scenes/GameScene";
-import { UnitManager } from "../UnitManager";
-import { MonsterManager } from "../MonsterManager";
+import { HeroManager } from "../HeroManager";
+import { EnemyManager } from "../EnemyManager";
 import ResourceManager from "../ResourceManager";
 import Base from "../Base";
 
@@ -16,8 +16,8 @@ export enum SkillEffectType {
 
 export interface SkillContext {
   scene: GameScene;
-  unitManager: UnitManager;
-  monsterManager: MonsterManager;
+  heroManager: HeroManager;
+  enemyManager: EnemyManager;
   resourceManager: ResourceManager;
   playerBase: Base;
   enemyBase: Base;

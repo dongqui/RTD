@@ -18,23 +18,23 @@ export class AttackSpeedBoostSkill extends BaseSkill {
   }
 
   execute(context: SkillContext): void {
-    const units = context.unitManager.getActiveUnits();
+    const heroes = context.heroManager.getActiveHeroes();
 
-    if (units.length === 0) {
-      console.log("No units to buff");
+    if (heroes.length === 0) {
+      console.log("No heroes to buff");
       return;
     }
 
-    units.forEach((unit) => {
+    heroes.forEach((hero) => {
       const effect = new AttackSpeedEffect(this.duration, this.multiplier);
-      unit.statusEffects.addEffect(effect);
+      hero.statusEffects.addEffect(effect);
     });
 
-    console.log(`Applied attack speed buff to ${units.length} units`);
+    console.log(`Applied attack speed buff to ${heroes.length} heroes`);
   }
 
   canExecute(context: SkillContext): boolean {
-    return context.unitManager.getActiveUnitCount() > 0;
+    return context.heroManager.getActiveHeroCount() > 0;
   }
 }
 

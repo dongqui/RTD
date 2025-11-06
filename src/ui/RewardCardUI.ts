@@ -125,7 +125,7 @@ export class RewardCardUI extends Modal {
         this.onCardSelected(option);
       });
 
-      cardsContainer.add(card);
+      cardsContainer.add(card.getContainer());
       this.cardInstances.push(card);
 
       // Entrance animation
@@ -212,9 +212,13 @@ export class RewardCardUI extends Modal {
 
     this.onSelectCallback = onSelect;
     this.cardOptions = CardDrawManager.generateCardOptions(3);
+    console.log("Generated card options:", this.cardOptions);
+
+    // Destroy previous card instances before clearing
+    this.cardInstances.forEach(card => card.destroy());
     this.cardInstances = [];
 
-    // Clear previous content
+    // Clear previous content (don't destroy children as we already did it manually)
     const container = this.getContentContainer();
     container.removeAll(true);
 

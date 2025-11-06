@@ -1,13 +1,13 @@
 import GameManager from "./GameManager";
-import { UnitManager, UnitType } from "./UnitManager";
-import { MonsterManager } from "./MonsterManager";
+import { HeroManager, HeroType } from "./HeroManager";
+import { EnemyManager } from "./EnemyManager";
 import { WaveConfig, SpawnGroup } from "./WaveConfig";
 
 export class SpawnManager {
   private scene: Phaser.Scene;
   private gameManager: GameManager;
-  private unitManager: UnitManager;
-  private monsterManager: MonsterManager;
+  private heroManager: HeroManager;
+  private enemyManager: EnemyManager;
 
   private enemySpawnX: number;
   private spawnY: number;
@@ -24,13 +24,13 @@ export class SpawnManager {
   constructor(
     scene: Phaser.Scene,
     gameManager: GameManager,
-    unitManager: UnitManager,
-    monsterManager: MonsterManager
+    heroManager: HeroManager,
+    enemyManager: EnemyManager
   ) {
     this.scene = scene;
     this.gameManager = gameManager;
-    this.unitManager = unitManager;
-    this.monsterManager = monsterManager;
+    this.heroManager = heroManager;
+    this.enemyManager = enemyManager;
 
     this.enemySpawnX = this.scene.cameras.main.width + 20;
     this.spawnY = this.scene.cameras.main.height / 2;
@@ -47,7 +47,7 @@ export class SpawnManager {
   private spawnEnemyMonster(): void {
     const randomYOffset = Phaser.Math.Between(-100, 100);
     const spawnY = this.spawnY + randomYOffset;
-    this.monsterManager.spawnMonster("basic", this.enemySpawnX, spawnY);
+    this.enemyManager.spawnEnemy("enemy_warrior", this.enemySpawnX, spawnY);
   }
 
   startWave(config: WaveConfig): void {
@@ -85,35 +85,35 @@ export class SpawnManager {
 
     this.enemySpawnTimer = this.scene.time.addEvent({
       delay: group.interval,
-      callback: () => this.spawnMonsterFromGroup(group),
+      callback: () => this.spawnEnemyFromGroup(group),
       repeat: group.count - 1,
     });
   }
 
-  private spawnMonsterFromGroup(group: SpawnGroup): void {
+  private spawnEnemyFromGroup(group: SpawnGroup): void {
     const randomYOffset = Phaser.Math.Between(-100, 100);
     const spawnY = this.spawnY + randomYOffset;
 
-    const monster = this.monsterManager.spawnMonster(
-      group.monsterType,
+    const enemy = this.enemyManager.spawnEnemy(
+      group.enemyType as any,
       this.enemySpawnX,
       spawnY
     );
 
-    if (monster) {
+    if (enemy) {
       if (group.healthMultiplier !== 1.0) {
-        monster.setHealthMultiplier(group.healthMultiplier);
+        enemy.setHealthMultiplier(group.healthMultiplier);
       }
 
       if (group.speedMultiplier && group.speedMultiplier !== 1.0) {
-        monster.setSpeedMultiplier(group.speedMultiplier);
+        enemy.setSpeedMultiplier(group.speedMultiplier);
       }
 
       if (group.rewardMultiplier && group.rewardMultiplier !== 1.0) {
-        monster.setRewardMultiplier(group.rewardMultiplier);
+        enemy.setRewardMultiplier(group.rewardMultiplier);
       }
 
-      this.scene.events.emit("wave-monster-spawned");
+      this.scene.events.emit("wave-enemy-spawned");
     }
 
     this.currentGroupSpawnCount++;

@@ -1,6 +1,6 @@
 import GameManager from "../GameManager";
-import { MonsterManager } from "../MonsterManager";
-import { UnitManager } from "../UnitManager";
+import { EnemyManager } from "../EnemyManager";
+import { HeroManager } from "../HeroManager";
 import { SpawnManager } from "../SpawnManager";
 import ResourceManager from "../ResourceManager";
 import ResourceUI from "../ui/ResourceUI";
@@ -20,8 +20,8 @@ import { SkillRegistry } from "../skills/SkillRegistry";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
-  private monsterManager: MonsterManager;
-  private unitManager: UnitManager;
+  private enemyManager: EnemyManager;
+  private heroManager: HeroManager;
   private spawnManager: SpawnManager;
   private resourceManager: ResourceManager;
   private resourceUI: ResourceUI;
@@ -67,8 +67,8 @@ export default class GameScene extends Phaser.Scene {
 
     this.gameManager = new GameManager(this);
 
-    this.monsterManager = new MonsterManager(this);
-    this.unitManager = new UnitManager(this);
+    this.enemyManager = new EnemyManager(this);
+    this.heroManager = new HeroManager(this);
 
     this.resourceManager = new ResourceManager(this, 10, 2000);
 
@@ -101,8 +101,8 @@ export default class GameScene extends Phaser.Scene {
     this.spawnManager = new SpawnManager(
       this,
       this.gameManager,
-      this.unitManager,
-      this.monsterManager
+      this.heroManager,
+      this.enemyManager
     );
   }
 
@@ -110,7 +110,7 @@ export default class GameScene extends Phaser.Scene {
     const { width } = this.scale.gameSize;
 
     this.waveManager = WaveManager.getInstance();
-    this.waveManager.initialize(this, this.spawnManager, this.monsterManager);
+    this.waveManager.initialize(this, this.spawnManager, this.enemyManager);
 
     this.waveUI = new WaveUI(this, width / 2, 50);
     this.waveUI.updateWave(
@@ -122,8 +122,8 @@ export default class GameScene extends Phaser.Scene {
     this.rewardCardUI = new RewardCardUI(this, PlayerDeck.getInstance());
     this.rewardCardUI.setVisible(false);
 
-    this.events.on("wave-monster-spawned", () => {
-      this.waveManager.onMonsterSpawned();
+    this.events.on("wave-enemy-spawned", () => {
+      this.waveManager.onEnemySpawned();
     });
 
     this.events.on("wave-started", (waveNumber: number) => {
@@ -164,19 +164,19 @@ export default class GameScene extends Phaser.Scene {
 
   private setupGameEventHandlers(): void {
     this.events.on(
-      "monster-manager-killed",
-      (_monster: any, reward: number) => {
+      "enemy-manager-killed",
+      (_enemy: any, reward: number) => {
         this.gameManager.addGold(reward);
       }
     );
 
-    this.events.on("monster-manager-reached-player-base", (_monster: any) => {
+    this.events.on("enemy-manager-reached-player-base", (_enemy: any) => {
       if (this.playerBase && this.playerBase.isActive()) {
         this.playerBase.takeDamage(1);
       }
     });
 
-    this.events.on("unit-reached-enemy-base", (_unit: any) => {
+    this.events.on("hero-reached-enemy-base", (_hero: any) => {
       if (this.enemyBase && this.enemyBase.isActive()) {
         this.enemyBase.takeDamage(1);
       }
@@ -196,8 +196,8 @@ export default class GameScene extends Phaser.Scene {
       this.showGameClearScreen();
     });
 
-    this.events.on("unit-died", (cardId: string) => {
-      this.onUnitDied(cardId);
+    this.events.on("hero-died", (cardId: string) => {
+      this.onHeroDied(cardId);
     });
 
     this.events.on("add-resource", (amount: number) => {
@@ -206,7 +206,7 @@ export default class GameScene extends Phaser.Scene {
     });
   }
 
-  private onUnitDied(cardId: string): void {
+  private onHeroDied(cardId: string): void {
     if (!cardId) return;
 
     this.cardManager.returnCard(cardId);
@@ -312,11 +312,11 @@ export default class GameScene extends Phaser.Scene {
     if (card.getCardType() === CardType.SKILL) {
       this.useSkillCard(card);
     } else {
-      this.spawnUnitFromCard(card);
+      this.spawnHeroFromCard(card);
     }
   }
 
-  private spawnUnitFromCard(card: Card): void {
+  private spawnHeroFromCard(card: Card): void {
     const cost = card.getCost();
 
     if (!this.resourceManager.spendResource(cost)) {
@@ -329,15 +329,15 @@ export default class GameScene extends Phaser.Scene {
     const randomYOffset = Phaser.Math.Between(-100, 100);
     const spawnY = height / 2 + randomYOffset;
 
-    const unitType = card.getType();
+    const heroType = card.getType();
     const cardId = card.getCardId();
 
-    this.unitManager.spawnUnit(unitType, spawnX, spawnY, cardId);
+    this.heroManager.spawnHero(heroType, spawnX, spawnY, cardId);
 
     this.cardManager.useCard(cardId);
 
     console.log(
-      `Spawned ${unitType} unit for ${cost} resources (cardId: ${cardId})`
+      `Spawned ${heroType} hero for ${cost} resources (cardId: ${cardId})`
     );
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
@@ -364,8 +364,8 @@ export default class GameScene extends Phaser.Scene {
 
     const context: SkillContext = {
       scene: this,
-      unitManager: this.unitManager,
-      monsterManager: this.monsterManager,
+      heroManager: this.heroManager,
+      enemyManager: this.enemyManager,
       resourceManager: this.resourceManager,
       playerBase: this.playerBase,
       enemyBase: this.enemyBase,
@@ -454,8 +454,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private resetToNextWave(): void {
-    this.monsterManager.clear();
-    this.unitManager.clear();
+    this.enemyManager.clear();
+    this.heroManager.clear();
     this.playerBase.reset();
     this.enemyBase.reset();
     this.cardManager.resetCards();
@@ -490,8 +490,8 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private resetToInitialState(): void {
-    this.monsterManager.clear();
-    this.unitManager.clear();
+    this.enemyManager.clear();
+    this.heroManager.clear();
     this.gameManager.reset();
     this.waveManager.reset();
     this.waveUI.updateWave(0, this.waveManager.getTotalWaves());
@@ -506,17 +506,17 @@ export default class GameScene extends Phaser.Scene {
   }
 
   update(): void {
-    if (this.monsterManager) {
-      this.monsterManager.update();
+    if (this.enemyManager) {
+      this.enemyManager.update();
     }
-    if (this.unitManager) {
-      this.unitManager.update(this.time.now, this.game.loop.delta);
+    if (this.heroManager) {
+      this.heroManager.update(this.time.now, this.game.loop.delta);
     }
     if (this.resourceManager) {
       this.resourceManager.update(this.time.now);
     }
     if (this.waveManager && this.waveUI) {
-      const remaining = this.waveManager.getMonstersRemaining();
+      const remaining = this.waveManager.getEnemiesRemaining();
       this.waveUI.updateEnemies(remaining);
     }
   }

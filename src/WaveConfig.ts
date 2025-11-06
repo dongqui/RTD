@@ -1,5 +1,5 @@
 export interface SpawnGroup {
-  monsterType: string;
+  enemyType: string;
   count: number;
   interval: number;
   healthMultiplier: number;
@@ -21,7 +21,7 @@ export class WaveConfigManager {
       description: "첫 번째 웨이브",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 5,
           interval: 2000,
           healthMultiplier: 1.0,
@@ -34,7 +34,7 @@ export class WaveConfigManager {
       description: "조금 더 많은 적",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 8,
           interval: 1800,
           healthMultiplier: 1.2,
@@ -47,7 +47,7 @@ export class WaveConfigManager {
       description: "더 강한 적",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 10,
           interval: 1600,
           healthMultiplier: 1.5,
@@ -60,7 +60,7 @@ export class WaveConfigManager {
       description: "빠른 웨이브",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 12,
           interval: 1400,
           healthMultiplier: 1.8,
@@ -74,7 +74,7 @@ export class WaveConfigManager {
       description: "첫 번째 도전",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 15,
           interval: 1200,
           healthMultiplier: 2.0,
@@ -88,7 +88,7 @@ export class WaveConfigManager {
       description: "물량 공세",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 20,
           interval: 1000,
           healthMultiplier: 2.2,
@@ -102,7 +102,7 @@ export class WaveConfigManager {
       description: "강화된 적들",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 18,
           interval: 1100,
           healthMultiplier: 2.5,
@@ -116,7 +116,7 @@ export class WaveConfigManager {
       description: "지옥의 시작",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 22,
           interval: 900,
           healthMultiplier: 3.0,
@@ -130,7 +130,7 @@ export class WaveConfigManager {
       description: "두 번째 도전",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 25,
           interval: 800,
           healthMultiplier: 3.5,
@@ -144,7 +144,7 @@ export class WaveConfigManager {
       description: "절반의 성공",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 28,
           interval: 750,
           healthMultiplier: 4.0,
@@ -158,7 +158,7 @@ export class WaveConfigManager {
       description: "극한의 물량",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 32,
           interval: 700,
           healthMultiplier: 4.5,
@@ -172,7 +172,7 @@ export class WaveConfigManager {
       description: "최강의 적들",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 35,
           interval: 650,
           healthMultiplier: 5.0,
@@ -186,7 +186,7 @@ export class WaveConfigManager {
       description: "악몽",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 40,
           interval: 600,
           healthMultiplier: 5.5,
@@ -200,7 +200,7 @@ export class WaveConfigManager {
       description: "최후의 시험",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 45,
           interval: 550,
           healthMultiplier: 6.0,
@@ -214,7 +214,7 @@ export class WaveConfigManager {
       description: "최종 결전",
       spawnGroups: [
         {
-          monsterType: "basic",
+          enemyType: "enemy_warrior",
           count: 50,
           interval: 500,
           healthMultiplier: 7.0,
