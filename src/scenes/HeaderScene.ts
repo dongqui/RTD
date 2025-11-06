@@ -41,7 +41,7 @@ export default class HeaderScene extends Phaser.Scene {
       32, // leftWidth
       29, // topHeight
       32, // rightWidth
-      27  // bottomHeight
+      27 // bottomHeight
     );
     resourceBarBg.setOrigin(0.5);
     resourceBarBg.setTint(0x1a152d); // #1A152D 색상
@@ -56,12 +56,17 @@ export default class HeaderScene extends Phaser.Scene {
 
     // 다이아몬드 숫자 텍스트 (흰색)
     const textX = barX + 10; // 바 중앙보다 약간 오른쪽
-    this.diamondText = this.add.text(textX, barY, this.diamondCount.toString(), {
-      fontSize: "26px",
-      color: "#FFFFFF",
-      fontFamily: "Germania One",
-      fontStyle: "bold",
-    });
+    this.diamondText = this.add.text(
+      textX,
+      barY,
+      this.diamondCount.toString(),
+      {
+        fontSize: "26px",
+        color: "#FFFFFF",
+        fontFamily: "Germania One",
+        fontStyle: "bold",
+      }
+    );
     this.diamondText.setOrigin(0.5);
     this.diamondText.setDepth(10); // DeckScene의 배경 rectangle보다 높은 depth
   }

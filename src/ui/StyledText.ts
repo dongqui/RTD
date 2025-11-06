@@ -9,6 +9,7 @@ export interface StyledTextConfig {
   fontFamily?: string;
   align?: "left" | "center" | "right";
   wordWrap?: { width: number };
+  fontStyle?: string;
 }
 
 export class StyledText extends Phaser.GameObjects.Text {
@@ -19,13 +20,14 @@ export class StyledText extends Phaser.GameObjects.Text {
     config: StyledTextConfig
   ) {
     const style: Phaser.Types.GameObjects.Text.TextStyle = {
-      fontFamily: config.fontFamily || "Germania One",
+      fontFamily: config.fontFamily || "OneStoreMobilePop",
       fontSize: config.fontSize || "28px",
       color: config.color || "#ffffff",
       stroke: config.stroke || "#000000",
       strokeThickness: config.strokeThickness ?? 4,
       align: config.align || "center",
       wordWrap: config.wordWrap,
+      fontStyle: config.fontStyle || "normal",
     };
 
     super(scene, x, y, config.text, style);

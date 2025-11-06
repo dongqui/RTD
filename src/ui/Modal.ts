@@ -8,6 +8,11 @@ export interface ModalConfig {
   backgroundColor?: number;
   showCloseButton?: boolean;
   onClose?: () => void;
+  onConfirm?: () => void;
+  onCancel?: () => void;
+  confirmText?: string;
+  cancelText?: string;
+  message?: string;
 }
 
 export class Modal extends Phaser.GameObjects.Container {
@@ -55,9 +60,6 @@ export class Modal extends Phaser.GameObjects.Container {
     this.panel = this.scene.add.container(sceneWidth / 2, sceneHeight / 2);
     this.add(this.panel);
 
-    // Background (NineSlice)
-    // spriteBorder: left=63, right=65, top=65, bottom=66
-    // Color: #2B2242
     this.background = this.scene.add
       .nineslice(
         0,
@@ -75,9 +77,6 @@ export class Modal extends Phaser.GameObjects.Container {
       .setTint(0x2b2242);
     this.panel.add(this.background);
 
-    // Border (NineSlice)
-    // spriteBorder: left=63, right=65, top=66, bottom=65
-    // Color: #1C112F
     this.border = this.scene.add
       .nineslice(
         0,
@@ -95,9 +94,6 @@ export class Modal extends Phaser.GameObjects.Container {
       .setTint(0x1c112f);
     this.panel.add(this.border);
 
-    // Inner Border (NineSlice)
-    // spriteBorder: left=60, right=60, top=59, bottom=60
-    // Color: #42365F
     this.innerBorder = this.scene.add
       .nineslice(
         0,
@@ -115,9 +111,6 @@ export class Modal extends Phaser.GameObjects.Container {
       .setTint(0x42365f);
     this.panel.add(this.innerBorder);
 
-    // Deco Line (Top decoration)
-    // spriteBorder: left=23, right=23, top=0, bottom=0
-    // Color: #514274
     this.decoLine = this.scene.add
       .nineslice(
         0,
@@ -135,34 +128,12 @@ export class Modal extends Phaser.GameObjects.Container {
       .setTint(0x514274);
     this.panel.add(this.decoLine);
 
-    // Corner Decorations (NineSlice)
-    // spriteBorder: left=29, right=30, top=29, bottom=29
-    // Color: #514274
-
-    // const deco = this.scene.add
-    //   .nineslice(
-    //     0,
-    //     0,
-    //     "popup_box_deco",
-    //     undefined,
-    //     panelWidth - 50,
-    //     panelHeight - 50,
-    //     29,
-    //     30,
-    //     29,
-    //     29
-    //   )
-    //   .setOrigin(0.5)
-    //   .setTint(0x514274);
-    // this.panel.add(deco);
-
-    // Title text if title is provided
     if (this.config.title) {
       this.createTitle(this.config.title, panelWidth, panelHeight);
     }
 
     // Content container for child components to use
-    const contentY = this.config.title ? 40 : 0;
+    const contentY = 0;
     this.contentContainer = this.scene.add.container(0, contentY);
     this.panel.add(this.contentContainer);
 
@@ -178,7 +149,7 @@ export class Modal extends Phaser.GameObjects.Container {
     panelHeight: number
   ): void {
     // Simple title text (no ribbon)
-    this.titleText = new StyledText(this.scene, 0, -panelHeight / 2 + 40, {
+    this.titleText = new StyledText(this.scene, 0, -panelHeight / 2 + 55, {
       text: title,
       fontSize: "28px",
     });
@@ -186,26 +157,45 @@ export class Modal extends Phaser.GameObjects.Container {
   }
 
   private createCloseButton(panelWidth: number, panelHeight: number): void {
+    const btnX = panelWidth / 2 - 30;
+    const btnY = -panelHeight / 2 + 30;
+
+    // Container for button and icon
+    const closeBtnContainer = this.scene.add.container(btnX, btnY);
+
+    // Red circle button background
     const closeBtn = this.scene.add
-      .text(panelWidth / 2 - 30, -panelHeight / 2 + 30, "✕", {
-        fontFamily: "Germania One",
-        fontSize: "32px",
-        color: "#ffffff",
-      })
+      .image(0, 0, "button_close_red")
       .setOrigin(0.5)
+      .setScale(0.8);
+
+    //Close icon in the center
+    const closeIcon = this.scene.add
+      .image(0, 0, "icon_close")
+      .setOrigin(0.5)
+      .setScale(0.5);
+
+    closeBtnContainer.add([closeBtn, closeIcon]);
+    closeBtnContainer.setSize(closeBtn.width * 0.8, closeBtn.height * 0.8);
+    closeBtnContainer
       .setInteractive({ useHandCursor: true })
       .on("pointerover", () => {
-        closeBtn.setColor("#ff5555");
+        closeBtnContainer.setScale(1.05);
       })
       .on("pointerout", () => {
-        closeBtn.setColor("#ffffff");
+        closeBtnContainer.setScale(1);
       })
       .on("pointerdown", () => {
+        closeBtnContainer.setScale(0.95);
+      })
+      .on("pointerup", () => {
+        closeBtnContainer.setScale(1.05);
         if (this.config.onClose) {
           this.config.onClose();
         }
       });
-    this.panel.add(closeBtn);
+
+    this.panel.add(closeBtnContainer);
   }
 
   protected getContentContainer(): Phaser.GameObjects.Container {

@@ -1,60 +1,79 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-html, body {
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    color: rgba(255, 255, 255, 0.87);
-    background-color: #000000;
-    font-family: 'Germania One', cursive;
-    touch-action: manipulation;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #000000;
+  font-family: "Germania One", cursive;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 #app {
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #game-container {
-    width: 100%;
-    height: 100%;
-    touch-action: manipulation;
+  width: 100%;
+  height: 100%;
+  touch-action: manipulation;
 }
 
 /* Prevent zoom on mobile */
-input, button, select, textarea {
-    font-size: 16px;
+input,
+button,
+select,
+textarea {
+  font-size: 16px;
 }
 
 /* Hide address bar on mobile */
 @media screen and (max-width: 768px) {
-    #app {
-        height: 100vh;
-        height: -webkit-fill-available;
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-    }
+  #app {
+    height: 100vh;
+    height: -webkit-fill-available;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
 }
 
 /* Prevent pull-to-refresh */
 body {
-    overscroll-behavior: none;
+  overscroll-behavior: none;
+}
+@font-face {
+  font-family: "DungeonFighterOnlineBeatBeat";
+  src: url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff"),
+    url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "OneStoreMobilePop";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff")
+    format("woff");
+  font-weight: normal;
+  font-display: swap;
 }
