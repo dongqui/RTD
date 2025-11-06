@@ -1,4 +1,6 @@
 import { BottomTab, BottomTabConfig } from "./BottomTab";
+import { SoundManager } from "../utils/SoundManager";
+
 interface ButtonData {
   key: string;
   imageKey: string;
@@ -123,6 +125,9 @@ export default class BottomNavigation {
     if (this.selectedTabKey === key) {
       return;
     }
+
+    // 탭 사운드 재생
+    SoundManager.getInstance().play("tab_sound");
 
     if (this.selectedTabKey) {
       const current = this.buttons.get(this.selectedTabKey);

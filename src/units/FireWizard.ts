@@ -24,17 +24,9 @@ export class FireWizard extends BaseUnit {
     }
   }
 
-  attack(target: CombatEntity | Base): void {
-    const currentTime = this.scene.time.now;
-    const attackSpeed = this.getAttackSpeed();
-
-    if (currentTime - this.getLastAttackTime() >= attackSpeed) {
-      this.setLastAttackTime(currentTime);
-      this.playAttackAnimation();
-
-      this.showFireEffect(target);
-      this.dealAoeDamage(target);
-    }
+  protected performAttack(target: CombatEntity | Base): void {
+    this.showFireEffect(target);
+    this.dealAoeDamage(target);
   }
 
   private showFireEffect(target: CombatEntity | Base): void {

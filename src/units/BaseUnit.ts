@@ -10,6 +10,7 @@ import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
 import { UnitRegistry, UnitType, UnitSpec } from "./UnitRegistry";
+import { SoundManager } from "../utils/SoundManager";
 
 export interface UnitConfig {
   health: number;
@@ -290,9 +291,19 @@ export abstract class BaseUnit implements CombatEntity {
 
     if (currentTime - this.lastAttackTime >= this.getAttackSpeed()) {
       this.lastAttackTime = currentTime;
-      target.takeDamage(this.getAttackDamage());
+      this.performAttack(target);
       this.playAttackAnimation();
+      this.playAttackSound();
     }
+  }
+
+  protected performAttack(target: CombatEntity | Base): void {
+    target.takeDamage(this.getAttackDamage());
+  }
+
+  protected playAttackSound(): void {
+    // Delay sound to sync with attack animation impact
+    SoundManager.getInstance().playDelayed("sound_hit", 200, { volume: 0.3 });
   }
 
   heal(amount: number): void {

@@ -4,7 +4,8 @@
       "Bash(dir:*)",
       "Bash(findstr:*)",
       "Bash(npm run build:*)",
-      "Bash(copy:*)"
+      "Bash(copy:*)",
+      "Bash(npx tsc:*)"
     ]
   },
   "hooks": {

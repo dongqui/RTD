@@ -3,6 +3,7 @@
 /* START OF COMPILED CODE */
 
 /* START-USER-IMPORTS */
+import { SoundManager } from "../utils/SoundManager";
 /* END-USER-IMPORTS */
 
 export default class Preload extends Phaser.Scene {
@@ -70,6 +71,9 @@ export default class Preload extends Phaser.Scene {
   }
 
   create() {
+    // Initialize SoundManager
+    SoundManager.getInstance().init(this);
+
     if (process.env.NODE_ENV === "development") {
       const start = new URLSearchParams(location.search).get("start");
 

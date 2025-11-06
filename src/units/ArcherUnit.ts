@@ -3,6 +3,7 @@ import { UnitSpec } from "./UnitRegistry";
 import { CombatEntity } from "../fsm/CombatEntity";
 import Base from "../Base";
 import { Projectile } from "../objects/Projectile";
+import { SoundManager } from "../utils/SoundManager";
 
 export class ArcherUnit extends BaseUnit {
   private projectiles: Projectile[] = [];
@@ -11,25 +12,23 @@ export class ArcherUnit extends BaseUnit {
     super(scene, x, y, "archer", cardId);
   }
 
-  attack(target: CombatEntity | Base): void {
-    const currentTime = this.scene.time.now;
+  protected performAttack(target: CombatEntity | Base): void {
+    const projectile = new Projectile(
+      this.scene,
+      this.spineObject.x + 25,
+      this.spineObject.y - 52,
+      target,
+      this.getAttackDamage(),
+      "arrow",
+      600
+    );
 
-    if (currentTime - this.getLastAttackTime() >= this.getAttackSpeed()) {
-      this.setLastAttackTime(currentTime);
+    this.projectiles.push(projectile);
+  }
 
-      const projectile = new Projectile(
-        this.scene,
-        this.spineObject.x + 25,
-        this.spineObject.y - 52,
-        target,
-        this.getAttackDamage(),
-        "arrow",
-        600
-      );
-
-      this.projectiles.push(projectile);
-      this.playAttackAnimation();
-    }
+  protected playAttackSound(): void {
+    // Play arrow sound immediately when shooting
+    SoundManager.getInstance().play("sound_hit_arrow", { volume: 0.4 });
   }
 
   update(time: number, delta: number): void {

@@ -291,6 +291,26 @@
         "type": "image",
         "key": "button_close_red",
         "url": "assets/components/buttons/Button_Convex_Circle_02_Red.png"
+      },
+      {
+        "type": "audio",
+        "key": "tab_sound",
+        "url": "assets/sounds/tab_sound.mp3"
+      },
+      {
+        "type": "audio",
+        "key": "sound_lighting",
+        "url": "assets/sounds/sound_lighting.mp3"
+      },
+      {
+        "type": "audio",
+        "key": "sound_hit",
+        "url": "assets/sounds/hit.wav"
+      },
+      {
+        "type": "audio",
+        "key": "sound_hit_arrow",
+        "url": "assets/sounds/hit_arrow.wav"
       }
     ]
   },

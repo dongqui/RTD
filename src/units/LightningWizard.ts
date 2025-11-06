@@ -2,6 +2,7 @@ import { BaseUnit } from "./BaseUnit";
 import { CombatEntity } from "../fsm/CombatEntity";
 import Base from "../Base";
 import { UnitSpec } from "./UnitRegistry";
+import { SoundManager } from "../utils/SoundManager";
 export class LightningWizard extends BaseUnit {
   private attackStack: number = 0;
   private maxAttackStack: number = 10;
@@ -25,22 +26,19 @@ export class LightningWizard extends BaseUnit {
     }
   }
 
-  attack(target: CombatEntity | Base): void {
-    const currentTime = this.scene.time.now;
-    const attackSpeed = this.getAttackSpeed();
+  protected performAttack(target: CombatEntity | Base): void {
+    target.takeDamage(this.getAttackDamage());
+    this.showLightningEffect(target);
 
-    if (currentTime - this.getLastAttackTime() >= attackSpeed) {
-      this.setLastAttackTime(currentTime);
-      target.takeDamage(this.getAttackDamage());
-      this.playAttackAnimation();
-
-      this.showLightningEffect(target);
-
-      if (this.attackStack < this.maxAttackStack) {
-        this.attackStack++;
-        this.updateAttackSpeed();
-      }
+    if (this.attackStack < this.maxAttackStack) {
+      this.attackStack++;
+      this.updateAttackSpeed();
     }
+  }
+
+  protected playAttackSound(): void {
+    // Override to use lightning sound instead of default hit sound
+    SoundManager.getInstance().play("sound_lighting", { volume: 0.5 });
   }
 
   private showLightningEffect(target: CombatEntity | Base): void {

@@ -39,17 +39,9 @@ export class FrozenWizard extends BaseUnit {
     }
   }
 
-  attack(target: CombatEntity | Base): void {
-    const currentTime = this.scene.time.now;
-    const attackSpeed = this.getAttackSpeed();
-
-    if (currentTime - this.getLastAttackTime() >= attackSpeed) {
-      this.setLastAttackTime(currentTime);
-      this.playAttackAnimation();
-
-      this.showFrozenEffect(target);
-      this.dealAoeDamage(target);
-    }
+  protected performAttack(target: CombatEntity | Base): void {
+    this.showFrozenEffect(target);
+    this.dealAoeDamage(target);
   }
 
   private showFrozenEffect(target: CombatEntity | Base): void {
