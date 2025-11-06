@@ -272,7 +272,11 @@ export default class GameScene extends Phaser.Scene {
   private setupResourceUI(): void {
     const { height } = this.scale.gameSize;
 
-    this.resourceUI = new ResourceUI(this, 10, height - 180, 10);
+    // ResourceUI를 화면 바닥에 배치 (바텀쪽에 공간 확보)
+    const resourceUIX = SAFE_AREA.left;
+    const resourceUIY = height - 80; // 바닥에서 80px 위 (공간 확보)
+
+    this.resourceUI = new ResourceUI(this, resourceUIX, resourceUIY, 10);
     this.resourceUI.updateResource(this.resourceManager.getCurrentResource());
 
     this.events.on("resource-changed", (currentResource: number) => {
@@ -432,20 +436,10 @@ export default class GameScene extends Phaser.Scene {
     this.rewardCardUI.showRewardSelection((selectedCard) => {
       console.log("Selected reward card:", selectedCard);
 
+      // Card is already added to deck in RewardCardUI.handleConfirm()
+      // Just log the result here
       if (selectedCard) {
-        const deck = PlayerDeck.getInstance();
-        const added = deck.addCard({
-          cardType: selectedCard.cardType,
-          type: selectedCard.type,
-          cost: selectedCard.cost,
-          name: selectedCard.name,
-        });
-
-        if (added) {
-          console.log(`Added ${selectedCard.name} to deck`);
-        } else {
-          console.warn("Failed to add card to deck (deck might be full)");
-        }
+        console.log(`Card selection confirmed: ${selectedCard.name}`);
       } else {
         console.log("Reward skipped");
       }
