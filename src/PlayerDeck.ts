@@ -5,7 +5,7 @@ import { SkillRegistry } from "./skills/SkillRegistry";
 
 export interface CardData {
   cardType: CardType;
-  type: UnitType;
+  type: UnitType | string; // UnitType for units, string for skills
   cost: number;
   name: string;
   id: string;

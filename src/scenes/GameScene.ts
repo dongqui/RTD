@@ -4,18 +4,19 @@ import { UnitManager } from "../UnitManager";
 import { SpawnManager } from "../SpawnManager";
 import ResourceManager from "../ResourceManager";
 import ResourceUI from "../ui/ResourceUI";
-import { SkillCard } from "../cards/SkillCard";
+import Card from "../ui/Card";
 import CardManager from "../CardManager";
 import Base, { BaseTeam } from "../Base";
 import PlayerDeck from "../PlayerDeck";
 
 import { registerAllSkills } from "../skills/SkillIndex";
 import { SAFE_AREA } from "../main";
-import { SkillContext } from "../skills/SkillTypes";
+import { SkillContext, CardType } from "../skills/SkillTypes";
 import { WaveManager } from "../WaveManager";
 import { WaveUI } from "../ui/WaveUI";
 import { RewardCardUI } from "../ui/RewardCardUI";
 import { Button } from "../ui/Button";
+import { SkillRegistry } from "../skills/SkillRegistry";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -303,15 +304,15 @@ export default class GameScene extends Phaser.Scene {
     this.updateCardStates();
   }
 
-  private handleCardUsed(card: UnitCard | SkillCard): void {
-    if (card instanceof SkillCard) {
+  private handleCardUsed(card: Card): void {
+    if (card.getCardType() === CardType.SKILL) {
       this.useSkillCard(card);
     } else {
       this.spawnUnitFromCard(card);
     }
   }
 
-  private spawnUnitFromCard(card: UnitCard): void {
+  private spawnUnitFromCard(card: Card): void {
     const cost = card.getCost();
 
     if (!this.resourceManager.spendResource(cost)) {
@@ -341,7 +342,7 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
-  private useSkillCard(card: SkillCard): void {
+  private useSkillCard(card: Card): void {
     const cost = card.getCost();
 
     if (!this.resourceManager.spendResource(cost)) {
@@ -349,7 +350,9 @@ export default class GameScene extends Phaser.Scene {
       return;
     }
 
-    const skill = card.getSkill();
+    const skillType = card.getType();
+    const skill = SkillRegistry.create(skillType as string, this);
+
     if (!skill) {
       console.error("Skill not found for card");
       return;

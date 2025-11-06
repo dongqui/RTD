@@ -54,28 +54,10 @@ export class CardDrawManager {
    * @returns CardConfig for Card component
    */
   static cardDataToConfig(cardData: CardData): CardConfig {
-    if (cardData.cardType === CardType.UNIT) {
-      const spec = UnitRegistry.getSpec(cardData.type);
-      return {
-        cost: spec.cost,
-        name: spec.name,
-        imageKey: `unit_portrait_${cardData.type}`,
-        attack: spec.stats.attackDamage,
-        health: spec.stats.health,
-        description: spec.description,
-        rate: spec.rate,
-      };
-    } else {
-      const spec = SkillRegistry.getSpec(cardData.type);
-      return {
-        cost: spec.cost,
-        name: spec.name,
-        imageKey: `skill_icon_${cardData.type}`,
-        attack: 0,
-        health: 0,
-        description: spec.description,
-        rate: spec.rate || 1,
-      };
-    }
+    return {
+      cardType: cardData.cardType,
+      id: cardData.id,
+      type: cardData.type,
+    };
   }
 }

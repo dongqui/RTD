@@ -119,6 +119,10 @@ export default class Card {
     return this.config.type;
   }
 
+  getCardType(): CardType {
+    return this.config.cardType;
+  }
+
   getCost(): number {
     if (this.config.cardType === CardType.UNIT) {
       return UnitRegistry.getSpec(this.config.type as UnitType).cost;
@@ -129,6 +133,38 @@ export default class Card {
 
   setVisible(visible: boolean): void {
     this.container.setVisible(visible);
+  }
+
+  setInteractive(
+    hitArea: any,
+    callback: Function,
+    dropZone?: boolean
+  ): this {
+    this.container.setInteractive(hitArea, callback, dropZone);
+    return this;
+  }
+
+  on(event: string, fn: Function, context?: any): this {
+    this.container.on(event, fn, context);
+    return this;
+  }
+
+  setAlpha(alpha: number): this {
+    this.container.setAlpha(alpha);
+    return this;
+  }
+
+  setScale(scaleX: number, scaleY?: number): this {
+    this.container.setScale(scaleX, scaleY);
+    return this;
+  }
+
+  get scaleX(): number {
+    return this.container.scaleX;
+  }
+
+  get scaleY(): number {
+    return this.container.scaleY;
   }
 
   destroy(): void {
