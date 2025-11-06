@@ -1,7 +1,8 @@
-import UnitCard, { UnitCardConfig } from "./ui/UnitCard";
+import UnitCard from "./ui/UnitCard";
 import { SkillCard, SkillCardConfig } from "./cards/SkillCard";
 import type { UnitType } from "./UnitManager";
 import { CardType } from "./skills/SkillTypes";
+import { UnitRegistry } from "./units/UnitRegistry";
 
 export interface CardPool {
   id: string;
@@ -79,11 +80,16 @@ export default class CardManager {
       };
       card = new SkillCard(this.scene, pos.x, pos.y, skillConfig);
     } else {
-      const unitConfig: UnitCardConfig = {
-        id: cardData.id,
-        type: cardData.type as UnitType,
-      };
-      card = new UnitCard(this.scene, pos.x, pos.y, unitConfig);
+      const spec = UnitRegistry.getSpec(cardData.type as UnitType);
+      card = new UnitCard(this.scene, pos.x, pos.y, {
+        cost: spec.cost,
+        name: spec.name,
+        imageKey: `unit_portrait_${cardData.type}`,
+        attack: spec.stats.attackDamage,
+        health: spec.stats.health,
+        description: spec.description,
+        rate: spec.rate,
+      });
     }
 
     card.setOnClick(() => {

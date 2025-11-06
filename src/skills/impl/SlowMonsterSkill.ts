@@ -38,7 +38,7 @@ export const slowMonsterSkillSpec: SkillSpec = {
   name: "빙결",
   description: "5초간 모든 적 이동 속도 -80%",
   cost: 6,
-  consumable: false,
+  consumable: true,
   effectType: SkillEffectType.DURATION,
   skillClass: SlowMonsterSkill,
 };

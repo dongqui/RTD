@@ -1,5 +1,5 @@
 import PlayerDeck from "../PlayerDeck";
-import UnitCard from "../ui/UnitCard";
+import Card from "../ui/Card";
 import { CardType } from "../skills/SkillTypes";
 import { CARD_WIDTH, CARD_HEIGHT } from "../constants";
 
@@ -7,7 +7,7 @@ const GLOBAL_HEADER_HEIGHT = 80; // HeaderScene 높이
 const DECK_HEADER_HEIGHT = 120; // DeckScene 헤더 높이
 const HEADER_HEIGHT = GLOBAL_HEADER_HEIGHT + DECK_HEADER_HEIGHT; // 총 헤더 높이
 export default class DeckScene extends Phaser.Scene {
-  private cards: UnitCard[] = [];
+  private cards: Card[] = [];
   private cardsContainer: Phaser.GameObjects.Container;
   private isDragging: boolean = false;
   private dragStartY: number = 0;
@@ -167,21 +167,20 @@ export default class DeckScene extends Phaser.Scene {
       const x = startX + col * (scaledCardWidth + cardSpacing);
       const y = startY + row * (scaledCardHeight + cardSpacing);
 
-      if (cardData.cardType === CardType.UNIT) {
-        const card = new UnitCard(this, x, y, {
-          type: cardData.type,
-          id: cardData.id,
-        });
+      const card = new Card(this, x, y, {
+        cardType: cardData.cardType,
+        type: cardData.type,
+        id: cardData.id,
+      });
 
-        // 카드 컨테이너 스케일 적용
-        const cardContainer = card["container"];
-        cardContainer.setScale(scale);
+      // 카드 컨테이너 스케일 적용
+      const cardContainer = card["container"];
+      cardContainer.setScale(scale);
 
-        // 카드를 스크롤 컨테이너에 추가
-        this.cardsContainer.add(cardContainer);
+      // 카드를 스크롤 컨테이너에 추가
+      this.cardsContainer.add(cardContainer);
 
-        this.cards.push(card);
-      }
+      this.cards.push(card);
     });
 
     // 스크롤 범위 계산

@@ -139,8 +139,23 @@
       },
       {
         "type": "image",
+        "key": "card_frame_hexagon_purple_bg",
+        "url": "assets/components/cardframe/CardFrame_Hexagon_01_Purple_Bg.png"
+      },
+      {
+        "type": "image",
+        "key": "card_frame_hexagon_purple_border",
+        "url": "assets/components/cardframe/CardFrame_Hexagon_01_Purple_Border.png"
+      },
+      {
+        "type": "image",
         "key": "icon_resource",
         "url": "assets/icons/icon_resource.png"
+      },
+      {
+        "type": "image",
+        "key": "icon_close",
+        "url": "assets/icons/Icon_Close_02.png"
       },
       {
         "type": "image",
@@ -271,6 +286,11 @@
         "type": "image",
         "key": "popup_box_deco",
         "url": "assets/components/popup/Popup_Box_Deco1.png"
+      },
+      {
+        "type": "image",
+        "key": "button_close_red",
+        "url": "assets/components/buttons/Button_Convex_Circle_02_Red.png"
       }
     ]
   },

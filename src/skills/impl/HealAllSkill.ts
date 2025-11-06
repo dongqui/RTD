@@ -33,7 +33,7 @@ export const healAllSkillSpec: SkillSpec = {
   name: "긴급 치료",
   description: "모든 아군 유닛 체력 50 회복",
   cost: 5,
-  consumable: false,
+  consumable: true,
   effectType: SkillEffectType.INSTANT,
   skillClass: HealAllSkill,
 };

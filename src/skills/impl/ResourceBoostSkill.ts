@@ -24,7 +24,7 @@ export const resourceBoostSkillSpec: SkillSpec = {
   name: "마나 폭발",
   description: `즉시 리소스 5 회복`,
   cost: 2,
-  consumable: false,
+  consumable: true,
   effectType: SkillEffectType.INSTANT,
   skillClass: ResourceBoostSkill,
 };
