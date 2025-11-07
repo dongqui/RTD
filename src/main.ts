@@ -35,7 +35,7 @@ class Boot extends Phaser.Scene {
 
 window.addEventListener("load", function () {
   const game = new Phaser.Game({
-    type: Phaser.AUTO,
+    type: Phaser.WEBGL,
     backgroundColor: "#0099db",
     parent: "game-container",
     plugins: {
