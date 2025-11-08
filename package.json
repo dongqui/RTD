@@ -23,7 +23,9 @@
     "phaser-asset-pack-hashing": "^1.0.6",
     "terser": "^5.28.1",
     "typescript": "^5.3.3",
-    "vite": "^5.1.4"
+    "vite": "^5.1.4",
+    "vite-plugin-pwa": "^1.1.0",
+    "workbox-window": "^7.3.0"
   },
   "dependencies": {
     "@apps-in-toss/web-framework": "^1.4.5",

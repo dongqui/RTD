@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" fill="#000000"/>
+
+  <!-- Shield shape -->
+  <path d="M 256 96.8
+           L 415.2 196.26666666666665
+           L 415.2 395.2
+           Q 415.2 415.2 395.2 415.2
+           L 276 415.2
+           L 256 435.2
+           L 236 415.2
+           L 116.8 415.2
+           Q 96.8 415.2 96.8 395.2
+           L 96.8 196.26666666666665
+           Z"
+           fill="#FFD700" stroke="#FFA500" stroke-width="3"/>
+
+  <!-- Inner decoration -->
+  <circle cx="256" cy="256" r="59.73333333333333" fill="#000000" opacity="0.3"/>
+
+  <!-- Text: RD -->
+  <text x="256" y="264"
+        font-family="Arial, sans-serif"
+        font-size="71.67999999999999"
+        font-weight="bold"
+        text-anchor="middle"
+        fill="#000000">RD</text>
+</svg>

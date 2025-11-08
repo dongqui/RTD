@@ -1,17 +1,40 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
+
+    <!-- Viewport & Mobile Meta Tags -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Random Defense" />
     <meta name="mobile-web-app-capable" content="yes" />
+
+    <!-- Theme Colors -->
     <meta name="theme-color" content="#000000" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Germania+One&display=swap" rel="stylesheet">
+    <meta name="msapplication-TileColor" content="#000000" />
+    <meta name="msapplication-navbutton-color" content="#000000" />
+
+    <!-- SEO & Description -->
+    <meta name="description" content="랜덤 디펜스 - 전략 타워 디펜스 게임" />
+    <meta name="keywords" content="랜덤 디펜스, 타워 디펜스, 게임, random defense, tower defense" />
+    <meta name="author" content="Random Defense Team" />
+
+    <!-- Windows PWA Tags -->
+    <meta name="msapplication-config" content="none" />
+    <meta name="application-name" content="Random Defense" />
+
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="/style.css">
+
     <title>Random Defense</title>
 </head>
 

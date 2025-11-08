@@ -5,7 +5,15 @@
       "Bash(findstr:*)",
       "Bash(npm run build:*)",
       "Bash(copy:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(npm install:*)",
+      "Bash(curl:*)",
+      "Bash(where:*)",
+      "Bash(nul)",
+      "Bash(node scripts/generate-icons.js:*)",
+      "Bash(cat:*)",
+      "Bash(npm start)",
+      "Bash(timeout /t 3)"
     ]
   },
   "hooks": {

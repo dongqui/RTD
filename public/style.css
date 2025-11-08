@@ -62,18 +62,67 @@ textarea {
 body {
   overscroll-behavior: none;
 }
+
+/* Desktop responsive styles - center game container */
+@media screen and (min-width: 769px) {
+  #app {
+    background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+  }
+
+  #game-container {
+    max-width: 480px;
+    max-height: 854px;
+    margin: 0 auto;
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Ensure proper aspect ratio on desktop */
+  @supports (aspect-ratio: 9 / 16) {
+    #game-container {
+      aspect-ratio: 9 / 16;
+      height: auto;
+      max-height: 90vh;
+    }
+  }
+}
+
+/* Landscape mode handling for mobile */
+@media screen and (max-width: 768px) and (orientation: landscape) {
+  #app {
+    height: 100vw;
+  }
+}
+
+/* High DPI displays */
+@media screen and (min-resolution: 2dppx) {
+  #game-container {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+/* Germania One font - local */
+@font-face {
+  font-family: "Germania One";
+  src: url("/fonts/germania-one.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* DNF BitBit font - local */
 @font-face {
   font-family: "DungeonFighterOnlineBeatBeat";
-  src: url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff"),
-    url("//cdn.df.nexon.com/img/common/font/DNFBitBit-Regular.woff2");
+  src: url("/fonts/DNFBitBit-Regular.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 
+/* OneStore Mobile POP font - local */
 @font-face {
   font-family: "OneStoreMobilePop";
-  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/ONE-Mobile-POP.woff")
-    format("woff");
+  src: url("/fonts/ONE-Mobile-POP.woff") format("woff");
   font-weight: normal;
   font-display: swap;
 }
