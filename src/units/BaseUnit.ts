@@ -9,6 +9,7 @@ import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
+import { SoundManager } from "../utils/SoundManager";
 
 /**
  * Visual configuration interface for unit appearance
@@ -148,6 +149,7 @@ export abstract class BaseUnit implements CombatEntity {
    */
   protected onAttack(target: CombatEntity | Base): void {
     // Override in subclasses to add attack effects
+    SoundManager.getInstance().playDelayed("sound_hit", 50, { volume: 0.3 });
   }
 
   protected performAttack(target: CombatEntity | Base): void {

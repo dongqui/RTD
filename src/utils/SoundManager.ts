@@ -50,7 +50,13 @@ export class SoundManager {
    * Play a sound effect
    */
   public play(soundKey: string, config?: SoundConfig): Phaser.Sound.BaseSound | null {
-    if (!this.scene || this._isMuted) {
+    if (!this.scene) {
+      console.warn('[SoundManager] Scene not initialized');
+      return null;
+    }
+
+    if (this._isMuted) {
+      console.log('[SoundManager] Sound is muted');
       return null;
     }
 
@@ -59,6 +65,7 @@ export class SoundManager {
       volume: (config?.volume ?? 1.0) * this._masterVolume,
     };
 
+    console.log('[SoundManager] Playing sound:', soundKey, 'with config:', finalConfig);
     return this.scene.sound.play(soundKey, finalConfig);
   }
 
@@ -66,10 +73,17 @@ export class SoundManager {
    * Play a sound with a delay
    */
   public playDelayed(soundKey: string, delay: number, config?: SoundConfig): void {
-    if (!this.scene || this._isMuted) {
+    if (!this.scene) {
+      console.warn('[SoundManager] playDelayed - Scene not initialized');
       return;
     }
 
+    if (this._isMuted) {
+      console.log('[SoundManager] playDelayed - Sound is muted');
+      return;
+    }
+
+    console.log('[SoundManager] playDelayed - Scheduling sound:', soundKey, 'delay:', delay);
     this.scene.time.delayedCall(delay, () => {
       this.play(soundKey, config);
     });

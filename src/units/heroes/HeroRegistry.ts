@@ -7,7 +7,9 @@ export type HeroType =
   | "frozen_wizard"
   | "fire_wizard"
   | "thief"
-  | "iron_knight";
+  | "iron_knight"
+  | "paladin"
+  | "barbarian";
 
 export interface HeroStats {
   health: number;

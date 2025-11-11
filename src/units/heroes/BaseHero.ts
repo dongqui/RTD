@@ -112,11 +112,6 @@ export abstract class BaseHero extends BaseUnit {
     return null;
   }
 
-  protected onAttack(target: CombatEntity | Base): void {
-    // Delay sound to sync with attack animation impact
-    SoundManager.getInstance().playDelayed("sound_hit", 200, { volume: 0.3 });
-  }
-
   getCost(): number {
     return this.cost;
   }

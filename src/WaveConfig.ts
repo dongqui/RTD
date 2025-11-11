@@ -27,6 +27,13 @@ export class WaveConfigManager {
           healthMultiplier: 1.0,
           rewardMultiplier: 1.0,
         },
+        {
+          enemyType: "enemy_archer",
+          count: 2,
+          interval: 2000,
+          healthMultiplier: 1.0,
+          rewardMultiplier: 1.0,
+        },
       ],
     },
     {

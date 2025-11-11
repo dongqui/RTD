@@ -3,6 +3,7 @@ import Base from "../../Base";
 import { Projectile } from "../../objects/Projectile";
 import { BaseEnemy } from "./BaseEnemy";
 import { EnemySpec, EnemyRegistry } from "./EnemyRegistry";
+import { SoundManager } from "../../utils/SoundManager";
 
 export class EnemyArcher extends BaseEnemy {
   private projectiles: Projectile[] = [];
@@ -27,6 +28,11 @@ export class EnemyArcher extends BaseEnemy {
     );
 
     this.projectiles.push(projectile);
+  }
+
+  protected onAttack(_target: CombatEntity | Base): void {
+    // Enemy archer uses arrow sound
+    SoundManager.getInstance().play("sound_hit_arrow", { volume: 0.3 });
   }
 
   update(time: number, delta: number): void {

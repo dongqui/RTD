@@ -26,7 +26,7 @@ export class ArcherHero extends BaseHero {
     this.projectiles.push(projectile);
   }
 
-  protected playAttackSound(): void {
+  protected onAttack(target: CombatEntity | Base): void {
     // Play arrow sound immediately when shooting
     SoundManager.getInstance().play("sound_hit_arrow", { volume: 0.4 });
   }

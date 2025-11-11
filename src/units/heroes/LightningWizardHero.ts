@@ -37,7 +37,7 @@ export class LightningWizardHero extends BaseHero {
     }
   }
 
-  protected playAttackSound(): void {
+  protected onAttack(_target: CombatEntity | Base): void {
     // Override to use lightning sound instead of default hit sound
     SoundManager.getInstance().play("sound_lighting", { volume: 0.5 });
   }

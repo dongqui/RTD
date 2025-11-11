@@ -17,6 +17,7 @@ import { WaveUI } from "../ui/WaveUI";
 import { RewardCardUI } from "../ui/RewardCardUI";
 import { Button } from "../ui/Button";
 import { SkillRegistry } from "../skills/SkillRegistry";
+import { SoundManager } from "../utils/SoundManager";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -51,6 +52,9 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     registerAllSkills();
+
+    // Initialize SoundManager with this scene
+    SoundManager.getInstance().init(this);
 
     const { width, height } = this.scale.gameSize;
 
