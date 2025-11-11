@@ -331,10 +331,6 @@ export abstract class BaseUnit implements CombatEntity {
   }
 
   playMoveAnimation(): void {
-    const currentAnim = this.spineObject.animationState.getCurrent(0);
-    if (currentAnim && currentAnim.animation?.name === BaseUnit.RUN_ANIM_KEY) {
-      return;
-    }
     this.spineObject.animationState.setAnimation(
       0,
       BaseUnit.RUN_ANIM_KEY,
@@ -365,7 +361,10 @@ export abstract class BaseUnit implements CombatEntity {
    * Override in subclasses to customize behavior
    */
   protected onAttackAnimationComplete(): void {
-    this.playIdleAnimation();
+    // Only play idle if we're still in attacking state
+    if (this.stateMachine.getCurrentStateType() === BehaviorState.ATTACKING) {
+      this.playIdleAnimation();
+    }
   }
 
   playIdleAnimation(): void {
