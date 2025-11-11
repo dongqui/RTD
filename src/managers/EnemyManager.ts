@@ -1,7 +1,7 @@
-import { BaseEnemy } from "./units/enemies/BaseEnemy";
-import { EnemyRegistry } from "./units/enemies";
+import { BaseEnemy } from "../units/enemies/BaseEnemy";
+import { EnemyRegistry } from "../units/enemies";
 
-export type { EnemyType } from "./units/enemies";
+export type { EnemyType } from "../units/enemies";
 
 export class EnemyManager {
   private scene: Phaser.Scene;

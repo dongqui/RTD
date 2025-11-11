@@ -1,18 +1,18 @@
-import GameManager from "../GameManager";
-import { EnemyManager } from "../EnemyManager";
-import { HeroManager } from "../HeroManager";
-import { SpawnManager } from "../SpawnManager";
-import ResourceManager from "../ResourceManager";
+import GameManager from "../managers/GameManager";
+import { EnemyManager } from "../managers/EnemyManager";
+import { HeroManager } from "../managers/HeroManager";
+import { SpawnManager } from "../managers/SpawnManager";
+import ResourceManager from "../managers/ResourceManager";
 import ResourceUI from "../ui/ResourceUI";
 import Card from "../ui/Card";
-import CardManager from "../CardManager";
+import InGameCardManager from "../managers/InGameCardManager";
 import Base, { BaseTeam } from "../Base";
-import PlayerDeck from "../PlayerDeck";
+import PlayerDeckManager from "../managers/PlayerDeckManager";
 
 import { registerAllSkills } from "../skills/SkillIndex";
 import { SAFE_AREA } from "../main";
 import { SkillContext, CardType } from "../skills/SkillTypes";
-import { WaveManager } from "../WaveManager";
+import { WaveManager } from "../managers/WaveManager";
 import { WaveUI } from "../ui/WaveUI";
 import { RewardCardUI } from "../ui/RewardCardUI";
 import { Button } from "../ui/Button";
@@ -25,7 +25,7 @@ export default class GameScene extends Phaser.Scene {
   private spawnManager: SpawnManager;
   private resourceManager: ResourceManager;
   private resourceUI: ResourceUI;
-  private cardManager: CardManager;
+  private cardManager: InGameCardManager;
   private playerBase: Base;
   private enemyBase: Base;
   private infoText: Phaser.GameObjects.Text;
@@ -119,7 +119,7 @@ export default class GameScene extends Phaser.Scene {
     );
     this.waveUI.setVisible(false);
 
-    this.rewardCardUI = new RewardCardUI(this, PlayerDeck.getInstance());
+    this.rewardCardUI = new RewardCardUI(this, PlayerDeckManager.getInstance());
     this.rewardCardUI.setVisible(false);
 
     this.events.on("wave-enemy-spawned", () => {
@@ -286,7 +286,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private setupUnitCards(): void {
-    const deck = PlayerDeck.getInstance();
+    const deck = PlayerDeckManager.getInstance();
     const deckCards = deck.getCards();
 
     const cardPool = deckCards.map((card) => ({
@@ -298,7 +298,7 @@ export default class GameScene extends Phaser.Scene {
       weight: 1,
     }));
 
-    this.cardManager = new CardManager(this, cardPool);
+    this.cardManager = new InGameCardManager(this, cardPool);
     this.cardManager.initializeCards();
 
     this.cardManager.setOnCardUsed((card) => {
@@ -497,7 +497,7 @@ export default class GameScene extends Phaser.Scene {
     this.waveUI.updateWave(0, this.waveManager.getTotalWaves());
     this.waveUI.hideStartButton();
 
-    PlayerDeck.getInstance().reset();
+    PlayerDeckManager.getInstance().reset();
 
     this.cardManager.resetCards();
     this.hideGameElements();

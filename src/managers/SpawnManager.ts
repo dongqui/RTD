@@ -1,7 +1,7 @@
 import GameManager from "./GameManager";
 import { HeroManager, HeroType } from "./HeroManager";
 import { EnemyManager } from "./EnemyManager";
-import { WaveConfig, SpawnGroup } from "./WaveConfig";
+import { WaveConfig, SpawnGroup } from "../WaveConfig";
 
 export class SpawnManager {
   private scene: Phaser.Scene;

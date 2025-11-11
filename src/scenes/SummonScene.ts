@@ -1,4 +1,4 @@
-import PlayerDeck, { CardData } from "../PlayerDeck";
+import PlayerDeckManager, { CardData } from "../managers/PlayerDeckManager";
 import { Button } from "../ui/Button";
 import { StyledText } from "../ui/StyledText";
 import Card from "../ui/Card";
@@ -7,7 +7,7 @@ import { ConfirmModal } from "../ui/ConfirmModal";
 import { CardCelebrationUI } from "../ui/CardCelebrationUI";
 
 export default class SummonScene extends Phaser.Scene {
-  private deck!: PlayerDeck;
+  private deck!: PlayerDeckManager;
   private glitterParticles: Phaser.GameObjects.Image[] = [];
   private glitterContainer!: Phaser.GameObjects.Container;
   private cardOptions: CardOption[] = [];
@@ -26,7 +26,7 @@ export default class SummonScene extends Phaser.Scene {
     super("SummonScene");
   }
 
-  create(data: { deck: PlayerDeck }): void {
+  create(data: { deck: PlayerDeckManager }): void {
     this.deck = data.deck;
 
     this.createBackground();

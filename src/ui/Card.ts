@@ -1,4 +1,4 @@
-import type { HeroType } from "../HeroManager";
+import type { HeroType } from "../managers/HeroManager";
 import { HeroRegistry } from "../units/heroes";
 import { SkillRegistry } from "../skills/SkillRegistry";
 import { CardType } from "../skills/SkillTypes";
@@ -119,6 +119,10 @@ export default class Card {
     return this.config.type;
   }
 
+  get cardData(): CardConfig {
+    return this.config;
+  }
+
   getCardType(): CardType {
     return this.config.cardType;
   }
@@ -137,7 +141,7 @@ export default class Card {
 
   setInteractive(
     hitArea: any,
-    callback: Function,
+    callback?: Phaser.Types.Input.HitAreaCallback,
     dropZone?: boolean
   ): this {
     this.container.setInteractive(hitArea, callback, dropZone);

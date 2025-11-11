@@ -1,4 +1,4 @@
-import PlayerDeck, { CardData } from "../PlayerDeck";
+import PlayerDeckManager, { CardData } from "../managers/PlayerDeckManager";
 
 export default class DeckViewUI {
   private scene: Phaser.Scene;
@@ -40,7 +40,7 @@ export default class DeckViewUI {
       })
       .setOrigin(0.5);
 
-    const deck = PlayerDeck.getInstance();
+    const deck = PlayerDeckManager.getInstance();
     const cards = deck.getCards();
 
     const countText = this.scene.add
@@ -91,7 +91,7 @@ export default class DeckViewUI {
       this.createCardSlot(card, x, y, cardWidth, cardHeight);
     });
 
-    const deck = PlayerDeck.getInstance();
+    const deck = PlayerDeckManager.getInstance();
     const emptySlots = deck.getMaxCards() - cards.length;
 
     for (let i = 0; i < emptySlots && cards.length + i < maxRows * cardsPerRow; i++) {
@@ -178,7 +178,7 @@ export default class DeckViewUI {
     const confirmed = confirm(`${card.name} 카드를 제거하시겠습니까?`);
 
     if (confirmed) {
-      PlayerDeck.getInstance().removeCard(card.id);
+      PlayerDeckManager.getInstance().removeCard(card.id);
       this.destroy();
       this.onClose();
     }

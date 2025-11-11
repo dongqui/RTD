@@ -1,7 +1,7 @@
 import { HeroType } from "./HeroManager";
-import { HeroRegistry } from "./units/heroes";
-import { CardType } from "./skills/SkillTypes";
-import { SkillRegistry } from "./skills/SkillRegistry";
+import { HeroRegistry } from "../units/heroes";
+import { CardType } from "../skills/SkillTypes";
+import { SkillRegistry } from "../skills/SkillRegistry";
 
 export interface CardData {
   cardType: CardType;
@@ -11,8 +11,8 @@ export interface CardData {
   id: string;
 }
 
-export default class PlayerDeck {
-  private static instance: PlayerDeck;
+export default class PlayerDeckManager {
+  private static instance: PlayerDeckManager;
   private cards: CardData[] = [];
   private readonly MAX_CARDS = 20;
   private readonly STORAGE_KEY = "player_deck";
@@ -25,11 +25,11 @@ export default class PlayerDeck {
     }
   }
 
-  static getInstance(): PlayerDeck {
-    if (!PlayerDeck.instance) {
-      PlayerDeck.instance = new PlayerDeck();
+  static getInstance(): PlayerDeckManager {
+    if (!PlayerDeckManager.instance) {
+      PlayerDeckManager.instance = new PlayerDeckManager();
     }
-    return PlayerDeck.instance;
+    return PlayerDeckManager.instance;
   }
 
   private initializeDefaultDeck(): void {

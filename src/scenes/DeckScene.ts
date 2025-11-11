@@ -1,4 +1,4 @@
-import PlayerDeck from "../PlayerDeck";
+import PlayerDeckManager from "../managers/PlayerDeckManager";
 import Card from "../ui/Card";
 import { CardType } from "../skills/SkillTypes";
 import { CARD_WIDTH, CARD_HEIGHT } from "../constants";
@@ -118,7 +118,7 @@ export default class DeckScene extends Phaser.Scene {
       .setDepth(10);
 
     // 카드 카운트 텍스트
-    const deck = PlayerDeck.getInstance();
+    const deck = PlayerDeckManager.getInstance();
     this.add
       .text(
         40,
@@ -138,7 +138,7 @@ export default class DeckScene extends Phaser.Scene {
   }
 
   private displayDeckCards(): void {
-    const deck = PlayerDeck.getInstance();
+    const deck = PlayerDeckManager.getInstance();
     const cards = deck.getCards();
 
     const { width, height } = this.scale.gameSize;

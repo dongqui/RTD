@@ -1,4 +1,4 @@
-import { CardData } from "../PlayerDeck";
+import { CardData } from "./PlayerDeckManager";
 import { HeroRegistry } from "../units/heroes";
 import { SkillRegistry } from "../skills/SkillRegistry";
 import { CardType } from "../skills/SkillTypes";

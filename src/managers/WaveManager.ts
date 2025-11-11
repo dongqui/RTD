@@ -1,4 +1,4 @@
-import { WaveConfig, WaveConfigManager } from "./WaveConfig";
+import { WaveConfig, WaveConfigManager } from "../WaveConfig";
 import { SpawnManager } from "./SpawnManager";
 import { EnemyManager } from "./EnemyManager";
 

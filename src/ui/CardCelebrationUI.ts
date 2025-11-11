@@ -3,7 +3,7 @@ import Card from "./Card";
 import { StyledText } from "./StyledText";
 
 export class CardCelebrationUI extends Phaser.GameObjects.Container {
-  private scene: Phaser.Scene;
+  declare scene: Phaser.Scene;
   private overlay: Phaser.GameObjects.Rectangle;
   private card: Card;
   private effectLight: Phaser.GameObjects.Image;
@@ -66,8 +66,9 @@ export class CardCelebrationUI extends Phaser.GameObjects.Container {
 
     // Selected card (create new instance with same config)
     this.card = new Card(this.scene, centerX, centerY - 50, originalCard.cardData);
-    this.card.setScale(1.5); // Enlarged
-    this.add(this.card);
+    const cardContainer = (this.card as any).container as Phaser.GameObjects.Container;
+    cardContainer.setScale(1.5); // Enlarged
+    this.add(cardContainer);
 
     // Continue text at bottom
     this.continueText = new StyledText(this.scene, centerX, sceneHeight - 100, {
@@ -94,10 +95,11 @@ export class CardCelebrationUI extends Phaser.GameObjects.Container {
     });
 
     // Scale and fade in card
-    this.card.setScale(0);
-    this.card.setAlpha(0);
+    const cardContainer = (this.card as any).container as Phaser.GameObjects.Container;
+    cardContainer.setScale(0);
+    cardContainer.setAlpha(0);
     this.scene.tweens.add({
-      targets: this.card,
+      targets: cardContainer,
       scale: 1.5,
       alpha: 1,
       duration: 500,

@@ -1,7 +1,7 @@
 import GameScene from "../scenes/GameScene";
-import { HeroManager } from "../HeroManager";
-import { EnemyManager } from "../EnemyManager";
-import ResourceManager from "../ResourceManager";
+import { HeroManager } from "../managers/HeroManager";
+import { EnemyManager } from "../managers/EnemyManager";
+import ResourceManager from "../managers/ResourceManager";
 import Base from "../Base";
 
 export enum CardType {

@@ -1,7 +1,7 @@
-import Card from "./ui/Card";
-import { CardType } from "./skills/SkillTypes";
-import { SAFE_AREA } from "./main";
-import { CARD_WIDTH, CARD_HEIGHT } from "./constants";
+import Card from "../ui/Card";
+import { CardType } from "../skills/SkillTypes";
+import { SAFE_AREA } from "../main";
+import { CARD_WIDTH, CARD_HEIGHT } from "../constants";
 
 export interface CardPool {
   id: string;
@@ -12,7 +12,7 @@ export interface CardPool {
   weight?: number;
 }
 
-export default class CardManager {
+export default class InGameCardManager {
   private scene: Phaser.Scene;
   private cards: (Card | null)[];
   private availableCards: CardPool[];
@@ -33,30 +33,25 @@ export default class CardManager {
 
   private calculateCardPositions(): void {
     const { width, height } = this.scene.scale.gameSize;
-    const cardSpacing = 20; // DeckScene과 동일한 간격
+    const cardSpacing = 20;
 
-    // DeckScene과 동일한 스케일 계산
     const sidePadding = 40;
     const cardsPerRow = 3;
     const availableWidth = width - sidePadding * 2;
     const scaledCardWidth =
       (availableWidth - cardSpacing * (cardsPerRow - 1)) / cardsPerRow;
-    const scale = scaledCardWidth / CARD_WIDTH; // DeckScene과 동일한 스케일
+    const scale = scaledCardWidth / CARD_WIDTH;
     const scaledCardHeight = CARD_HEIGHT * scale;
 
     const totalWidth =
       this.maxCards * scaledCardWidth + (this.maxCards - 1) * cardSpacing;
 
-    // ResourceUI는 바닥에서 80px 위에 있고, 높이는 80px
     const resourceUIY = height - 80;
     const resourceUIHeight = 80;
 
-    // 카드들을 ResourceUI 위에 배치
-    // ResourceUI 위쪽 + 여백(20px) + 카드 높이/2
     const cardY =
       resourceUIY - resourceUIHeight / 2 - 20 - scaledCardHeight / 2;
 
-    // SAFE_AREA 내에서 카드들을 수평 중앙 정렬
     const centerX = (SAFE_AREA.left + SAFE_AREA.right) / 2;
     const startX = centerX - totalWidth / 2 + scaledCardWidth / 2;
 

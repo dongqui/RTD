@@ -1,7 +1,7 @@
-import { BaseHero } from "./units/heroes/BaseHero";
-import { HeroRegistry } from "./units/heroes";
+import { BaseHero } from "../units/heroes/BaseHero";
+import { HeroRegistry } from "../units/heroes";
 
-export type { HeroType } from "./units/heroes";
+export type { HeroType } from "../units/heroes";
 
 export class HeroManager {
   private heroes: BaseHero[] = [];

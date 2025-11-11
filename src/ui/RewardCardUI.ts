@@ -1,4 +1,4 @@
-import PlayerDeck, { CardData } from "../PlayerDeck";
+import PlayerDeckManager, { CardData } from "../managers/PlayerDeckManager";
 import { Modal } from "./Modal";
 import Card from "./Card";
 import { ConfirmModal } from "./ConfirmModal";
@@ -10,14 +10,14 @@ import { CardDrawManager, CardOption } from "../managers/CardDrawManager";
 export class RewardCardUI extends Modal {
   private onSelectCallback: ((card: CardData | null) => void) | null = null;
   private cardOptions: CardOption[] = [];
-  private deck: PlayerDeck;
+  private deck: PlayerDeckManager;
   private cardInstances: Card[] = [];
   private confirmModal?: ConfirmModal;
   private celebrationUI?: CardCelebrationUI;
   private selectedCard: CardData | null = null;
   private titleRibbon?: Phaser.GameObjects.NineSlice;
 
-  constructor(scene: Phaser.Scene, deck: PlayerDeck) {
+  constructor(scene: Phaser.Scene, deck: PlayerDeckManager) {
     const { width } = scene.cameras.main;
     super(scene, {
       // No title in base Modal, we'll add custom ribbon

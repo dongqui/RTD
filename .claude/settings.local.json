@@ -13,7 +13,9 @@
       "Bash(node scripts/generate-icons.js:*)",
       "Bash(cat:*)",
       "Bash(npm start)",
-      "Bash(timeout /t 3)"
+      "Bash(timeout /t 3)",
+      "Bash(if not exist \"src\\managers\" mkdir \"src\\managers\")",
+      "Bash(mkdir:*)"
     ]
   },
   "hooks": {
