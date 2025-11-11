@@ -1,6 +1,6 @@
 import { BaseEnemy } from "./BaseEnemy";
 
-export type EnemyType = "enemy_warrior";
+export type EnemyType = "enemy_warrior" | "enemy_archer";
 
 export interface EnemyStats {
   health: number;
