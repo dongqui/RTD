@@ -1,7 +1,7 @@
 import GameScene from "../scenes/GameScene";
 import { HeroManager } from "../managers/HeroManager";
 import { EnemyManager } from "../managers/EnemyManager";
-import ResourceManager from "../managers/ResourceManager";
+import RuneManager from "../managers/RuneManager";
 import Base from "../Base";
 
 export enum CardType {
@@ -18,7 +18,7 @@ export interface SkillContext {
   scene: GameScene;
   heroManager: HeroManager;
   enemyManager: EnemyManager;
-  resourceManager: ResourceManager;
+  resourceManager: RuneManager;
   playerBase: Base;
   enemyBase: Base;
 }

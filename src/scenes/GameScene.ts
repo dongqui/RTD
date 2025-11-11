@@ -2,7 +2,7 @@ import GameManager from "../managers/GameManager";
 import { EnemyManager } from "../managers/EnemyManager";
 import { HeroManager } from "../managers/HeroManager";
 import { SpawnManager } from "../managers/SpawnManager";
-import ResourceManager from "../managers/ResourceManager";
+import RuneManager from "../managers/RuneManager";
 import ResourceUI from "../ui/ResourceUI";
 import Card from "../ui/Card";
 import InGameCardManager from "../managers/InGameCardManager";
@@ -24,7 +24,7 @@ export default class GameScene extends Phaser.Scene {
   private enemyManager: EnemyManager;
   private heroManager: HeroManager;
   private spawnManager: SpawnManager;
-  private resourceManager: ResourceManager;
+  private runeManager: RuneManager;
   private resourceUI: ResourceUI;
   private cardManager: InGameCardManager;
   private playerBase: Base;
@@ -74,7 +74,7 @@ export default class GameScene extends Phaser.Scene {
     this.enemyManager = new EnemyManager(this);
     this.heroManager = new HeroManager(this);
 
-    this.resourceManager = new ResourceManager(this, 10, 2000);
+    this.runeManager = new RuneManager(this, 10, 2000);
 
     this.setupBases();
     this.setupSpawnManager();
@@ -205,7 +205,7 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.events.on("add-resource", (amount: number) => {
-      this.resourceManager.addResource(amount);
+      this.runeManager.addResource(amount);
       console.log(`Resource added: +${amount} (from thief death)`);
     });
   }
@@ -281,7 +281,7 @@ export default class GameScene extends Phaser.Scene {
     const resourceUIY = height - 80; // 바닥에서 80px 위 (공간 확보)
 
     this.resourceUI = new ResourceUI(this, resourceUIX, resourceUIY, 10);
-    this.resourceUI.updateResource(this.resourceManager.getCurrentResource());
+    this.resourceUI.updateResource(this.runeManager.getCurrentResource());
 
     this.events.on("resource-changed", (currentResource: number) => {
       this.resourceUI.updateResource(currentResource);
@@ -323,7 +323,7 @@ export default class GameScene extends Phaser.Scene {
   private spawnHeroFromCard(card: Card): void {
     const cost = card.getCost();
 
-    if (!this.resourceManager.spendResource(cost)) {
+    if (!this.runeManager.spendResource(cost)) {
       console.log("Not enough resources!");
       return;
     }
@@ -353,7 +353,7 @@ export default class GameScene extends Phaser.Scene {
   private useSkillCard(card: Card): void {
     const cost = card.getCost();
 
-    if (!this.resourceManager.spendResource(cost)) {
+    if (!this.runeManager.spendResource(cost)) {
       console.log("Not enough resources!");
       return;
     }
@@ -370,7 +370,7 @@ export default class GameScene extends Phaser.Scene {
       scene: this,
       heroManager: this.heroManager,
       enemyManager: this.enemyManager,
-      resourceManager: this.resourceManager,
+      resourceManager: this.runeManager,
       playerBase: this.playerBase,
       enemyBase: this.enemyBase,
     };
@@ -402,7 +402,7 @@ export default class GameScene extends Phaser.Scene {
   private updateCardStates(): void {
     if (!this.cardManager) return;
 
-    const currentResource = this.resourceManager.getCurrentResource();
+    const currentResource = this.runeManager.getCurrentResource();
     this.cardManager.updateCardStates(currentResource);
   }
 
@@ -516,8 +516,8 @@ export default class GameScene extends Phaser.Scene {
     if (this.heroManager) {
       this.heroManager.update(this.time.now, this.game.loop.delta);
     }
-    if (this.resourceManager) {
-      this.resourceManager.update(this.time.now);
+    if (this.runeManager) {
+      this.runeManager.update(this.time.now);
     }
     if (this.waveManager && this.waveUI) {
       const remaining = this.waveManager.getEnemiesRemaining();

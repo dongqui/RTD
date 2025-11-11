@@ -1,4 +1,4 @@
-export default class ResourceManager {
+export default class RuneManager {
   private scene: Phaser.Scene;
   private currentResource: number;
   private maxResource: number;
