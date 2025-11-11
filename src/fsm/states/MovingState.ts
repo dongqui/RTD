@@ -16,14 +16,26 @@ export class MovingState implements State<CombatEntity> {
     const target = entity.findTarget();
 
     if (target) {
-      const distance = Phaser.Math.Distance.Between(
-        entity.getX(),
-        entity.getY(),
-        target.getX(),
-        target.getY()
-      );
+      // For melee units (small attack range), use horizontal distance only
+      // For ranged units (large attack range), use full distance
+      const attackRange = entity.getAttackRange();
+      const isMeleeUnit = attackRange <= 100; // Threshold to determine melee vs ranged
 
-      if (distance <= entity.getAttackRange()) {
+      let distance: number;
+      if (isMeleeUnit) {
+        // Use only horizontal distance for melee units
+        distance = Math.abs(entity.getX() - target.getX());
+      } else {
+        // Use full diagonal distance for ranged units
+        distance = Phaser.Math.Distance.Between(
+          entity.getX(),
+          entity.getY(),
+          target.getX(),
+          target.getY()
+        );
+      }
+
+      if (distance <= attackRange) {
         entity.stateMachine.changeState(BehaviorState.ATTACKING);
         return;
       }

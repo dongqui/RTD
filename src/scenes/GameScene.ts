@@ -330,7 +330,7 @@ export default class GameScene extends Phaser.Scene {
 
     const { height } = this.scale.gameSize;
     const spawnX = this.playerBase.getX() - 20;
-    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const randomYOffset = Phaser.Math.Between(-150, 150);
     const spawnY = height / 2 + randomYOffset;
 
     const heroType = card.getType();

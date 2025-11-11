@@ -45,7 +45,7 @@ export class SpawnManager {
   }
 
   private spawnEnemyMonster(): void {
-    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const randomYOffset = Phaser.Math.Between(-150, 150);
     const spawnY = this.spawnY + randomYOffset;
     this.enemyManager.spawnEnemy("enemy_warrior", this.enemySpawnX, spawnY);
   }
@@ -91,7 +91,7 @@ export class SpawnManager {
   }
 
   private spawnEnemyFromGroup(group: SpawnGroup): void {
-    const randomYOffset = Phaser.Math.Between(-100, 100);
+    const randomYOffset = Phaser.Math.Between(-150, 150);
     const spawnY = this.spawnY + randomYOffset;
 
     const enemy = this.enemyManager.spawnEnemy(

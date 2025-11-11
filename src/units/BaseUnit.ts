@@ -111,16 +111,21 @@ export abstract class BaseUnit implements CombatEntity {
       // Ranged units move forward only (direction-based)
       this.spineObject.x += this.getMoveDirection() * moveDistance;
     } else {
-      // Melee units move towards target
-      const angle = Phaser.Math.Angle.Between(
-        this.spineObject.x,
-        this.spineObject.y,
-        targetX,
-        targetY
-      );
+      // Melee units: prioritize horizontal movement, minimal vertical adjustment
+      const xDistance = targetX - this.spineObject.x;
+      const yDistance = targetY - this.spineObject.y;
 
-      this.spineObject.x += Math.cos(angle) * moveDistance;
-      this.spineObject.y += Math.sin(angle) * moveDistance;
+      // Move primarily on X axis
+      const xDirection = Math.sign(xDistance);
+      this.spineObject.x += xDirection * moveDistance;
+
+      // Only adjust Y if difference is significant (more than 30 pixels)
+      const yThreshold = 30;
+      if (Math.abs(yDistance) > yThreshold) {
+        // Move Y slowly (20% of normal speed) to gradually align
+        const yDirection = Math.sign(yDistance);
+        this.spineObject.y += yDirection * moveDistance * 0.2;
+      }
     }
   }
 
