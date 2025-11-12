@@ -167,12 +167,9 @@ export default class GameScene extends Phaser.Scene {
   }
 
   private setupGameEventHandlers(): void {
-    this.events.on(
-      "enemy-manager-killed",
-      (_enemy: any, reward: number) => {
-        this.gameManager.addGold(reward);
-      }
-    );
+    this.events.on("enemy-manager-killed", (_enemy: any, reward: number) => {
+      this.gameManager.addGold(reward);
+    });
 
     this.events.on("enemy-manager-reached-player-base", (_enemy: any) => {
       if (this.playerBase && this.playerBase.isActive()) {
@@ -370,14 +367,14 @@ export default class GameScene extends Phaser.Scene {
       scene: this,
       heroManager: this.heroManager,
       enemyManager: this.enemyManager,
-      resourceManager: this.runeManager,
+      rune: this.runeManager,
       playerBase: this.playerBase,
       enemyBase: this.enemyBase,
     };
 
     if (!skill.canExecute(context)) {
       console.log("Cannot execute skill");
-      this.resourceManager.addResource(cost);
+      this.runeManager.addResource(cost);
       return;
     }
 

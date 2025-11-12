@@ -6,19 +6,19 @@ import Base from "../Base";
 
 export enum CardType {
   UNIT = "unit",
-  SKILL = "skill"
+  SKILL = "skill",
 }
 
 export enum SkillEffectType {
   INSTANT = "instant",
-  DURATION = "duration"
+  DURATION = "duration",
 }
 
 export interface SkillContext {
   scene: GameScene;
   heroManager: HeroManager;
   enemyManager: EnemyManager;
-  resourceManager: RuneManager;
+  runeManager: RuneManager;
   playerBase: Base;
   enemyBase: Base;
 }
