@@ -184,13 +184,23 @@
       },
       {
         "type": "image",
-        "key": "unit_portrait_ironknight",
-        "url": "assets/portraits/unit_portrait_ironknight.png"
+        "key": "unit_portrait_iron_knight",
+        "url": "assets/portraits/unit_portrait_iron_knight.png"
       },
       {
         "type": "image",
         "key": "unit_portrait_warrior",
         "url": "assets/portraits/unit_portrait_warrior.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_paladin",
+        "url": "assets/portraits/unit_portrait_paladin.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_barbarian",
+        "url": "assets/portraits/unit_portrait_barbarian.png"
       },
       {
         "type": "image",
