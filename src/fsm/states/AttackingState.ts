@@ -47,6 +47,5 @@ export class AttackingState implements State<CombatEntity> {
     entity.attack(target);
   }
 
-  exit(_entity: CombatEntity): void {
-  }
+  exit(_entity: CombatEntity): void {}
 }

@@ -7,7 +7,7 @@ import "./FireWizardHero";
 import "./FrozenWizardHero";
 import "./LightningWizardHero";
 import "./Paladin";
-import "./Babarian";
+import "./Barbarian";
 
 export { HeroRegistry } from "./HeroRegistry";
 export type { HeroType, HeroSpec } from "./HeroRegistry";
