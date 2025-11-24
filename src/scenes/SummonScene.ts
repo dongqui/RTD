@@ -1,4 +1,5 @@
 import PlayerDeckManager, { CardData } from "../managers/PlayerDeckManager";
+import CurrencyManager from "../managers/CurrencyManager";
 import { Button } from "../ui/Button";
 import { StyledText } from "../ui/StyledText";
 import Card from "../ui/Card";
@@ -7,7 +8,8 @@ import { ConfirmModal } from "../ui/ConfirmModal";
 import { CardCelebrationUI } from "../ui/CardCelebrationUI";
 
 export default class SummonScene extends Phaser.Scene {
-  private deck!: PlayerDeckManager;
+  private deck: PlayerDeckManager;
+  private currencyManager: CurrencyManager;
   private glitterParticles: Phaser.GameObjects.Image[] = [];
   private glitterContainer!: Phaser.GameObjects.Container;
   private cardOptions: CardOption[] = [];
@@ -15,19 +17,22 @@ export default class SummonScene extends Phaser.Scene {
   private selectedCard: CardData | null = null;
   private confirmCardModal?: ConfirmModal;
   private confirmSkipModal?: ConfirmModal;
+  private insufficientDiamondsModal?: ConfirmModal;
   private celebrationUI?: CardCelebrationUI;
   private cardsContainer?: Phaser.GameObjects.Container;
   private skipButton?: Button;
   private titleText?: StyledText;
   private summonButton?: Button;
   private summonButtonContainer?: Phaser.GameObjects.Container;
+  private readonly SUMMON_COST = 100;
 
   constructor() {
     super("SummonScene");
+    this.deck = PlayerDeckManager.getInstance();
+    this.currencyManager = CurrencyManager.getInstance();
   }
 
-  create(data: { deck: PlayerDeckManager }): void {
-    this.deck = data.deck;
+  create(): void {
 
     this.createBackground();
     this.createTitle();
@@ -44,6 +49,12 @@ export default class SummonScene extends Phaser.Scene {
       message: "카드 선택을 건너뛰시겠습니까?",
       onConfirm: () => this.handleSkipConfirm(),
       onCancel: () => {},
+    });
+    this.insufficientDiamondsModal = new ConfirmModal(this, {
+      message: "다이아몬드가 부족합니다!",
+      onConfirm: () => {},
+      onCancel: () => {},
+      showCancelButton: false,
     });
     this.celebrationUI = new CardCelebrationUI(this);
   }
@@ -133,7 +144,7 @@ export default class SummonScene extends Phaser.Scene {
       height: 90,
       color: "sky",
 
-      onClick: () => this.onSummonClicked(1, 100),
+      onClick: () => this.onSummonClicked(),
     });
 
     // Add diamond icon inside button (left side)
@@ -151,9 +162,15 @@ export default class SummonScene extends Phaser.Scene {
     this.summonButtonContainer.add([this.summonButton, diamondIcon, costText]);
   }
 
-  private onSummonClicked(_count: number, _cost: number): void {
-    // TODO: Check if player has enough diamonds
-    // For now, proceed with summoning
+  private onSummonClicked(): void {
+    // Check if player has enough diamonds
+    if (!this.currencyManager.hasDiamonds(this.SUMMON_COST)) {
+      this.insufficientDiamondsModal?.show();
+      return;
+    }
+
+    // Deduct diamonds
+    this.currencyManager.spendDiamonds(this.SUMMON_COST);
 
     // Hide UI elements
     if (this.titleText) {
@@ -229,6 +246,7 @@ export default class SummonScene extends Phaser.Scene {
 
     // Create cards container
     this.cardsContainer = this.add.container(width / 2, height / 2);
+    this.cardsContainer.setDepth(100);
 
     // Subtitle (improved readability)
     const subtitle = new StyledText(this, 0, -200, {
@@ -249,30 +267,8 @@ export default class SummonScene extends Phaser.Scene {
       const cardConfig = CardDrawManager.cardDataToConfig(option);
       const card = new Card(this, x, 0, cardConfig);
 
-      (card as any).originalCardData = option;
-
-      const hitArea = new Phaser.Geom.Rectangle(-75, -125, 150, 250);
-      card.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains, true);
-
-      card.on("pointerover", () => {
-        this.tweens.add({
-          targets: card,
-          scaleX: 1.1,
-          scaleY: 1.1,
-          duration: 100,
-        });
-      });
-
-      card.on("pointerout", () => {
-        this.tweens.add({
-          targets: card,
-          scaleX: 1,
-          scaleY: 1,
-          duration: 100,
-        });
-      });
-
-      card.on("pointerdown", () => {
+      // Set click handler
+      card.setOnClick(() => {
         this.onCardSelected(option);
       });
 
@@ -280,10 +276,11 @@ export default class SummonScene extends Phaser.Scene {
       this.cardInstances.push(card);
 
       // Entrance animation
-      card.setAlpha(0);
-      card.setScale(0.5);
+      const container = card.getContainer();
+      container.setAlpha(0);
+      container.setScale(0.5);
       this.tweens.add({
-        targets: card,
+        targets: container,
         alpha: 1,
         scale: 1,
         duration: 300,
@@ -295,8 +292,8 @@ export default class SummonScene extends Phaser.Scene {
     // Skip button
     this.skipButton = new Button(this, 0, 200, {
       text: "스킵",
-      width: 200,
-      height: 80,
+      width: 150,
+      height: 60,
       color: "yellow",
       textStyle: {
         fontSize: "28px",
@@ -327,20 +324,20 @@ export default class SummonScene extends Phaser.Scene {
       const added = this.deck.addCard(this.selectedCard);
       if (added) {
         const selectedCardInstance = this.cardInstances.find(
-          (card) => (card as any).originalCardData === this.selectedCard
+          (card) => card.getCardId() === this.selectedCard?.id
         );
 
         if (selectedCardInstance) {
           this.hideCards();
           this.celebrationUI!.show(selectedCardInstance, () => {
-            this.returnToMainScene();
+            this.resetToInitialState();
           });
         } else {
           console.warn(
             "Selected card instance not found, proceeding without celebration"
           );
           this.hideCards();
-          this.returnToMainScene();
+          this.resetToInitialState();
         }
       }
     }
@@ -349,7 +346,7 @@ export default class SummonScene extends Phaser.Scene {
   private handleSkipConfirm(): void {
     // Skip - no card selected
     this.hideCards();
-    this.returnToMainScene();
+    this.resetToInitialState();
   }
 
   private hideCards(): void {
@@ -365,7 +362,7 @@ export default class SummonScene extends Phaser.Scene {
     }
   }
 
-  private returnToMainScene(): void {
+  private resetToInitialState(): void {
     // Show HeaderScene and NavigationScene again
     const headerScene = this.scene.get("HeaderScene");
     if (headerScene) {
@@ -373,7 +370,17 @@ export default class SummonScene extends Phaser.Scene {
     }
     this.game.events.emit("showNavigation");
 
-    // Return to previous scene or main menu
-    this.scene.start("Game");
+    // Show UI elements again
+    if (this.titleText) {
+      this.titleText.setVisible(true);
+    }
+    if (this.summonButtonContainer) {
+      this.summonButtonContainer.setVisible(true);
+    }
+
+    // Reset state
+    this.cardOptions = [];
+    this.cardInstances = [];
+    this.selectedCard = null;
   }
 }
