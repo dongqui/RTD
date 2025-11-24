@@ -1,7 +1,7 @@
 import { HeroType } from "./HeroManager";
 import { HeroRegistry } from "../units/heroes";
 import { CardType } from "../skills/SkillTypes";
-import { SkillRegistry } from "../skills/SkillRegistry";
+import { LocalStorage } from "../data/LocalStorage";
 
 export interface CardData {
   cardType: CardType;
@@ -15,7 +15,7 @@ export default class PlayerDeckManager {
   private static instance: PlayerDeckManager;
   private cards: CardData[] = [];
   private readonly MAX_CARDS = 20;
-  private readonly STORAGE_KEY = "player_deck";
+  private readonly STORAGE_KEY = "deck";
 
   private constructor() {
     this.load();
@@ -121,23 +121,11 @@ export default class PlayerDeckManager {
   }
 
   private save(): void {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.cards));
-    } catch (error) {
-      console.error("Failed to save deck:", error);
-    }
+    LocalStorage.set(this.STORAGE_KEY, this.cards);
   }
 
   private load(): void {
-    try {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
-      if (saved) {
-        this.cards = JSON.parse(saved);
-      }
-    } catch (error) {
-      console.error("Failed to load deck:", error);
-      this.cards = [];
-    }
+    this.cards = LocalStorage.get<CardData[]>(this.STORAGE_KEY, []);
   }
 
   reset(): void {
