@@ -1,5 +1,5 @@
 import { WaveConfig, WaveConfigManager } from "../WaveConfig";
-import { SpawnManager } from "./SpawnManager";
+import { EnemySpawnManager } from "./EnemySpawnManager";
 import { EnemyManager } from "./EnemyManager";
 
 export enum WaveState {
@@ -13,7 +13,7 @@ export class WaveManager {
   private static instance: WaveManager | null = null;
 
   private scene: Phaser.Scene | null = null;
-  private spawnManager: SpawnManager | null = null;
+  private spawnManager: EnemySpawnManager | null = null;
   private enemyManager: EnemyManager | null = null;
 
   private currentWave: number = 0;
@@ -37,7 +37,7 @@ export class WaveManager {
 
   initialize(
     scene: Phaser.Scene,
-    spawnManager: SpawnManager,
+    spawnManager: EnemySpawnManager,
     enemyManager: EnemyManager
   ): void {
     this.scene = scene;

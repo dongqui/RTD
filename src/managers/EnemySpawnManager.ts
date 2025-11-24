@@ -3,7 +3,7 @@ import { HeroManager, HeroType } from "./HeroManager";
 import { EnemyManager } from "./EnemyManager";
 import { WaveConfig, SpawnGroup } from "../WaveConfig";
 
-export class SpawnManager {
+export class EnemySpawnManager {
   private scene: Phaser.Scene;
   private gameManager: GameManager;
   private heroManager: HeroManager;
@@ -45,7 +45,7 @@ export class SpawnManager {
   }
 
   private spawnEnemyMonster(): void {
-    const randomYOffset = Phaser.Math.Between(-150, 150);
+    const randomYOffset = Phaser.Math.Between(-100, 100);
     const spawnY = this.spawnY + randomYOffset;
     this.enemyManager.spawnEnemy("enemy_warrior", this.enemySpawnX, spawnY);
   }

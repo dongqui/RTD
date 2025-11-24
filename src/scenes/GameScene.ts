@@ -1,7 +1,7 @@
 import GameManager from "../managers/GameManager";
 import { EnemyManager } from "../managers/EnemyManager";
 import { HeroManager } from "../managers/HeroManager";
-import { SpawnManager } from "../managers/SpawnManager";
+import { EnemySpawnManager } from "../managers/EnemySpawnManager";
 import RuneManager from "../managers/RuneManager";
 import ResourceUI from "../ui/ResourceUI";
 import Card from "../ui/Card";
@@ -23,7 +23,7 @@ export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
   private enemyManager: EnemyManager;
   private heroManager: HeroManager;
-  private spawnManager: SpawnManager;
+  private spawnManager: EnemySpawnManager;
   private runeManager: RuneManager;
   private resourceUI: ResourceUI;
   private cardManager: InGameCardManager;
@@ -77,7 +77,7 @@ export default class GameScene extends Phaser.Scene {
     this.runeManager = new RuneManager(this, 10, 2000);
 
     this.setupBases();
-    this.setupSpawnManager();
+    this.setupEnemySpawnManager();
     this.setupWaveManager();
     this.setupGameEventHandlers();
     this.setupResourceUI();
@@ -101,8 +101,8 @@ export default class GameScene extends Phaser.Scene {
     this.data.set("enemyBase", this.enemyBase);
   }
 
-  private setupSpawnManager(): void {
-    this.spawnManager = new SpawnManager(
+  private setupEnemySpawnManager(): void {
+    this.spawnManager = new EnemySpawnManager(
       this,
       this.gameManager,
       this.heroManager,
@@ -327,7 +327,7 @@ export default class GameScene extends Phaser.Scene {
 
     const { height } = this.scale.gameSize;
     const spawnX = this.playerBase.getX() - 20;
-    const randomYOffset = Phaser.Math.Between(-150, 150);
+    const randomYOffset = Phaser.Math.Between(-100, 100);
     const spawnY = height / 2 + randomYOffset;
 
     const heroType = card.getType();
@@ -367,7 +367,7 @@ export default class GameScene extends Phaser.Scene {
       scene: this,
       heroManager: this.heroManager,
       enemyManager: this.enemyManager,
-      rune: this.runeManager,
+      runeManager: this.runeManager,
       playerBase: this.playerBase,
       enemyBase: this.enemyBase,
     };
