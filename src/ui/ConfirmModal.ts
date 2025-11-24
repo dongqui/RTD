@@ -8,7 +8,8 @@ export interface ConfirmModalConfig {
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => void;
-  onCancel: () => void;
+  onCancel?: () => void;
+  showCancelButton?: boolean;
 }
 
 export class ConfirmModal extends Modal {
@@ -24,6 +25,7 @@ export class ConfirmModal extends Modal {
     this.confirmConfig = {
       confirmText: "확인",
       cancelText: "취소",
+      showCancelButton: true,
       ...config,
     };
 
@@ -47,25 +49,29 @@ export class ConfirmModal extends Modal {
     const buttonsContainer = this.scene.add.container(0, 60);
     container.add(buttonsContainer);
 
-    // Cancel button
-    const cancelButton = new Button(this.scene, -130, 0, {
-      text: this.confirmConfig.cancelText!,
-      width: 120,
-      height: 50,
-      color: "red",
-      textStyle: {
-        fontSize: "20px",
-      },
-      onClick: () => {
-        this.hide(() => {
-          this.confirmConfig.onCancel();
-        });
-      },
-    });
-    buttonsContainer.add(cancelButton);
+    const showCancel = this.confirmConfig.showCancelButton !== false;
+
+    if (showCancel) {
+      // Cancel button
+      const cancelButton = new Button(this.scene, -130, 0, {
+        text: this.confirmConfig.cancelText!,
+        width: 120,
+        height: 50,
+        color: "red",
+        textStyle: {
+          fontSize: "20px",
+        },
+        onClick: () => {
+          this.hide(() => {
+            this.confirmConfig.onCancel?.();
+          });
+        },
+      });
+      buttonsContainer.add(cancelButton);
+    }
 
     // Confirm button
-    const confirmButton = new Button(this.scene, 130, 0, {
+    const confirmButton = new Button(this.scene, showCancel ? 130 : 0, 0, {
       text: this.confirmConfig.confirmText!,
       width: 120,
       height: 50,
