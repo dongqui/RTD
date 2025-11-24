@@ -73,12 +73,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.setSize(buttonWidth, buttonHeight);
 
     this.setInteractive(
-      new Phaser.Geom.Rectangle(
-        -buttonWidth / 2,
-        -buttonHeight / 2,
-        buttonWidth,
-        buttonHeight
-      ),
+      new Phaser.Geom.Rectangle(0, 0, buttonWidth, buttonHeight),
       Phaser.Geom.Rectangle.Contains
     );
 
@@ -128,7 +123,7 @@ export class Button extends Phaser.GameObjects.Container {
     this.setSize(width, height);
 
     if (this.input) {
-      this.input.hitArea.setTo(-width / 2, -height / 2, width, height);
+      this.input.hitArea.setTo(0, 0, width, height);
     }
   }
 
