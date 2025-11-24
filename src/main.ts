@@ -3,7 +3,7 @@ import Preload from "./scenes/Preload";
 import GameScene from "./scenes/GameScene";
 import SummonScene from "./scenes/SummonScene";
 import DeckScene from "./scenes/DeckScene";
-import TestScene from "./scenes/TestScene";
+import SettingScene from "./scenes/SettingScene";
 import NavigationScene from "./scenes/NavigationScene";
 import HeaderScene from "./scenes/HeaderScene";
 import { SpinePlugin } from "@esotericsoftware/spine-phaser-v3";
@@ -69,7 +69,7 @@ window.addEventListener("load", function () {
       SummonScene,
       GameScene,
       DeckScene,
-      TestScene,
+      SettingScene,
     ],
   });
 

@@ -149,6 +149,11 @@
       },
       {
         "type": "image",
+        "key": "icon_setting",
+        "url": "assets/icons/icon_setting.png"
+      },
+      {
+        "type": "image",
         "key": "icon_resource",
         "url": "assets/icons/icon_resource.png"
       },
@@ -321,6 +326,16 @@
         "type": "audio",
         "key": "sound_hit_arrow",
         "url": "assets/sounds/hit_arrow.wav"
+      },
+      {
+        "type": "audio",
+        "key": "bgm_home",
+        "url": "assets/sounds/bgm_home.mp3"
+      },
+      {
+        "type": "audio",
+        "key": "bgm_battle",
+        "url": "assets/sounds/bgm_battle.mp3"
       }
     ]
   },

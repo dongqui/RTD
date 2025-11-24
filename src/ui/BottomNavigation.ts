@@ -1,5 +1,5 @@
 import { BottomTab, BottomTabConfig } from "./BottomTab";
-import { SoundManager } from "../utils/SoundManager";
+import { SoundManager } from "../managers/SoundManager";
 
 interface ButtonData {
   key: string;
@@ -68,10 +68,10 @@ export default class BottomNavigation {
         scene: "DeckScene",
       },
       {
-        key: "test",
-        imageKey: "icon_book",
-        label: "테스트",
-        scene: "TestScene",
+        key: "setting",
+        imageKey: "icon_setting",
+        label: "설정",
+        scene: "SettingScene",
       },
     ];
 
