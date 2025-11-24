@@ -49,7 +49,7 @@ class SkillCard extends Phaser.GameObjects.Container {
       0,
       "card_frame_hexagon_purple_bg"
     );
-    this.background.setDisplaySize(this.cardWidth - 23, this.cardHeight - 25);
+    this.background.setDisplaySize(this.cardWidth - 20, this.cardHeight - 25);
     this.background.setOrigin(0.5);
     this.add(this.background);
 
