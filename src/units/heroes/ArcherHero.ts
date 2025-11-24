@@ -3,7 +3,7 @@ import { HeroSpec, HeroRegistry } from "./HeroRegistry";
 import { CombatEntity } from "../../fsm/CombatEntity";
 import Base from "../../Base";
 import { Projectile } from "../../objects/Projectile";
-import { SoundManager } from "../../utils/SoundManager";
+import { SoundManager } from "../../managers/SoundManager";
 
 export class ArcherHero extends BaseHero {
   private projectiles: Projectile[] = [];

@@ -3,7 +3,7 @@ import Base from "../../Base";
 import { Projectile } from "../../objects/Projectile";
 import { BaseEnemy } from "./BaseEnemy";
 import { EnemySpec, EnemyRegistry } from "./EnemyRegistry";
-import { SoundManager } from "../../utils/SoundManager";
+import { SoundManager } from "../../managers/SoundManager";
 
 export class EnemyArcher extends BaseEnemy {
   private projectiles: Projectile[] = [];

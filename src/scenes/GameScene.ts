@@ -17,7 +17,7 @@ import { WaveUI } from "../ui/WaveUI";
 import { RewardCardUI } from "../ui/RewardCardUI";
 import { Button } from "../ui/Button";
 import { SkillRegistry } from "../skills/SkillRegistry";
-import { SoundManager } from "../utils/SoundManager";
+import { SoundManager } from "../managers/SoundManager";
 
 export default class GameScene extends Phaser.Scene {
   private gameManager: GameManager;
@@ -185,16 +185,19 @@ export default class GameScene extends Phaser.Scene {
 
     this.events.on("battle-started", () => {
       console.log("Battle started!");
+      SoundManager.getInstance().playBGM("bgm_battle");
     });
 
     this.events.on("game-over", () => {
       console.log("Game Over!");
       this.showGameOverScreen();
+      SoundManager.getInstance().playBGM("bgm_home");
     });
 
     this.events.on("game-clear", () => {
       console.log("Game Clear!");
       this.showGameClearScreen();
+      SoundManager.getInstance().playBGM("bgm_home");
     });
 
     this.events.on("hero-died", (cardId: string) => {

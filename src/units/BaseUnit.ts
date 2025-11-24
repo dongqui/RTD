@@ -9,7 +9,7 @@ import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
-import { SoundManager } from "../utils/SoundManager";
+import { SoundManager } from "../managers/SoundManager";
 
 /**
  * Visual configuration interface for unit appearance

@@ -2,7 +2,7 @@ import { BaseHero } from "./BaseHero";
 import { CombatEntity } from "../../fsm/CombatEntity";
 import Base from "../../Base";
 import { HeroSpec, HeroRegistry } from "./HeroRegistry";
-import { SoundManager } from "../../utils/SoundManager";
+import { SoundManager } from "../../managers/SoundManager";
 
 export class LightningWizardHero extends BaseHero {
   private attackStack: number = 0;

@@ -6,6 +6,7 @@ import Card from "../ui/Card";
 import { CardDrawManager, CardOption } from "../managers/CardDrawManager";
 import { ConfirmModal } from "../ui/ConfirmModal";
 import { CardCelebrationUI } from "../ui/CardCelebrationUI";
+import { SoundManager } from "../managers/SoundManager";
 
 export default class SummonScene extends Phaser.Scene {
   private deck: PlayerDeckManager;
@@ -33,6 +34,9 @@ export default class SummonScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Play home BGM
+    SoundManager.getInstance().init(this);
+    SoundManager.getInstance().playBGM("bgm_home");
 
     this.createBackground();
     this.createTitle();

@@ -3,7 +3,7 @@
 /* START OF COMPILED CODE */
 
 /* START-USER-IMPORTS */
-import { SoundManager } from "../utils/SoundManager";
+import { SoundManager } from "../managers/SoundManager";
 /* END-USER-IMPORTS */
 
 export default class Preload extends Phaser.Scene {
