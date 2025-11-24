@@ -111,24 +111,23 @@ export class Modal extends Phaser.GameObjects.Container {
       .setTint(0x42365f);
     this.panel.add(this.innerBorder);
 
-    this.decoLine = this.scene.add
-      .nineslice(
-        0,
-        -panelHeight / 2 + 90,
-        "popup_box_deco_line",
-        undefined,
-        panelWidth - 80,
-        40,
-        23,
-        23,
-        0,
-        0
-      )
-      .setOrigin(0.5)
-      .setTint(0x514274);
-    this.panel.add(this.decoLine);
-
     if (this.config.title) {
+      this.decoLine = this.scene.add
+        .nineslice(
+          0,
+          -panelHeight / 2 + 90,
+          "popup_box_deco_line",
+          undefined,
+          panelWidth - 80,
+          40,
+          23,
+          23,
+          0,
+          0
+        )
+        .setOrigin(0.5)
+        .setTint(0x514274);
+      this.panel.add(this.decoLine);
       this.createTitle(this.config.title, panelWidth, panelHeight);
     }
 
