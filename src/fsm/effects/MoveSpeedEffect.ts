@@ -3,7 +3,6 @@ import { StatusEffect, EffectType } from "./StatusEffect";
 
 export class MoveSpeedEffect extends StatusEffect {
   private multiplier: number;
-  private originalValue: number | null = null;
 
   constructor(duration: number, multiplier: number) {
     super(EffectType.MOVE_SPEED, duration);
@@ -11,14 +10,11 @@ export class MoveSpeedEffect extends StatusEffect {
   }
 
   apply(entity: CombatEntity): void {
-    this.originalValue = entity.speedMultiplier;
-    entity.speedMultiplier *= this.multiplier;
+    entity.statusEffects.registerSpeedMultiplier(this.getId(), this.multiplier);
   }
 
   remove(entity: CombatEntity): void {
-    if (this.originalValue !== null) {
-      entity.speedMultiplier = this.originalValue;
-    }
+    entity.statusEffects.unregisterSpeedMultiplier(this.getId());
   }
 
   getMultiplier(): number {

@@ -4,6 +4,9 @@ import { StatusEffect, EffectType } from "./StatusEffect";
 export class StatusEffectManager {
   private entity: CombatEntity;
   private effects: Map<string, StatusEffect>;
+  private speedMultipliers: Map<string, number> = new Map();
+  private attackSpeedMultipliers: Map<string, number> = new Map();
+  private baseSpeedMultiplier: number = 1.0;
 
   constructor(entity: CombatEntity) {
     this.entity = entity;
@@ -63,5 +66,52 @@ export class StatusEffectManager {
 
   getEffectCount(): number {
     return this.effects.size;
+  }
+
+  registerSpeedMultiplier(effectId: string, multiplier: number): void {
+    this.speedMultipliers.set(effectId, multiplier);
+    this.recalculateSpeedMultiplier();
+  }
+
+  unregisterSpeedMultiplier(effectId: string): void {
+    this.speedMultipliers.delete(effectId);
+    this.recalculateSpeedMultiplier();
+  }
+
+  private recalculateSpeedMultiplier(): void {
+    let totalMultiplier = this.baseSpeedMultiplier;
+
+    // Multiply all active speed multipliers
+    for (const multiplier of this.speedMultipliers.values()) {
+      totalMultiplier *= multiplier;
+    }
+
+    // Apply to movement speed
+    this.entity.speedMultiplier = totalMultiplier;
+
+    // Synchronize animation speed (with null check)
+    if (this.entity.spineObject?.animationState) {
+      this.entity.spineObject.animationState.timeScale = totalMultiplier;
+    }
+  }
+
+  registerAttackSpeedMultiplier(effectId: string, multiplier: number): void {
+    this.attackSpeedMultipliers.set(effectId, multiplier);
+    this.recalculateAttackSpeedMultiplier();
+  }
+
+  unregisterAttackSpeedMultiplier(effectId: string): void {
+    this.attackSpeedMultipliers.delete(effectId);
+    this.recalculateAttackSpeedMultiplier();
+  }
+
+  private recalculateAttackSpeedMultiplier(): void {
+    let totalMultiplier = 1.0;
+
+    for (const multiplier of this.attackSpeedMultipliers.values()) {
+      totalMultiplier *= multiplier;
+    }
+
+    this.entity.attackSpeedMultiplier = totalMultiplier;
   }
 }

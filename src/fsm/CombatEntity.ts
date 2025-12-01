@@ -1,6 +1,7 @@
 import { StateMachine } from "./StateMachine";
 import { StatusEffectManager } from "./effects/StatusEffectManager";
 import Base from "../Base";
+import { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 
 export interface CombatEntity {
   stateMachine: StateMachine<CombatEntity>;
@@ -9,6 +10,8 @@ export interface CombatEntity {
   speedMultiplier: number;
   attackDamageMultiplier: number;
   attackSpeedMultiplier: number;
+
+  spineObject: SpineGameObject;
 
   move(delta: number): void;
   moveTowards(targetX: number, targetY: number, delta: number): void;
