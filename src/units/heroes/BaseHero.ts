@@ -2,7 +2,7 @@ import { CombatEntity } from "../../fsm/CombatEntity";
 import { BehaviorState } from "../../fsm/StateTypes";
 import Base from "../../Base";
 import { HeroRegistry, HeroType, HeroSpec } from "./HeroRegistry";
-import { SoundManager } from "../../managers/SoundManager";
+
 import { BaseUnit, UnitVisual } from "../BaseUnit";
 
 export interface HeroConfig {

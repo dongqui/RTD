@@ -3,6 +3,7 @@ import "./WarriorHero";
 import "./ArcherHero";
 import "./ThiefHero";
 import "./IronKnightHero";
+import "./RushKnightHero";
 import "./FireWizardHero";
 import "./FrozenWizardHero";
 import "./LightningWizardHero";

@@ -34,6 +34,7 @@ export default class PlayerDeckManager {
 
   private initializeDefaultDeck(): void {
     const defaultHeroTypes: HeroType[] = [
+      "rush_knight",
       "warrior",
       "archer",
       "lightning_wizard",

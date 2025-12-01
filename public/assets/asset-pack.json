@@ -209,6 +209,11 @@
       },
       {
         "type": "image",
+        "key": "unit_portrait_rush_knight",
+        "url": "assets/portraits/unit_portrait_rush_knight.png"
+      },
+      {
+        "type": "image",
         "key": "icon_health",
         "url": "assets/icons/icon_health.png"
       },

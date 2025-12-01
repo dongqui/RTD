@@ -15,7 +15,8 @@
       "Bash(npm start)",
       "Bash(timeout /t 3)",
       "Bash(if not exist \"src\\managers\" mkdir \"src\\managers\")",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(del \"c:\\Users\\kimwi\\OneDrive\\Desktop\\dev\\RTD\\src\\scenes\\TestScene.ts\")"
     ]
   },
   "hooks": {

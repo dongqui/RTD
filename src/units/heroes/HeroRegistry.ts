@@ -8,6 +8,7 @@ export type HeroType =
   | "fire_wizard"
   | "thief"
   | "iron_knight"
+  | "rush_knight"
   | "paladin"
   | "barbarian";
 
