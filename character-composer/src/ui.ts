@@ -1,4 +1,5 @@
 import { Skin } from "@esotericsoftware/spine-core";
+import { PreviewManager } from "./PreviewManager";
 
 export class ComposerUI {
   private selectedParts: string[] = [];
@@ -9,18 +10,29 @@ export class ComposerUI {
   private isFlipped: boolean = false;
   private skinColor: string = "#ffc294";
   private hairColor: string = "#212121";
+  private previewManager!: PreviewManager;
+  private intersectionObserver: IntersectionObserver | null = null;
 
   async init() {
+    // PreviewManager 생성
+    this.previewManager = new PreviewManager();
+
     await this.loadSpineData();
     this.setupEventListeners();
     this.loadPresets();
 
     // Phaser에서 spine 객체가 준비될 때까지 대기
     const game = (window as any).game as Phaser.Game;
+
     game.events.once("spine-ready", (spineObject: any) => {
       this.spineObject = spineObject;
       console.log("UI received spine object");
       this.updateCharacterSkin();
+    });
+
+    game.events.once("preview-ready", (scene: any) => {
+      this.previewManager.setScene(scene);
+      console.log("Preview system ready");
     });
   }
 
@@ -78,35 +90,37 @@ export class ComposerUI {
       `;
 
       const itemsDiv = document.createElement("div");
-      itemsDiv.className = "category-items";
+      itemsDiv.className = "category-items collapsed"; // 초기에는 접힘
 
       categories[categoryName].sort().forEach((skinName) => {
-        const itemDiv = document.createElement("div");
-        itemDiv.className = "part-item";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = `part-${skinName}`;
-        checkbox.value = skinName;
-        checkbox.addEventListener("change", (e) => this.onPartToggle(e));
-
-        const label = document.createElement("label");
-        label.htmlFor = `part-${skinName}`;
-        label.textContent = skinName.split("/")[1] || skinName;
-
-        itemDiv.appendChild(checkbox);
-        itemDiv.appendChild(label);
+        const itemDiv = this.createPartItemGrid(skinName);
         itemsDiv.appendChild(itemDiv);
       });
 
       header.addEventListener("click", () => {
+        const wasCollapsed = itemsDiv.classList.contains("collapsed");
         itemsDiv.classList.toggle("collapsed");
+
+        // 펼쳐질 때 lazy loading 시작
+        if (wasCollapsed) {
+          this.observeItemsInCategory(itemsDiv);
+        } else {
+          // 접힐 때 observer 해제 (성능 최적화)
+          const images = itemsDiv.querySelectorAll(".part-preview");
+          images.forEach((img) => {
+            if (this.intersectionObserver) {
+              this.intersectionObserver.unobserve(img);
+            }
+          });
+        }
       });
 
       categoryDiv.appendChild(header);
       categoryDiv.appendChild(itemsDiv);
       categoriesDiv.appendChild(categoryDiv);
     });
+
+    this.setupLazyLoading();
   }
 
   populateAnimationList() {
@@ -388,13 +402,115 @@ ${formattedParts}
     });
   }
 
+  createPartItemGrid(skinName: string): HTMLElement {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "part-item-grid";
+    itemDiv.dataset.partName = skinName;
+
+    // 이미지 컨테이너 (체크박스 오버레이용)
+    const imageContainer = document.createElement("div");
+    imageContainer.className = "part-image-container";
+
+    // 프리뷰 이미지 (초기에는 비어있음)
+    const img = document.createElement("img");
+    img.className = "part-preview loading";
+    img.alt = skinName.split("/")[1] || skinName;
+    img.dataset.partName = skinName;
+
+    // 체크박스 (이미지 위 오버레이)
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = `part-${skinName}`;
+    checkbox.value = skinName;
+    checkbox.className = "part-checkbox";
+    checkbox.addEventListener("change", (e) => this.onPartToggle(e));
+
+    // 라벨 (이미지 아래)
+    const label = document.createElement("label");
+    label.htmlFor = `part-${skinName}`;
+    label.className = "part-label";
+    label.textContent = skinName.split("/")[1] || skinName;
+
+    // 셀 클릭 시 체크박스 토글
+    itemDiv.addEventListener("click", (e) => {
+      // 체크박스 자체를 클릭한 경우는 제외 (이미 change 이벤트가 발생함)
+      if (e.target === checkbox) return;
+
+      checkbox.checked = !checkbox.checked;
+      // change 이벤트를 수동으로 발생시킴
+      checkbox.dispatchEvent(new Event("change"));
+    });
+
+    // 조립
+    imageContainer.appendChild(img);
+    imageContainer.appendChild(checkbox);
+    itemDiv.appendChild(imageContainer);
+    itemDiv.appendChild(label);
+
+    return itemDiv;
+  }
+
+  setupLazyLoading() {
+    this.intersectionObserver = new IntersectionObserver(
+      async (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement;
+            const partName = img.dataset.partName;
+
+            if (partName && !img.src) {
+              await this.loadPreviewForImage(img, partName);
+            }
+
+            this.intersectionObserver!.unobserve(img);
+          }
+        }
+      },
+      {
+        root: document.getElementById("parts-categories"),
+        rootMargin: "100px", // 뷰포트 진입 100px 전에 로드
+        threshold: 0.01,
+      }
+    );
+  }
+
+  observeItemsInCategory(categoryItemsDiv: HTMLElement) {
+    const images = categoryItemsDiv.querySelectorAll(".part-preview");
+    images.forEach((img) => {
+      if (this.intersectionObserver) {
+        this.intersectionObserver.observe(img);
+      }
+    });
+  }
+
+  async loadPreviewForImage(img: HTMLImageElement, partName: string) {
+    try {
+      img.classList.add("loading");
+      const dataURL = await this.previewManager.getPreview(partName, 200, 200);
+      img.src = dataURL;
+      img.classList.remove("loading");
+      img.classList.add("loaded");
+    } catch (error) {
+      console.error(`Failed to load preview for ${partName}:`, error);
+      img.classList.remove("loading");
+      img.classList.add("error");
+    }
+  }
+
   filterParts(searchTerm: string) {
-    const allItems = document.querySelectorAll(".part-item");
+    const allItems = document.querySelectorAll(".part-item-grid");
     allItems.forEach((item) => {
-      const label = item.querySelector("label")!;
+      const label = item.querySelector(".part-label")!;
       const text = label.textContent!.toLowerCase();
-      if (text.includes(searchTerm)) {
+
+      if (text.includes(searchTerm) || searchTerm === "") {
         (item as HTMLElement).style.display = "flex";
+
+        // 새로 보이는 아이템에 대해 lazy load 트리거
+        const img = item.querySelector(".part-preview") as HTMLImageElement;
+        if (img && !img.src && this.intersectionObserver) {
+          this.intersectionObserver.observe(img);
+        }
       } else {
         (item as HTMLElement).style.display = "none";
       }
@@ -456,11 +572,10 @@ ${formattedParts}
 
     if (!preset) return;
 
-    document
-      .querySelectorAll('.part-item input[type="checkbox"]')
-      .forEach((cb) => {
-        (cb as HTMLInputElement).checked = false;
-      });
+    // 모든 체크박스 해제
+    document.querySelectorAll(".part-checkbox").forEach((cb) => {
+      (cb as HTMLInputElement).checked = false;
+    });
 
     if (Array.isArray(preset)) {
       this.selectedParts = [...preset];

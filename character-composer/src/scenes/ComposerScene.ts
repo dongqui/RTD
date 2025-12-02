@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Skin, Vector2 } from "@esotericsoftware/spine-core";
+import { Skin } from "@esotericsoftware/spine-core";
 import { SpineGameObject } from "@esotericsoftware/spine-phaser-v3";
 type CenterOptions = {
   scale?: number; // 고정 스케일 (기본 1)
@@ -62,6 +62,7 @@ export default class ComposerScene extends Phaser.Scene {
     };
 
     this.game.events.emit("spine-ready", this.spineObject);
+    this.game.events.emit("preview-ready", this);
   }
 
   captureCharacter(
@@ -120,5 +121,81 @@ export default class ComposerScene extends Phaser.Scene {
 
   update() {
     // Phaser Spine 플러그인이 자동으로 업데이트 처리
+  }
+
+  generatePartPreview(
+    partName: string,
+    width: number = 200,
+    height: number = 200
+  ): Promise<string> {
+    return new Promise((resolve) => {
+      try {
+        console.log(`Generating preview for: ${partName}, size: ${width}x${height}`);
+
+        // RenderTexture를 (0, 0)에 생성
+        const renderTexture = this.add.renderTexture(0, 0, width, height);
+
+        // 임시 Spine 오브젝트 생성
+        const tempSpine = this.add.spine(
+          width / 2,
+          height / 2 + 100,
+          "fantasy_character",
+          "fantasy_character-atlas"
+        );
+
+        // 해당 파츠 스킨만 적용
+        const skin = tempSpine.skeleton.data.findSkin(partName);
+        if (!skin) {
+          console.warn(`Skin not found: ${partName}`);
+          tempSpine.destroy();
+          renderTexture.destroy();
+          resolve(this.getPlaceholderImage());
+          return;
+        }
+
+        const customSkin = new Skin("preview");
+        customSkin.addSkin(skin);
+        tempSpine.skeleton.setSkin(customSkin);
+        tempSpine.skeleton.setSlotsToSetupPose();
+        tempSpine.skeleton.setToSetupPose();
+
+        // 스케일 조정
+        const spineHeight = tempSpine.skeleton.data.height;
+        const scale = (height * 0.7) / spineHeight;
+        tempSpine.setScale(scale);
+
+        console.log(`Rendering ${partName} at position: ${width / 2}, ${height / 2 + 100}, scale: ${scale}`);
+
+        // 렌더링 - tempSpine을 renderTexture에 그림
+        renderTexture.draw(tempSpine);
+
+        // base64로 변환
+        renderTexture.snapshot((snapshot: Phaser.Display.Color | HTMLImageElement) => {
+          let dataURL: string;
+
+          if (snapshot instanceof HTMLImageElement) {
+            dataURL = snapshot.src;
+            console.log(`Preview generated for ${partName}, length: ${dataURL.length}`);
+          } else {
+            console.warn(`Snapshot returned Color object for ${partName}`);
+            dataURL = this.getPlaceholderImage();
+          }
+
+          // 정리
+          renderTexture.destroy();
+          tempSpine.destroy();
+
+          resolve(dataURL);
+        });
+      } catch (error) {
+        console.error(`Failed to generate preview for ${partName}:`, error);
+        resolve(this.getPlaceholderImage());
+      }
+    });
+  }
+
+  private getPlaceholderImage(): string {
+    // 투명한 1x1 PNG
+    return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==";
   }
 }
