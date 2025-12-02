@@ -8,19 +8,17 @@
   </head>
   <body>
     <div class="container">
-      <header>
-        <h1>Fantasy Character Composer</h1>
-        <p>Spine 캐릭터 파츠를 조합하고 스킨 배열을 생성하세요</p>
-      </header>
-
       <div class="main-content">
         <aside class="parts-panel">
           <h2>파츠 선택</h2>
           <div class="search-box">
             <input type="text" id="search" placeholder="파츠 검색..." />
           </div>
-          <div id="parts-categories" class="parts-list">
+          <div class="category-selector" id="category-selector">
             <p>로딩 중...</p>
+          </div>
+          <div id="parts-grid" class="parts-grid">
+            <!-- 선택된 카테고리의 파츠들이 여기 표시됩니다 -->
           </div>
         </aside>
 
@@ -58,7 +56,12 @@
             </div>
             <div class="control-group">
               <label>유닛 타입:</label>
-              <input type="text" id="unit-type-input" placeholder="예: warrior" style="flex: 1; padding: 5px;" />
+              <input
+                type="text"
+                id="unit-type-input"
+                placeholder="예: warrior"
+                style="flex: 1; padding: 5px"
+              />
               <button id="export-image-btn">이미지 저장 (PNG)</button>
             </div>
           </div>

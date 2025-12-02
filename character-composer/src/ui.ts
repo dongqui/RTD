@@ -60,7 +60,8 @@ export class ComposerUI {
   }
 
   populatePartsList() {
-    const categoriesDiv = document.getElementById("parts-categories")!;
+    const categorySelectorDiv = document.getElementById("category-selector")!;
+    const partsGridDiv = document.getElementById("parts-grid")!;
     const categories: { [key: string]: string[] } = {};
 
     Object.keys(this.allSkins).forEach((skinName) => {
@@ -76,51 +77,71 @@ export class ComposerUI {
     });
 
     const sortedCategories = Object.keys(categories).sort();
-    categoriesDiv.innerHTML = "";
+    categorySelectorDiv.innerHTML = "";
+    partsGridDiv.innerHTML = "";
 
-    sortedCategories.forEach((categoryName) => {
-      const categoryDiv = document.createElement("div");
-      categoryDiv.className = "category";
+    // 라디오 버튼 생성
+    sortedCategories.forEach((categoryName, index) => {
+      const radioId = `category-${categoryName}`;
 
-      const header = document.createElement("div");
-      header.className = "category-header";
-      header.innerHTML = `
-        <span class="category-title">${categoryName}</span>
-        <span class="category-count">${categories[categoryName].length}</span>
-      `;
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "category";
+      radio.id = radioId;
+      radio.value = categoryName;
+      radio.className = "category-radio";
 
-      const itemsDiv = document.createElement("div");
-      itemsDiv.className = "category-items collapsed"; // 초기에는 접힘
+      const label = document.createElement("label");
+      label.htmlFor = radioId;
+      label.className = "category-label";
+      label.textContent = categoryName;
 
-      categories[categoryName].sort().forEach((skinName) => {
-        const itemDiv = this.createPartItemGrid(skinName);
-        itemsDiv.appendChild(itemDiv);
-      });
+      // 첫 번째 카테고리를 기본 선택
+      if (index === 0) {
+        radio.checked = true;
+      }
 
-      header.addEventListener("click", () => {
-        const wasCollapsed = itemsDiv.classList.contains("collapsed");
-        itemsDiv.classList.toggle("collapsed");
-
-        // 펼쳐질 때 lazy loading 시작
-        if (wasCollapsed) {
-          this.observeItemsInCategory(itemsDiv);
-        } else {
-          // 접힐 때 observer 해제 (성능 최적화)
-          const images = itemsDiv.querySelectorAll(".part-preview");
-          images.forEach((img) => {
-            if (this.intersectionObserver) {
-              this.intersectionObserver.unobserve(img);
-            }
-          });
+      // 라디오 버튼 변경 이벤트
+      radio.addEventListener("change", () => {
+        if (radio.checked) {
+          this.showCategoryParts(categoryName, categories[categoryName]);
         }
       });
 
-      categoryDiv.appendChild(header);
-      categoryDiv.appendChild(itemsDiv);
-      categoriesDiv.appendChild(categoryDiv);
+      categorySelectorDiv.appendChild(radio);
+      categorySelectorDiv.appendChild(label);
     });
 
+    // 첫 번째 카테고리를 초기 표시
+    if (sortedCategories.length > 0) {
+      this.showCategoryParts(sortedCategories[0], categories[sortedCategories[0]]);
+    }
+
     this.setupLazyLoading();
+  }
+
+  showCategoryParts(categoryName: string, parts: string[]) {
+    const partsGridDiv = document.getElementById("parts-grid")!;
+    partsGridDiv.innerHTML = "";
+
+    // 기존 observer 해제
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.setupLazyLoading();
+    }
+
+    parts.sort().forEach((skinName) => {
+      const itemDiv = this.createPartItemGrid(skinName);
+      partsGridDiv.appendChild(itemDiv);
+    });
+
+    // 새로 추가된 아이템들 observe
+    const images = partsGridDiv.querySelectorAll(".part-preview");
+    images.forEach((img) => {
+      if (this.intersectionObserver) {
+        this.intersectionObserver.observe(img);
+      }
+    });
   }
 
   populateAnimationList() {
@@ -467,20 +488,11 @@ ${formattedParts}
         }
       },
       {
-        root: document.getElementById("parts-categories"),
+        root: document.getElementById("parts-grid"),
         rootMargin: "100px", // 뷰포트 진입 100px 전에 로드
         threshold: 0.01,
       }
     );
-  }
-
-  observeItemsInCategory(categoryItemsDiv: HTMLElement) {
-    const images = categoryItemsDiv.querySelectorAll(".part-preview");
-    images.forEach((img) => {
-      if (this.intersectionObserver) {
-        this.intersectionObserver.observe(img);
-      }
-    });
   }
 
   async loadPreviewForImage(img: HTMLImageElement, partName: string) {

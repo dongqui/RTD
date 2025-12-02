@@ -37,12 +37,21 @@ header p {
 
 .main-content {
   display: grid;
-  grid-template-columns: 600px 1fr 350px;
+  grid-template-columns: 6fr 1fr 350px;
   gap: 20px;
-  height: calc(100vh - 180px);
+  height: calc(100vh - 80px);
 }
 
-.parts-panel,
+.parts-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .output-panel {
   background: white;
   border-radius: 10px;
@@ -75,55 +84,50 @@ header p {
   border-color: #667eea;
 }
 
-.parts-list {
+.category-selector {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.category {
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
   padding: 10px;
-}
-
-.category-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding: 5px;
   background: #f5f5f5;
-  border-radius: 3px;
-  margin-bottom: 10px;
+  border-radius: 8px;
 }
 
-.category-header:hover {
-  background: #e8e8e8;
+.category-radio {
+  display: none;
 }
 
-.category-title {
-  font-weight: bold;
-  color: #333;
+.category-label {
+  padding: 8px 16px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s ease;
+  user-select: none;
 }
 
-.category-count {
+.category-label:hover {
+  background: #f9f9f9;
+  border-color: #667eea;
+}
+
+.category-radio:checked + .category-label {
   background: #667eea;
+  border-color: #667eea;
   color: white;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
 }
 
-.category-items {
+.parts-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
   padding: 10px;
-}
-
-.category-items.collapsed {
-  display: none;
+  grid-auto-rows: min-content;
 }
 
 .part-item-grid {
@@ -163,7 +167,8 @@ header p {
 
 .part-preview.loading {
   opacity: 0.3;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="%23667eea" stroke-width="4" stroke-dasharray="31.4 31.4" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/></circle></svg>') center/40px no-repeat;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="%23667eea" stroke-width="4" stroke-dasharray="31.4 31.4" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 25 25" to="360 25 25" dur="1s" repeatCount="indefinite"/></circle></svg>')
+    center/40px no-repeat;
 }
 
 .part-preview.loaded {
@@ -172,7 +177,9 @@ header p {
 
 .part-preview.error {
   opacity: 0.5;
-  background: #fee url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e74c3c"><path d="M12 2L2 22h20L12 2zm0 3.5L19.5 20h-15L12 5.5zM11 10v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg>') center/30px no-repeat;
+  background: #fee
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e74c3c"><path d="M12 2L2 22h20L12 2zm0 3.5L19.5 20h-15L12 5.5zM11 10v5h2v-5h-2zm0 6v2h2v-2h-2z"/></svg>')
+    center/30px no-repeat;
 }
 
 .part-checkbox {
