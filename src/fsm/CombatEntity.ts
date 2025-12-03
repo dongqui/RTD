@@ -38,4 +38,7 @@ export interface CombatEntity {
   getScene(): Phaser.Scene;
   getX(): number;
   getY(): number;
+
+  onDeath(): void;
+  onHPZero(): void;
 }

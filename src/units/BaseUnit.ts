@@ -7,6 +7,7 @@ import { BehaviorState } from "../fsm/StateTypes";
 import { MovingState } from "../fsm/states/MovingState";
 import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
+import { RevivingState } from "../fsm/states/RevivingState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
 import { SoundManager } from "../managers/SoundManager";
@@ -57,6 +58,10 @@ export abstract class BaseUnit implements CombatEntity {
       new AttackingState()
     );
     this.stateMachine.registerState(BehaviorState.DEAD, new DeadState());
+    this.stateMachine.registerState(
+      BehaviorState.REVIVING,
+      new RevivingState()
+    );
 
     // Don't initialize state here - let subclass finish construction first
   }
@@ -170,8 +175,12 @@ export abstract class BaseUnit implements CombatEntity {
     this.playHitAnimation();
 
     if (this.currentHealth <= 0) {
-      this.stateMachine.changeState(BehaviorState.DEAD);
+      this.onHPZero();
     }
+  }
+
+  onHPZero(): void {
+    this.stateMachine.changeState(BehaviorState.DEAD);
   }
 
   protected playHitAnimation(): void {
@@ -298,6 +307,8 @@ export abstract class BaseUnit implements CombatEntity {
       "hair_front",
       "helmet_hair",
       "hair_hat",
+      "beard",
+      "brow",
     ];
 
     const skinRgb = this.hexToRgb(visual.skinColor);
@@ -389,22 +400,18 @@ export abstract class BaseUnit implements CombatEntity {
       BaseUnit.DIE_ANIM_KEY,
       false
     );
-
-    this.healthBar.destroy();
-    this.onDeath();
-
-    this.scene.time.delayedCall(1000, () => {
-      if (this.spineObject) {
-        this.spineObject.destroy();
-      }
-    });
   }
 
   /**
    * Called when unit dies
    * Override in subclasses to emit custom events
    */
-  protected onDeath(): void {
+  onDeath(): void {
+    console.log("onDeath");
     // Override in subclasses to emit death events
+    this.healthBar.destroy();
+    if (this.spineObject) {
+      this.spineObject.destroy();
+    }
   }
 }

@@ -69,7 +69,8 @@ export abstract class BaseHero extends BaseUnit {
     }
   }
 
-  protected onDeath(): void {
+  onDeath(): void {
+    super.onDeath();
     this.scene.events.emit("hero-killed", this);
     this.scene.events.emit("hero-died", this.cardId);
   }
@@ -87,6 +88,13 @@ export abstract class BaseHero extends BaseUnit {
 
     for (const enemy of enemies) {
       if (enemy.isDead && enemy.isDead()) continue;
+
+      // 부활 중인 유닛은 타겟에서 제외
+      if (
+        enemy.stateMachine &&
+        enemy.stateMachine.getCurrentStateType() === BehaviorState.REVIVING
+      )
+        continue;
 
       const distance = Phaser.Math.Distance.Between(
         this.spineObject.x,

@@ -4,4 +4,5 @@ export enum BehaviorState {
   ATTACKING = "attacking",
   STUNNED = "stunned",
   DEAD = "dead",
+  REVIVING = "reviving",
 }

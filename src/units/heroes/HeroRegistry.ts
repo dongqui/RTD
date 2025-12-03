@@ -10,7 +10,8 @@ export type HeroType =
   | "iron_knight"
   | "rush_knight"
   | "paladin"
-  | "barbarian";
+  | "barbarian"
+  | "immortal_hero";
 
 export interface HeroStats {
   health: number;
@@ -73,7 +74,6 @@ export class HeroRegistry {
 
   static getSpec(type: HeroType): HeroSpec {
     const spec = this.specs[type];
-    console.log(spec, type);
     if (!spec) {
       throw new Error(`Hero spec not found for type: ${type}`);
     }

@@ -9,6 +9,7 @@ import "./FrozenWizardHero";
 import "./LightningWizardHero";
 import "./Paladin";
 import "./Barbarian";
+import "./ImmortalHero";
 
 export { HeroRegistry } from "./HeroRegistry";
 export type { HeroType, HeroSpec } from "./HeroRegistry";

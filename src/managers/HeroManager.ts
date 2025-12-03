@@ -1,5 +1,6 @@
 import { BaseHero } from "../units/heroes/BaseHero";
 import { HeroRegistry } from "../units/heroes";
+import { BehaviorState } from "../fsm/StateTypes";
 
 export type { HeroType } from "../units/heroes";
 
@@ -12,7 +13,12 @@ export class HeroManager {
     this.scene.data.set("heroes", this.heroes);
   }
 
-  spawnHero(type: string, x: number, y: number, cardId: string = ""): BaseHero | null {
+  spawnHero(
+    type: string,
+    x: number,
+    y: number,
+    cardId: string = ""
+  ): BaseHero | null {
     if (!HeroRegistry.hasSpec(type)) {
       console.error(`Unknown hero type: ${type}`);
       return null;
@@ -31,7 +37,12 @@ export class HeroManager {
 
   update(time: number, delta: number): void {
     this.heroes = this.heroes.filter((hero) => {
-      if (hero.isDead() || !hero.spineObject) {
+      // 부활 중인 히어로는 제거하지 않음
+      const isReviving =
+        hero.stateMachine &&
+        hero.stateMachine.getCurrentStateType() === BehaviorState.REVIVING;
+
+      if ((hero.isDead() && !isReviving) || !hero.spineObject) {
         return false;
       }
       hero.update(time, delta);
@@ -39,7 +50,6 @@ export class HeroManager {
     });
     this.scene.data.set("heroes", this.heroes);
   }
-
   getActiveHeroes(): BaseHero[] {
     return this.heroes.filter((hero) => !hero.isDead());
   }

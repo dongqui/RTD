@@ -32,7 +32,7 @@ export function throttle<T extends (...args: any[]) => any>(
  * Throttle이 적용된 console.log
  * @param delay - 밀리초 단위의 throttle 지연 시간 (기본값: 100ms)
  */
-export const throttledLog = (delay: number = 100) => {
+export const throttledLog = (delay: number = 100, ...args: any[]) => {
   const log = throttle(console.log, delay);
   return (...args: any[]) => log(...args);
 };

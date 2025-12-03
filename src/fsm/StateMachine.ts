@@ -17,6 +17,8 @@ export class StateMachine<T> {
   }
 
   changeState(newStateType: BehaviorState): void {
+    console.log("changeState", newStateType);
+    console.log("currentStateType", this.currentStateType);
     if (this.currentStateType === newStateType) {
       return;
     }

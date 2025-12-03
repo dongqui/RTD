@@ -214,6 +214,11 @@
       },
       {
         "type": "image",
+        "key": "unit_portrait_immortal_hero",
+        "url": "assets/portraits/unit_portrait_immortal_hero.png"
+      },
+      {
+        "type": "image",
         "key": "icon_health",
         "url": "assets/icons/icon_health.png"
       },

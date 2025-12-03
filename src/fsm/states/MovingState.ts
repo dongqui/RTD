@@ -8,10 +8,13 @@ export class MovingState implements State<CombatEntity> {
   }
 
   update(entity: CombatEntity, delta: number): void {
-    if (entity.isDead()) {
-      entity.stateMachine.changeState(BehaviorState.DEAD);
-      return;
-    }
+    // if (
+    //   entity.isDead() &&
+    //   entity.stateMachine.getCurrentStateType() !== BehaviorState.REVIVING
+    // ) {
+    //   entity.stateMachine.changeState(BehaviorState.DEAD);
+    //   return;
+    // }
 
     const target = entity.findTarget();
 
