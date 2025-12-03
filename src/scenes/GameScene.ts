@@ -131,29 +131,23 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.events.on("wave-started", (waveNumber: number) => {
-      console.log(`Wave ${waveNumber} started`);
       this.waveUI.setVisible(true);
       this.waveUI.showWaveStartAnimation(waveNumber);
       this.waveUI.updateWave(waveNumber, this.waveManager.getTotalWaves());
     });
 
     this.events.on("wave-completed", (waveNumber: number) => {
-      console.log(`Wave ${waveNumber} completed (received event)`);
-
       if (waveNumber === -1) {
-        console.log("Enemy base destroyed, completing wave");
         const currentWave = this.waveManager.getCurrentWave();
         const totalWaves = this.waveManager.getTotalWaves();
 
         this.waveUI.showWaveCompletedAnimation(currentWave);
 
         if (currentWave >= totalWaves) {
-          console.log("Last wave completed!");
           this.time.delayedCall(2500, () => {
             this.gameManager.gameClear();
           });
         } else {
-          console.log("Showing reward selection");
           this.time.delayedCall(2500, () => {
             this.showRewardSelection();
           });
@@ -184,18 +178,15 @@ export default class GameScene extends Phaser.Scene {
     });
 
     this.events.on("battle-started", () => {
-      console.log("Battle started!");
       SoundManager.getInstance().playBGM("bgm_battle");
     });
 
     this.events.on("game-over", () => {
-      console.log("Game Over!");
       this.showGameOverScreen();
       SoundManager.getInstance().playBGM("bgm_home");
     });
 
     this.events.on("game-clear", () => {
-      console.log("Game Clear!");
       this.showGameClearScreen();
       SoundManager.getInstance().playBGM("bgm_home");
     });
@@ -206,7 +197,6 @@ export default class GameScene extends Phaser.Scene {
 
     this.events.on("add-resource", (amount: number) => {
       this.runeManager.addResource(amount);
-      console.log(`Resource added: +${amount} (from thief death)`);
     });
   }
 
@@ -214,7 +204,6 @@ export default class GameScene extends Phaser.Scene {
     if (!cardId) return;
 
     this.cardManager.returnCard(cardId);
-    console.log(`Card returned to deck: ${cardId}`);
 
     for (let i = 0; i < this.cardManager.getCards().length; i++) {
       const card = this.cardManager.getCards()[i];
@@ -324,7 +313,6 @@ export default class GameScene extends Phaser.Scene {
     const cost = card.getCost();
 
     if (!this.runeManager.spendResource(cost)) {
-      console.log("Not enough resources!");
       return;
     }
 
@@ -340,10 +328,6 @@ export default class GameScene extends Phaser.Scene {
 
     this.cardManager.useCard(cardId);
 
-    console.log(
-      `Spawned ${heroType} hero for ${cost} resources (cardId: ${cardId})`
-    );
-
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {
       this.cardManager.replaceCard(cardIndex);
@@ -354,7 +338,6 @@ export default class GameScene extends Phaser.Scene {
     const cost = card.getCost();
 
     if (!this.runeManager.spendResource(cost)) {
-      console.log("Not enough resources!");
       return;
     }
 
@@ -376,7 +359,6 @@ export default class GameScene extends Phaser.Scene {
     };
 
     if (!skill.canExecute(context)) {
-      console.log("Cannot execute skill");
       this.runeManager.addResource(cost);
       return;
     }
@@ -388,10 +370,6 @@ export default class GameScene extends Phaser.Scene {
     if (skill.isConsumable()) {
       this.cardManager.removeCardFromPool(cardId);
     }
-
-    console.log(
-      `Used skill ${skill.getName()} for ${cost} resources (cardId: ${cardId})`
-    );
 
     const cardIndex = this.cardManager.getCards().indexOf(card);
     if (cardIndex !== -1) {
@@ -414,7 +392,6 @@ export default class GameScene extends Phaser.Scene {
       width: 300,
       height: 100,
       onClick: () => {
-        console.log("Start button clicked!");
         this.startGame();
         this.startButton.destroy();
       },
@@ -438,14 +415,10 @@ export default class GameScene extends Phaser.Scene {
     this.resourceUI.setVisible(false);
 
     this.rewardCardUI.showRewardSelection((selectedCard) => {
-      console.log("Selected reward card:", selectedCard);
-
       // Card is already added to deck in RewardCardUI.handleConfirm()
       // Just log the result here
       if (selectedCard) {
-        console.log(`Card selection confirmed: ${selectedCard.name}`);
       } else {
-        console.log("Reward skipped");
       }
 
       this.cardManager.setVisible(true);

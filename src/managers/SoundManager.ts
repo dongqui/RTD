@@ -69,14 +69,16 @@ export class SoundManager {
   /**
    * Play a sound effect
    */
-  public play(soundKey: string, config?: SoundConfig): Phaser.Sound.BaseSound | null {
+  public play(
+    soundKey: string,
+    config?: SoundConfig
+  ): Phaser.Sound.BaseSound | null {
     if (!this.scene) {
-      console.warn('[SoundManager] Scene not initialized');
+      console.warn("[SoundManager] Scene not initialized");
       return null;
     }
 
     if (this._isMuted) {
-      console.log('[SoundManager] Sound is muted');
       return null;
     }
 
@@ -85,7 +87,6 @@ export class SoundManager {
       volume: (config?.volume ?? 1.0) * this._masterVolume,
     };
 
-    console.log('[SoundManager] Playing sound:', soundKey, 'with config:', finalConfig);
     this.scene.sound.play(soundKey, finalConfig);
     return this.scene.sound.get(soundKey);
   }
@@ -93,18 +94,20 @@ export class SoundManager {
   /**
    * Play a sound with a delay
    */
-  public playDelayed(soundKey: string, delay: number, config?: SoundConfig): void {
+  public playDelayed(
+    soundKey: string,
+    delay: number,
+    config?: SoundConfig
+  ): void {
     if (!this.scene) {
-      console.warn('[SoundManager] playDelayed - Scene not initialized');
+      console.warn("[SoundManager] playDelayed - Scene not initialized");
       return;
     }
 
     if (this._isMuted) {
-      console.log('[SoundManager] playDelayed - Sound is muted');
       return;
     }
 
-    console.log('[SoundManager] playDelayed - Scheduling sound:', soundKey, 'delay:', delay);
     this.scene.time.delayedCall(delay, () => {
       this.play(soundKey, config);
     });
@@ -202,7 +205,7 @@ export class SoundManager {
    */
   public playBGM(bgmKey: string): void {
     if (!this.scene) {
-      console.warn('[SoundManager] playBGM - Scene not initialized');
+      console.warn("[SoundManager] playBGM - Scene not initialized");
       return;
     }
 
@@ -226,7 +229,6 @@ export class SoundManager {
     });
     this.currentBGM.play();
     this.currentBGMKey = bgmKey;
-    console.log('[SoundManager] Playing BGM:', bgmKey);
   }
 
   /**
@@ -245,7 +247,7 @@ export class SoundManager {
    */
   public setBGMVolume(volume: number): void {
     this._bgmVolume = Phaser.Math.Clamp(volume, 0, 1);
-    if (this.currentBGM && 'setVolume' in this.currentBGM) {
+    if (this.currentBGM && "setVolume" in this.currentBGM) {
       (this.currentBGM as Phaser.Sound.WebAudioSound).setVolume(
         this._bgmVolume * this._masterVolume
       );

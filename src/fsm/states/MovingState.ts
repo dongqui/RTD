@@ -46,6 +46,5 @@ export class MovingState implements State<CombatEntity> {
     }
   }
 
-  exit(_entity: CombatEntity): void {
-  }
+  exit(_entity: CombatEntity): void {}
 }

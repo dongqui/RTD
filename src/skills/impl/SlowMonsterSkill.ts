@@ -1,5 +1,10 @@
 import { BaseSkill } from "../BaseSkill";
-import { SkillConfig, SkillContext, SkillEffectType, SkillSpec } from "../SkillTypes";
+import {
+  SkillConfig,
+  SkillContext,
+  SkillEffectType,
+  SkillSpec,
+} from "../SkillTypes";
 import { MoveSpeedEffect } from "../../fsm/effects/MoveSpeedEffect";
 
 export class SlowEnemySkill extends BaseSkill {
@@ -16,16 +21,13 @@ export class SlowEnemySkill extends BaseSkill {
     const enemies = context.enemyManager.getActiveEnemies();
 
     if (enemies.length === 0) {
-      console.log("No enemies to slow");
       return;
     }
 
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy) => {
       const effect = new MoveSpeedEffect(this.duration, this.multiplier);
       enemy.statusEffects.addEffect(effect);
     });
-
-    console.log(`Applied slow debuff to ${enemies.length} enemies`);
   }
 
   canExecute(context: SkillContext): boolean {

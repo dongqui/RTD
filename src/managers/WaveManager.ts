@@ -105,9 +105,6 @@ export class WaveManager {
     if (!this.scene) return;
 
     this.waveState = WaveState.COMPLETED;
-    console.log(
-      `Wave ${this.currentWave} completed! Killed: ${this.enemiesKilledThisWave}`
-    );
 
     this.scene.events.emit(
       "wave-completed",
@@ -132,14 +129,12 @@ export class WaveManager {
   private onAllWavesCompleted(): void {
     if (!this.scene) return;
 
-    console.log("All waves completed! Victory!");
     this.scene.events.emit("all-waves-completed");
   }
 
   onWaveFailed(): void {
     if (!this.scene) return;
 
-    console.log(`Wave ${this.currentWave} failed!`);
     this.scene.events.emit("wave-failed", this.currentWave);
   }
 

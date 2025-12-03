@@ -212,10 +212,9 @@ export class RewardCardUI extends Modal {
 
     this.onSelectCallback = onSelect;
     this.cardOptions = CardDrawManager.generateCardOptions(3);
-    console.log("Generated card options:", this.cardOptions);
 
     // Destroy previous card instances before clearing
-    this.cardInstances.forEach(card => card.destroy());
+    this.cardInstances.forEach((card) => card.destroy());
     this.cardInstances = [];
 
     // Clear previous content (don't destroy children as we already did it manually)

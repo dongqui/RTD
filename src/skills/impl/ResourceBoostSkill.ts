@@ -1,5 +1,10 @@
 import { BaseSkill } from "../BaseSkill";
-import { SkillConfig, SkillContext, SkillEffectType, SkillSpec } from "../SkillTypes";
+import {
+  SkillConfig,
+  SkillContext,
+  SkillEffectType,
+  SkillSpec,
+} from "../SkillTypes";
 
 export class ResourceBoostSkill extends BaseSkill {
   private amount: number;
@@ -10,12 +15,14 @@ export class ResourceBoostSkill extends BaseSkill {
   }
 
   execute(context: SkillContext): void {
-    context.resourceManager.addResource(this.amount);
-    console.log(`Resource boosted by ${this.amount}`);
+    context.runeManager.addResource(this.amount);
   }
 
   canExecute(context: SkillContext): boolean {
-    return context.resourceManager.getCurrentResource() < context.resourceManager.getMaxResource();
+    return (
+      context.runeManager.getCurrentResource() <
+      context.runeManager.getMaxResource()
+    );
   }
 }
 

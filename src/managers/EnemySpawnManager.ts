@@ -129,7 +129,6 @@ export class EnemySpawnManager {
   private onAllGroupsSpawned(): void {
     this.isSpawning = false;
     this.stop();
-    console.log("All spawn groups completed for this wave");
     this.scene.events.emit("wave-spawn-completed");
   }
 

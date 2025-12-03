@@ -34,7 +34,7 @@ export default class PlayerDeckManager {
 
   private initializeDefaultDeck(): void {
     const defaultHeroTypes: HeroType[] = [
-      "rush_knight",
+      "immortal_hero",
       "warrior",
       "archer",
       "lightning_wizard",
@@ -70,7 +70,6 @@ export default class PlayerDeckManager {
 
   addCard(card: Omit<CardData, "id">): boolean {
     if (this.cards.length >= this.MAX_CARDS) {
-      console.log("Deck is full!");
       return false;
     }
 

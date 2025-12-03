@@ -1,5 +1,10 @@
 import { BaseSkill } from "../BaseSkill";
-import { SkillConfig, SkillContext, SkillEffectType, SkillSpec } from "../SkillTypes";
+import {
+  SkillConfig,
+  SkillContext,
+  SkillEffectType,
+  SkillSpec,
+} from "../SkillTypes";
 
 export class HealAllSkill extends BaseSkill {
   private healAmount: number;
@@ -13,14 +18,12 @@ export class HealAllSkill extends BaseSkill {
     const heroes = context.heroManager.getActiveHeroes();
     let healedCount = 0;
 
-    heroes.forEach(hero => {
+    heroes.forEach((hero) => {
       if (!hero.isDead()) {
         hero.heal(this.healAmount);
         healedCount++;
       }
     });
-
-    console.log(`Healed ${healedCount} heroes for ${this.healAmount} HP each`);
   }
 
   canExecute(context: SkillContext): boolean {

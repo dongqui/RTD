@@ -21,7 +21,6 @@ export class AttackSpeedBoostSkill extends BaseSkill {
     const heroes = context.heroManager.getActiveHeroes();
 
     if (heroes.length === 0) {
-      console.log("No heroes to buff");
       return;
     }
 
@@ -29,8 +28,6 @@ export class AttackSpeedBoostSkill extends BaseSkill {
       const effect = new AttackSpeedEffect(this.duration, this.multiplier);
       hero.statusEffects.addEffect(effect);
     });
-
-    console.log(`Applied attack speed buff to ${heroes.length} heroes`);
   }
 
   canExecute(context: SkillContext): boolean {

@@ -45,12 +45,6 @@ export class StateMachine<T> {
     this.currentState = newState;
 
     this.currentState.enter(this.entity);
-
-    console.log(
-      `State transition: ${this.previousStateType || "null"} -> ${
-        this.currentStateType
-      }`
-    );
   }
 
   update(delta: number): void {
@@ -69,5 +63,31 @@ export class StateMachine<T> {
 
   isInState(stateType: BehaviorState): boolean {
     return this.currentStateType === stateType;
+  }
+
+  /**
+   * Force change state without checking canTransitionTo
+   * Used for special cases like revival from DEAD state
+   */
+  forceChangeState(newStateType: BehaviorState): void {
+    if (this.currentStateType === newStateType) {
+      return;
+    }
+
+    const newState = this.states.get(newStateType);
+    if (!newState) {
+      console.error(`State ${newStateType} not registered!`);
+      return;
+    }
+
+    if (this.currentState) {
+      this.currentState.exit(this.entity);
+    }
+
+    this.previousStateType = this.currentStateType;
+    this.currentStateType = newStateType;
+    this.currentState = newState;
+
+    this.currentState.enter(this.entity);
   }
 }
