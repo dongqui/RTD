@@ -26,13 +26,11 @@ export class ComposerUI {
 
     game.events.once("spine-ready", (spineObject: any) => {
       this.spineObject = spineObject;
-      console.log("UI received spine object");
       this.updateCharacterSkin();
     });
 
     game.events.once("preview-ready", (scene: any) => {
       this.previewManager.setScene(scene);
-      console.log("Preview system ready");
     });
   }
 
@@ -114,7 +112,10 @@ export class ComposerUI {
 
     // 첫 번째 카테고리를 초기 표시
     if (sortedCategories.length > 0) {
-      this.showCategoryParts(sortedCategories[0], categories[sortedCategories[0]]);
+      this.showCategoryParts(
+        sortedCategories[0],
+        categories[sortedCategories[0]]
+      );
     }
 
     this.setupLazyLoading();
@@ -197,20 +198,15 @@ export class ComposerUI {
 
   updateCharacterSkin() {
     if (!this.spineObject) {
-      console.log("Spine object not ready yet");
       return;
     }
-
-    console.log("Updating skin with parts:", this.selectedParts);
 
     const customSkin = new Skin("custom");
 
     this.selectedParts.forEach((skinName) => {
       const skin = this.spineObject.skeleton.data.findSkin(skinName);
-      console.log(skin);
 
       if (skin) {
-        console.log("Adding skin:", skinName);
         customSkin.addSkin(skin);
       } else {
         console.warn("Skin not found:", skinName);
@@ -221,7 +217,6 @@ export class ComposerUI {
     this.spineObject.skeleton.setSlotsToSetupPose();
 
     this.applyColors();
-    console.log("Skin updated successfully");
   }
 
   private applyColors() {
@@ -236,7 +231,13 @@ export class ComposerUI {
       "arm_l",
     ];
 
-    const hairSlots: string[] = ["hair_long", "beard", "brow", "hair", "helmet_hair"];
+    const hairSlots: string[] = [
+      "hair_long",
+      "beard",
+      "brow",
+      "hair",
+      "helmet_hair",
+    ];
 
     const skinRgb = this.hexToRgb(this.skinColor);
     skinSlots.forEach((slotName) => {
@@ -292,7 +293,7 @@ ${formattedParts}
     const outputData = {
       skinColor: this.skinColor,
       hairColor: this.hairColor,
-      skinKeys: this.selectedParts
+      skinKeys: this.selectedParts,
     };
 
     jsonOutput.innerHTML = `<code>${JSON.stringify(
@@ -353,7 +354,7 @@ ${formattedParts}
       const outputData = {
         skinColor: this.skinColor,
         hairColor: this.hairColor,
-        skinKeys: this.selectedParts
+        skinKeys: this.selectedParts,
       };
 
       const text = JSON.stringify(outputData, null, 2);
@@ -402,25 +403,31 @@ ${formattedParts}
       this.updateOutput();
     });
 
-    document.getElementById("export-image-btn")!.addEventListener("click", () => {
-      const unitTypeInput = document.getElementById("unit-type-input") as HTMLInputElement;
-      const unitType = unitTypeInput.value.trim();
+    document
+      .getElementById("export-image-btn")!
+      .addEventListener("click", () => {
+        const unitTypeInput = document.getElementById(
+          "unit-type-input"
+        ) as HTMLInputElement;
+        const unitType = unitTypeInput.value.trim();
 
-      if (!unitType) {
-        alert("유닛 타입을 입력해주세요! (예: warrior, archer, lightning_wizard, frozen_wizard)");
-        return;
-      }
+        if (!unitType) {
+          alert(
+            "유닛 타입을 입력해주세요! (예: warrior, archer, lightning_wizard, frozen_wizard)"
+          );
+          return;
+        }
 
-      const game = (window as any).game as Phaser.Game;
-      const scene = game.scene.getScene("ComposerScene") as any;
+        const game = (window as any).game as Phaser.Game;
+        const scene = game.scene.getScene("ComposerScene") as any;
 
-      if (scene && scene.captureCharacter) {
-        scene.captureCharacter(unitType);
-        alert(`이미지가 unit_portrait_${unitType}.png 로 저장됩니다!`);
-      } else {
-        console.error("Scene not found or captureCharacter method missing");
-      }
-    });
+        if (scene && scene.captureCharacter) {
+          scene.captureCharacter(unitType);
+          alert(`이미지가 unit_portrait_${unitType}.png 로 저장됩니다!`);
+        } else {
+          console.error("Scene not found or captureCharacter method missing");
+        }
+      });
   }
 
   createPartItemGrid(skinName: string): HTMLElement {
@@ -534,7 +541,7 @@ ${formattedParts}
     presets[name] = {
       skinKeys: [...this.selectedParts],
       skinColor: this.skinColor,
-      hairColor: this.hairColor
+      hairColor: this.hairColor,
     };
     localStorage.setItem("character-presets", JSON.stringify(presets));
     this.loadPresets();
@@ -596,8 +603,12 @@ ${formattedParts}
       this.skinColor = preset.skinColor || "#32323c";
       this.hairColor = preset.hairColor || "#8b4513";
 
-      const skinColorInput = document.getElementById("skin-color") as HTMLInputElement;
-      const hairColorInput = document.getElementById("hair-color") as HTMLInputElement;
+      const skinColorInput = document.getElementById(
+        "skin-color"
+      ) as HTMLInputElement;
+      const hairColorInput = document.getElementById(
+        "hair-color"
+      ) as HTMLInputElement;
       if (skinColorInput) skinColorInput.value = this.skinColor;
       if (hairColorInput) hairColorInput.value = this.hairColor;
     }

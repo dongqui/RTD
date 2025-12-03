@@ -25,20 +25,11 @@ export default class ComposerScene extends Phaser.Scene {
   }
 
   create() {
-    console.log("ComposerScene created");
     this.spineObject = this.add.spine(
       this.scale.gameSize.width / 2,
       this.scale.gameSize.height / 2 + 100,
       "fantasy_character",
       "fantasy_character-atlas"
-    );
-
-    console.log("Spine object created:", this.spineObject);
-    console.log("Available skins:", this.spineObject.skeleton.data.skins);
-
-    console.log(
-      "Available slots:",
-      this.spineObject.skeleton.slots.map((s: any) => s.data.name)
     );
 
     (window as any).spineObject = this.spineObject;
@@ -130,7 +121,9 @@ export default class ComposerScene extends Phaser.Scene {
   ): Promise<string> {
     return new Promise((resolve) => {
       try {
-        console.log(`Generating preview for: ${partName}, size: ${width}x${height}`);
+        console.log(
+          `Generating preview for: ${partName}, size: ${width}x${height}`
+        );
 
         // RenderTexture를 (0, 0)에 생성
         const renderTexture = this.add.renderTexture(0, 0, width, height);
@@ -164,29 +157,37 @@ export default class ComposerScene extends Phaser.Scene {
         const scale = (height * 0.7) / spineHeight;
         tempSpine.setScale(scale);
 
-        console.log(`Rendering ${partName} at position: ${width / 2}, ${height / 2 + 100}, scale: ${scale}`);
+        console.log(
+          `Rendering ${partName} at position: ${width / 2}, ${
+            height / 2 + 100
+          }, scale: ${scale}`
+        );
 
         // 렌더링 - tempSpine을 renderTexture에 그림
         renderTexture.draw(tempSpine);
 
         // base64로 변환
-        renderTexture.snapshot((snapshot: Phaser.Display.Color | HTMLImageElement) => {
-          let dataURL: string;
+        renderTexture.snapshot(
+          (snapshot: Phaser.Display.Color | HTMLImageElement) => {
+            let dataURL: string;
 
-          if (snapshot instanceof HTMLImageElement) {
-            dataURL = snapshot.src;
-            console.log(`Preview generated for ${partName}, length: ${dataURL.length}`);
-          } else {
-            console.warn(`Snapshot returned Color object for ${partName}`);
-            dataURL = this.getPlaceholderImage();
+            if (snapshot instanceof HTMLImageElement) {
+              dataURL = snapshot.src;
+              console.log(
+                `Preview generated for ${partName}, length: ${dataURL.length}`
+              );
+            } else {
+              console.warn(`Snapshot returned Color object for ${partName}`);
+              dataURL = this.getPlaceholderImage();
+            }
+
+            // 정리
+            renderTexture.destroy();
+            tempSpine.destroy();
+
+            resolve(dataURL);
           }
-
-          // 정리
-          renderTexture.destroy();
-          tempSpine.destroy();
-
-          resolve(dataURL);
-        });
+        );
       } catch (error) {
         console.error(`Failed to generate preview for ${partName}:`, error);
         resolve(this.getPlaceholderImage());
