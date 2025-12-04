@@ -11,7 +11,10 @@ export type HeroType =
   | "rush_knight"
   | "paladin"
   | "barbarian"
-  | "immortal_hero";
+  | "immortal_hero"
+  | "mace_knight"
+  | "priest"
+  | "ranger";
 
 export interface HeroStats {
   health: number;

@@ -10,6 +10,9 @@ import "./LightningWizardHero";
 import "./Paladin";
 import "./Barbarian";
 import "./ImmortalHero";
+import "./MaceHero";
+import "./PriestHero";
+import "./RangerHero";
 
 export { HeroRegistry } from "./HeroRegistry";
 export type { HeroType, HeroSpec } from "./HeroRegistry";

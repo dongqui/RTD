@@ -63,6 +63,18 @@
         "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
       },
       {
+        "type": "spritesheet",
+        "key": "heal",
+        "url": "assets/skills/heal.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
+      {
+        "type": "spritesheet",
+        "key": "stun",
+        "url": "assets/skills/stun.png",
+        "frameConfig": { "frameWidth": 64, "frameHeight": 64 }
+      },
+      {
         "type": "image",
         "key": "background_game",
         "url": "assets/Background_04.png"
@@ -216,6 +228,21 @@
         "type": "image",
         "key": "unit_portrait_immortal_hero",
         "url": "assets/portraits/unit_portrait_immortal_hero.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_mace_knight",
+        "url": "assets/portraits/unit_portrait_mace_knight.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_priest",
+        "url": "assets/portraits/unit_portrait_priest.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_ranger",
+        "url": "assets/portraits/unit_portrait_ranger.png"
       },
       {
         "type": "image",

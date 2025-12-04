@@ -8,6 +8,7 @@ import { MovingState } from "../fsm/states/MovingState";
 import { AttackingState } from "../fsm/states/AttackingState";
 import { DeadState } from "../fsm/states/DeadState";
 import { RevivingState } from "../fsm/states/RevivingState";
+import { StunnedState } from "../fsm/states/StunnedState";
 import Base from "../Base";
 import { HealthBar } from "../ui/HealthBar";
 import { SoundManager } from "../managers/SoundManager";
@@ -62,6 +63,7 @@ export abstract class BaseUnit implements CombatEntity {
       BehaviorState.REVIVING,
       new RevivingState()
     );
+    this.stateMachine.registerState(BehaviorState.STUNNED, new StunnedState());
 
     // Don't initialize state here - let subclass finish construction first
   }
@@ -213,7 +215,17 @@ export abstract class BaseUnit implements CombatEntity {
   }
 
   playStunAnimation(): void {
+    // Hit 애니메이션 재생
     this.playHitAnimation();
+
+    // Hit 스파인 애니메이션도 재생
+    if (this.spineObject) {
+      this.spineObject.animationState.setAnimation(
+        0,
+        BaseUnit.HIT_ANIM_KEY,
+        false
+      );
+    }
   }
 
   heal(amount: number): void {
