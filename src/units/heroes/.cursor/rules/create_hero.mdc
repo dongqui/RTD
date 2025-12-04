@@ -1,0 +1,11 @@
+---
+description: 영웅 클래스 만들 때 따라야 할 룰
+alwaysApply: false
+---
+
+1. 보통 필요한 spec을 주석으로 제공할 것임. 그 주석을 spec으로 정의 - 근거리 공격은 WarriorHero, 원거리 공격은 Archer 참고해서 기본 세팅 맞추기
+2. portrait image 를 asset-pack.json에 추가 (assets/prtraits 에 이미지 넣어둘 것임)
+3. heroes/index 로 import
+4. 특성은 fsm를 활용하거나, 개별적으로 정의하기
+
+---
