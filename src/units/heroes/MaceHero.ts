@@ -63,7 +63,7 @@ export const maceSpec: HeroSpec = {
       "brow/brow_f_5",
       "eyes/eyes_f_14",
       "gear_left/gear_left_f_11",
-      "gear_right/gear_right_f_10",
+      "gear_right/gear_right_f_8",
       "helmet/helmet_f_4",
       "skin/skin_1",
       "top/top_f_4",
