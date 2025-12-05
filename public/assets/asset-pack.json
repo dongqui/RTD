@@ -432,6 +432,16 @@
         "type": "audio",
         "key": "speedup",
         "url": "assets/sounds/speedup.wav"
+      },
+      {
+        "type": "audio",
+        "key": "fire",
+        "url": "assets/sounds/fire.wav"
+      },
+      {
+        "type": "audio",
+        "key": "ice",
+        "url": "assets/skills/ice.wav"
       }
     ]
   },

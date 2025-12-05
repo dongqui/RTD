@@ -2,6 +2,7 @@ import { BaseHero } from "./BaseHero";
 import { CombatEntity } from "../../fsm/CombatEntity";
 import Base from "../../Base";
 import { HeroSpec, HeroRegistry } from "./HeroRegistry";
+import { SoundManager } from "../../managers/SoundManager";
 
 export class FrozenWizardHero extends BaseHero {
   private static frozenAnimCreated: boolean = false;
@@ -42,6 +43,10 @@ export class FrozenWizardHero extends BaseHero {
   protected performAttack(target: CombatEntity | Base): void {
     this.showFrozenEffect(target);
     this.dealAoeDamage(target);
+  }
+
+  protected onAttack(_target: CombatEntity | Base): void {
+    SoundManager.getInstance().play("ice", { volume: 0.6 });
   }
 
   private showFrozenEffect(target: CombatEntity | Base): void {

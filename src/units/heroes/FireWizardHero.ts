@@ -2,6 +2,7 @@ import { BaseHero } from "./BaseHero";
 import { CombatEntity } from "../../fsm/CombatEntity";
 import Base from "../../Base";
 import { HeroSpec, HeroRegistry } from "./HeroRegistry";
+import { SoundManager } from "../../managers/SoundManager";
 
 export class FireWizardHero extends BaseHero {
   private static fireAnimCreated: boolean = false;
@@ -27,6 +28,10 @@ export class FireWizardHero extends BaseHero {
   protected performAttack(target: CombatEntity | Base): void {
     this.showFireEffect(target);
     this.dealAoeDamage(target);
+  }
+
+  protected onAttack(_target: CombatEntity | Base): void {
+    SoundManager.getInstance().play("fire", { volume: 0.6 });
   }
 
   private showFireEffect(target: CombatEntity | Base): void {
