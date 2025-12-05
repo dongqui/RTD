@@ -30,29 +30,11 @@ export class CrazyKnightHero extends BaseHero {
     }
   }
 
-  private onEnemyKilled(enemy: BaseEnemy): void {
+  private onEnemyKilled(): void {
     // 주변 적이 죽었는지 확인
-    if (!this.spineObject || !this.spineObject.active) {
-      return;
-    }
-
-    // BaseEnemy.onDeath()에서 이벤트를 먼저 emit하므로 spineObject는 아직 존재함
-    if (!enemy.spineObject) {
-      return;
-    }
-
-    const distance = Phaser.Math.Distance.Between(
-      this.spineObject.x,
-      this.spineObject.y,
-      enemy.spineObject.x,
-      enemy.spineObject.y
-    );
-
-    if (distance <= this.detectionRadius) {
-      this.attackStack++;
-      this.updateAttackDamage();
-      this.updateAttackStackUI();
-    }
+    this.attackStack++;
+    this.updateAttackDamage();
+    this.updateAttackStackUI();
   }
 
   private updateAttackDamage(): void {
