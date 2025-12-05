@@ -419,8 +419,6 @@ export abstract class BaseUnit implements CombatEntity {
    * Override in subclasses to emit custom events
    */
   onDeath(): void {
-    console.log("onDeath");
-    // Override in subclasses to emit death events
     this.healthBar.destroy();
     if (this.spineObject) {
       this.spineObject.destroy();

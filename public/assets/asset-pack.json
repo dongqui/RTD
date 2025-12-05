@@ -92,6 +92,7 @@
         "url": "assets/skills/slash_dark.png",
         "frameConfig": { "frameWidth": 128, "frameHeight": 128, "endFrame": 10 }
       },
+
       {
         "type": "image",
         "key": "background_game",
@@ -281,6 +282,11 @@
         "type": "image",
         "key": "unit_portrait_dark_knight",
         "url": "assets/portraits/unit_portrait_dark_knight.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_crazy_knight",
+        "url": "assets/portraits/unit_portrait_crazy_knight.png"
       },
       {
         "type": "image",

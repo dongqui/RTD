@@ -18,7 +18,8 @@ export type HeroType =
   | "bomb"
   | "lee"
   | "crossbow"
-  | "dark_knight";
+  | "dark_knight"
+  | "crazy_knight";
 
 export interface HeroStats {
   health: number;
