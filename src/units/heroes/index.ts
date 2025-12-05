@@ -16,6 +16,7 @@ import "./RangerHero";
 import "./BombHero";
 import "./LeeHero";
 import "./CrossBowHero";
+import "./DarkKnight";
 
 export { HeroRegistry } from "./HeroRegistry";
 export type { HeroType, HeroSpec } from "./HeroRegistry";
