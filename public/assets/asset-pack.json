@@ -75,6 +75,18 @@
         "frameConfig": { "frameWidth": 64, "frameHeight": 64 }
       },
       {
+        "type": "spritesheet",
+        "key": "bomb",
+        "url": "assets/skills/bomb.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
+      {
+        "type": "spritesheet",
+        "key": "firebolt",
+        "url": "assets/skills/firebolt.png",
+        "frameConfig": { "frameWidth": 48, "frameHeight": 48 }
+      },
+      {
         "type": "image",
         "key": "background_game",
         "url": "assets/Background_04.png"
@@ -246,6 +258,21 @@
       },
       {
         "type": "image",
+        "key": "unit_portrait_bomb",
+        "url": "assets/portraits/unit_portrait_bomb.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_lee",
+        "url": "assets/portraits/unit_portrait_lee.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_crossbow",
+        "url": "assets/portraits/unit_portrait_crossbow.png"
+      },
+      {
+        "type": "image",
         "key": "icon_health",
         "url": "assets/icons/icon_health.png"
       },
@@ -373,6 +400,21 @@
         "type": "audio",
         "key": "bgm_battle",
         "url": "assets/sounds/bgm_battle.mp3"
+      },
+      {
+        "type": "audio",
+        "key": "heal",
+        "url": "assets/sounds/heal.wav"
+      },
+      {
+        "type": "audio",
+        "key": "bomb",
+        "url": "assets/sounds/bomb.wav"
+      },
+      {
+        "type": "audio",
+        "key": "speedup",
+        "url": "assets/sounds/speedup.wav"
       }
     ]
   },

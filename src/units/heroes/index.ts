@@ -13,6 +13,9 @@ import "./ImmortalHero";
 import "./MaceHero";
 import "./PriestHero";
 import "./RangerHero";
+import "./BombHero";
+import "./LeeHero";
+import "./CrossBowHero";
 
 export { HeroRegistry } from "./HeroRegistry";
 export type { HeroType, HeroSpec } from "./HeroRegistry";
