@@ -92,7 +92,7 @@ export class PriestHero extends BaseHero {
 
   protected onAttack(_target: CombatEntity | Base): void {
     // 힐 사운드 재생
-    SoundManager.getInstance().playDelayed("sound_hit", 50, { volume: 0.3 });
+    SoundManager.getInstance().play("heal", { volume: 0.4 });
   }
 }
 
