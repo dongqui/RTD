@@ -33,7 +33,11 @@ export default class PlayerDeckManager {
   }
 
   private initializeDefaultDeck(): void {
-    const defaultHeroTypes: HeroType[] = ["dark_mage"];
+    const defaultHeroTypes: HeroType[] = [
+      "frost_knight",
+      "mage",
+      "barbarian_mercenary",
+    ];
 
     const heroCards: CardData[] = defaultHeroTypes.map((type) => {
       const spec = HeroRegistry.getSpec(type);

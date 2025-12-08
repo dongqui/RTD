@@ -19,7 +19,8 @@ export class MageHero extends BaseHero {
       target,
       this.getAttackDamage(),
       "energyball",
-      550
+      550,
+      0.5
     );
 
     this.projectiles.push(projectile);

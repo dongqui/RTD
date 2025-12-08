@@ -16,7 +16,8 @@ export class Projectile {
     target: CombatEntity | Base,
     damage: number,
     textureKey: string = "Arrow",
-    speed: number = 600
+    speed: number = 600,
+    scale: number = 1
   ) {
     this.scene = scene;
     this.target = target;
@@ -24,7 +25,7 @@ export class Projectile {
     this.speed = speed;
 
     this.sprite = scene.add.image(x, y, textureKey);
-    this.sprite.setScale(1);
+    this.sprite.setScale(scale);
     this.sprite.setDepth(100);
 
     const angle = Phaser.Math.Angle.Between(x, y, target.getX(), target.getY());
