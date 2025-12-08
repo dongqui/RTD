@@ -1,5 +1,6 @@
 import { CombatEntity } from "../CombatEntity";
 import { StatusEffect, EffectType } from "./StatusEffect";
+import { StatusEffectIconManager } from "./StatusEffectIconManager";
 
 export class StatusEffectManager {
   private entity: CombatEntity;
@@ -8,15 +9,28 @@ export class StatusEffectManager {
   private attackSpeedMultipliers: Map<string, number> = new Map();
   private attackDamageMultipliers: Map<string, number> = new Map();
   private baseSpeedMultiplier: number = 1.0;
+  private iconManager: StatusEffectIconManager | null = null;
 
   constructor(entity: CombatEntity) {
     this.entity = entity;
     this.effects = new Map();
   }
 
+  initialize(scene: Phaser.Scene): void {
+    if (!this.iconManager) {
+      this.iconManager = new StatusEffectIconManager(this.entity, scene);
+    }
+  }
+
   addEffect(effect: StatusEffect): void {
     effect.apply(this.entity);
     this.effects.set(effect.getId(), effect);
+
+    // 아이콘 설정이 있으면 아이콘 추가
+    const iconConfig = effect.getIconConfig();
+    if (iconConfig && this.iconManager) {
+      this.iconManager.addIcon(effect.getId(), iconConfig);
+    }
   }
 
   removeEffect(id: string): void {
@@ -24,6 +38,11 @@ export class StatusEffectManager {
     if (effect) {
       effect.remove(this.entity);
       this.effects.delete(id);
+
+      // 아이콘 제거
+      if (this.iconManager) {
+        this.iconManager.removeIcon(id);
+      }
     }
   }
 
@@ -63,6 +82,12 @@ export class StatusEffectManager {
   clear(): void {
     this.effects.forEach((effect) => effect.remove(this.entity));
     this.effects.clear();
+
+    // 아이콘 매니저 정리
+    if (this.iconManager) {
+      this.iconManager.clear();
+      this.iconManager = null;
+    }
   }
 
   getEffectCount(): number {

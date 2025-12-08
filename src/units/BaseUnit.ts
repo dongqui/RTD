@@ -294,6 +294,9 @@ export abstract class BaseUnit implements CombatEntity {
 
     this.healthBar = new HealthBar(this.scene, x, y - 100);
     this.healthBar.setVisible(false);
+
+    // Initialize status effect icon manager
+    this.statusEffects.initialize(this.scene);
   }
 
   /**

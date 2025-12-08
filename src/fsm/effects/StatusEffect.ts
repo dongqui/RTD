@@ -1,4 +1,5 @@
 import { CombatEntity } from "../CombatEntity";
+import { EffectIconConfig } from "./StatusEffectIconManager";
 
 export enum EffectType {
   ATTACK_SPEED = "attack_speed",
@@ -23,6 +24,11 @@ export abstract class StatusEffect {
 
   abstract apply(entity: CombatEntity): void;
   abstract remove(entity: CombatEntity): void;
+
+  // 아이콘 설정을 반환하는 메서드 (옵션)
+  getIconConfig(): EffectIconConfig | null {
+    return null;
+  }
 
   update(delta: number): void {
     this.remainingTime = Math.max(0, this.remainingTime - delta);
