@@ -188,6 +188,20 @@ export default class InGameCardManager {
     return this.cards;
   }
 
+  getCardById(cardId: string): CardPool | undefined {
+    const usedCard = this.usedCards.get(cardId);
+    if (usedCard) {
+      return usedCard;
+    }
+
+    return this.availableCards.find((card) => card.id === cardId);
+  }
+
+  removeUsedCard(cardId: string): void {
+    this.usedCards.delete(cardId);
+    this.cardsInHand.delete(cardId);
+  }
+
   useCard(cardId: string): void {
     const cardIndex = this.availableCards.findIndex(
       (card) => card.id === cardId

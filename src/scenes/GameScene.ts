@@ -195,15 +195,42 @@ export default class GameScene extends Phaser.Scene {
       this.onHeroDied(cardId);
     });
 
+    this.events.on("barbarian-mercenary-died", (cardId: string) => {
+      this.onBarbarianMercenaryDied(cardId);
+    });
+
     this.events.on("add-resource", (amount: number) => {
       this.runeManager.addResource(amount);
     });
   }
 
   private onHeroDied(cardId: string): void {
-    if (!cardId) return;
+    if (!cardId || !this.cardManager) return;
+
+    const cardData = this.cardManager.getCardById(cardId);
+    if (cardData?.type === "barbarian_mercenary") {
+      return; // 전용 처리 루틴에서만 소모 처리
+    }
 
     this.cardManager.returnCard(cardId);
+
+    for (let i = 0; i < this.cardManager.getCards().length; i++) {
+      const card = this.cardManager.getCards()[i];
+      if (!card) {
+        this.cardManager.replaceCard(i);
+        break;
+      }
+    }
+
+    this.updateCardStates();
+  }
+
+  private onBarbarianMercenaryDied(cardId: string): void {
+    if (!cardId || !this.cardManager) return;
+
+    this.cardManager.removeUsedCard(cardId);
+    this.cardManager.removeCardFromPool(cardId);
+    PlayerDeckManager.getInstance().removeCard(cardId);
 
     for (let i = 0; i < this.cardManager.getCards().length; i++) {
       const card = this.cardManager.getCards()[i];

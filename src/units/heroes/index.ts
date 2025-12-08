@@ -9,6 +9,7 @@ import "./FrozenWizardHero";
 import "./LightningWizardHero";
 import "./Paladin";
 import "./Barbarian";
+import "./BarbarianMercenary";
 import "./ImmortalHero";
 import "./MaceHero";
 import "./PriestHero";

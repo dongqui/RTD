@@ -11,6 +11,7 @@ export type HeroType =
   | "rush_knight"
   | "paladin"
   | "barbarian"
+  | "barbarian_mercenary"
   | "immortal_hero"
   | "mace_knight"
   | "priest"
