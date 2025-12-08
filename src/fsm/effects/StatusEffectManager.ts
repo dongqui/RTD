@@ -6,6 +6,7 @@ export class StatusEffectManager {
   private effects: Map<string, StatusEffect>;
   private speedMultipliers: Map<string, number> = new Map();
   private attackSpeedMultipliers: Map<string, number> = new Map();
+  private attackDamageMultipliers: Map<string, number> = new Map();
   private baseSpeedMultiplier: number = 1.0;
 
   constructor(entity: CombatEntity) {
@@ -56,11 +57,11 @@ export class StatusEffectManager {
       }
     });
 
-    expiredIds.forEach(id => this.removeEffect(id));
+    expiredIds.forEach((id) => this.removeEffect(id));
   }
 
   clear(): void {
-    this.effects.forEach(effect => effect.remove(this.entity));
+    this.effects.forEach((effect) => effect.remove(this.entity));
     this.effects.clear();
   }
 
@@ -113,5 +114,25 @@ export class StatusEffectManager {
     }
 
     this.entity.attackSpeedMultiplier = totalMultiplier;
+  }
+
+  registerAttackDamageMultiplier(effectId: string, multiplier: number): void {
+    this.attackDamageMultipliers.set(effectId, multiplier);
+    this.recalculateAttackDamageMultiplier();
+  }
+
+  unregisterAttackDamageMultiplier(effectId: string): void {
+    this.attackDamageMultipliers.delete(effectId);
+    this.recalculateAttackDamageMultiplier();
+  }
+
+  private recalculateAttackDamageMultiplier(): void {
+    let totalMultiplier = 1.0;
+
+    for (const multiplier of this.attackDamageMultipliers.values()) {
+      totalMultiplier *= multiplier;
+    }
+
+    this.entity.attackDamageMultiplier = totalMultiplier;
   }
 }

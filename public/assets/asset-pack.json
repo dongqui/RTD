@@ -92,6 +92,12 @@
         "url": "assets/skills/slash_dark.png",
         "frameConfig": { "frameWidth": 128, "frameHeight": 128, "endFrame": 10 }
       },
+      {
+        "type": "spritesheet",
+        "key": "dark",
+        "url": "assets/skills/dark.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
+      },
 
       {
         "type": "image",
@@ -285,6 +291,11 @@
       },
       {
         "type": "image",
+        "key": "unit_portrait_dark_mage",
+        "url": "assets/portraits/unit_portrait_dark_mage.png"
+      },
+      {
+        "type": "image",
         "key": "unit_portrait_crazy_knight",
         "url": "assets/portraits/unit_portrait_crazy_knight.png"
       },
@@ -442,6 +453,11 @@
         "type": "audio",
         "key": "ice",
         "url": "assets/skills/ice.wav"
+      },
+      {
+        "type": "audio",
+        "key": "dark",
+        "url": "assets/sounds/dark.wav"
       }
     ]
   },

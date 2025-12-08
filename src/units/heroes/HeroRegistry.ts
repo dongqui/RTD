@@ -19,7 +19,8 @@ export type HeroType =
   | "lee"
   | "crossbow"
   | "dark_knight"
-  | "crazy_knight";
+  | "crazy_knight"
+  | "dark_mage";
 
 export interface HeroStats {
   health: number;
