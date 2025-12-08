@@ -5,6 +5,7 @@ export class Projectile {
   private scene: Phaser.Scene;
   private sprite: Phaser.GameObjects.Image;
   private target: CombatEntity | Base;
+  private attacker: CombatEntity;
   private damage: number;
   private speed: number;
   private active: boolean = true;
@@ -14,6 +15,7 @@ export class Projectile {
     x: number,
     y: number,
     target: CombatEntity | Base,
+    attacker: CombatEntity,
     damage: number,
     textureKey: string = "Arrow",
     speed: number = 600,
@@ -21,6 +23,7 @@ export class Projectile {
   ) {
     this.scene = scene;
     this.target = target;
+    this.attacker = attacker;
     this.damage = damage;
     this.speed = speed;
 
@@ -47,7 +50,7 @@ export class Projectile {
     );
 
     if (distance < 10) {
-      this.target.takeDamage(this.damage);
+      this.target.takeDamage(this.damage, this.attacker);
       this.destroy();
       return false;
     }

@@ -22,6 +22,7 @@ export class EnemyArcher extends BaseEnemy {
       this.spineObject.x - 25,
       this.spineObject.y - 52,
       target,
+      this,
       this.getAttackDamage(),
       "arrow",
       600

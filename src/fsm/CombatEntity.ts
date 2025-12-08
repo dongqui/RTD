@@ -17,7 +17,7 @@ export interface CombatEntity {
   moveTowards(targetX: number, targetY: number, delta: number): void;
   findTarget(): CombatEntity | Base | null;
   attack(target: CombatEntity | Base): void;
-  takeDamage(damage: number): void;
+  takeDamage(damage: number, attacker?: CombatEntity): void;
   heal(amount: number): void;
 
   playIdleAnimation(): void;

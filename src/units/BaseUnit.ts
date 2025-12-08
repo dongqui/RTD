@@ -165,10 +165,10 @@ export abstract class BaseUnit implements CombatEntity {
   }
 
   protected performAttack(target: CombatEntity | Base): void {
-    target.takeDamage(this.getAttackDamage());
+    target.takeDamage(this.getAttackDamage(), this);
   }
 
-  takeDamage(damage: number): void {
+  takeDamage(damage: number, attacker?: CombatEntity): void {
     if (this.isDead()) {
       return;
     }

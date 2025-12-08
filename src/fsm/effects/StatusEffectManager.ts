@@ -23,13 +23,23 @@ export class StatusEffectManager {
   }
 
   addEffect(effect: StatusEffect): void {
+    const effectId = effect.getId();
+    const existingEffect = this.effects.get(effectId);
+
+    // 같은 ID의 효과가 이미 있으면 시간만 갱신
+    if (existingEffect) {
+      existingEffect.refresh(effect.getDuration());
+      return;
+    }
+
+    // 새로운 효과 적용
     effect.apply(this.entity);
-    this.effects.set(effect.getId(), effect);
+    this.effects.set(effectId, effect);
 
     // 아이콘 설정이 있으면 아이콘 추가
     const iconConfig = effect.getIconConfig();
     if (iconConfig && this.iconManager) {
-      this.iconManager.addIcon(effect.getId(), iconConfig);
+      this.iconManager.addIcon(effectId, iconConfig);
     }
   }
 

@@ -17,6 +17,7 @@ export class MageHero extends BaseHero {
       this.spineObject.x + 25,
       this.spineObject.y - 52,
       target,
+      this,
       this.getAttackDamage(),
       "energyball",
       550,

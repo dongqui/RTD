@@ -110,6 +110,12 @@
         "frameConfig": { "frameWidth": 128, "frameHeight": 128, "endFrame": 8 }
       },
       {
+        "type": "spritesheet",
+        "key": "frost_defence",
+        "url": "assets/skills/forst_defence.png",
+        "frameConfig": { "frameWidth": 128, "frameHeight": 128, "endFrame": 10 }
+      },
+      {
         "type": "image",
         "key": "background_game",
         "url": "assets/Background_04.png"

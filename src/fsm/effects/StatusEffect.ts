@@ -38,6 +38,10 @@ export abstract class StatusEffect {
     return this.remainingTime <= 0;
   }
 
+  refresh(duration?: number): void {
+    this.remainingTime = duration ?? this.duration;
+  }
+
   getType(): EffectType {
     return this.type;
   }
