@@ -23,9 +23,9 @@ export class AttackDamageEffect extends StatusEffect {
 
   getIconConfig(): EffectIconConfig {
     return {
-      iconKey: "icon_swoard",
+      iconKey: this.multiplier < 1 ? "icon_weak" : "icon_weak",
       position: IconPosition.ABOVE_HEAD,
-      scale: 0.5,
+      scale: 0.3,
       alpha: 0.9,
     };
   }
