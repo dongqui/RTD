@@ -33,6 +33,11 @@
         "url": "assets/Arrow.png"
       },
       {
+        "type": "image",
+        "key": "energyball",
+        "url": "assets/energyball.png"
+      },
+      {
         "type": "spritesheet",
         "key": "warrior_run",
         "url": "assets/Warrior_Run.png",
@@ -98,7 +103,6 @@
         "url": "assets/skills/dark.png",
         "frameConfig": { "frameWidth": 128, "frameHeight": 128 }
       },
-
       {
         "type": "image",
         "key": "background_game",
@@ -186,6 +190,11 @@
       },
       {
         "type": "image",
+        "key": "icon_weak",
+        "url": "assets/icons/icon_weak.png"
+      },
+      {
+        "type": "image",
         "key": "icon_setting",
         "url": "assets/icons/icon_setting.png"
       },
@@ -203,6 +212,11 @@
         "type": "image",
         "key": "unit_portrait_archer",
         "url": "assets/portraits/unit_portrait_archer.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_mage",
+        "url": "assets/portraits/unit_portrait_mage.png"
       },
       {
         "type": "image",
@@ -243,6 +257,11 @@
         "type": "image",
         "key": "unit_portrait_barbarian",
         "url": "assets/portraits/unit_portrait_barbarian.png"
+      },
+      {
+        "type": "image",
+        "key": "unit_portrait_barbarian_mercenary",
+        "url": "assets/portraits/unit_portrait_barbarian_mercenary.png"
       },
       {
         "type": "image",

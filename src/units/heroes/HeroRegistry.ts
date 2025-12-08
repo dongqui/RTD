@@ -3,6 +3,7 @@ import { BaseHero } from "./BaseHero";
 export type HeroType =
   | "warrior"
   | "archer"
+  | "mage"
   | "lightning_wizard"
   | "frozen_wizard"
   | "fire_wizard"
